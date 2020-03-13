@@ -4,65 +4,85 @@ import { city } from "./city";
 import PickerExtend from 'picker-extend';
 import axios from 'axios';
 
-class init{
-    constructor(){
+axios.defaults.baseURL = '';
+axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+axios.defaults.crossDomain = true;
+axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
+axios.defaults.headers.common['Authorization'] = ''; // 设置请求头为 Authorization
+//配置发送请求前的拦截器 可以设置token信息 
+axios.interceptors.request.use(config => {
+    //loading开始
+    return config;
+}, error => {
+    //出错，也要loading结束
+    return Promise.reject(error);
+});
+
+class init {
+    constructor() {
         this.data = {};
         this.dom = document.querySelector('.submit');
         this.clone = document.querySelector('.module');
-        this._submit_ = this._submit_(location.href.substring(location.href.lastIndexOf('/') + 1, location.href.length - 5));
+        this._submit_ = this._submit_(location.href.substring(location.href.lastIndexOf('/') + 1).split('.')[0]);
     }
 
-    _input_(){
+    _input_() {
         document.querySelectorAll('input').forEach((element, index) => {
-            this.data[element.name] = element.value +`|${ element.getAttribute('placeholder') }`;
+            this.data[element.name] = element.value + `|${element.getAttribute('placeholder')}`;
         });
     }
 
-    _submit_(params){
-        this.dom.onclick = () => {  //提交
-            try {
-                this._input_();  //输出表单 内容
-                Object.keys(this.data).forEach((element, index) =>{  //检测 表单内容
-                    console.log(this.data)
-                    if(Object.values(this.data)[index].split('|')[0] != ''){
-                        console.log(element)
-                    }else{   
-                        throw new Error(Object.values(this.data)[index].split('|')[1] != 'null' ? Object.values(this.data)[index].split('|')[1]: `'${ element }' cannot be empty!`);
-                    }
-                });
-            } catch (error) {
-                this._alert_(error, 1000);
+    _submit_(params) {
+        try {
+            switch (params) {
+                case 'index':
+                    if (location.href.split('?').length < 2) location.href = './login.html';
+                    document.querySelector('input[name=number]').value = location.href.split('?')[1];
+                    document.querySelectorAll('.pullimage').forEach((element, index) => {  // 图片上传
+                        document.querySelectorAll('.pullimage')[index].onclick = domain => {
+                            this._image_(element.name, index);  //触发图片上传
+                        }
+                    });
+                    document.querySelectorAll('input[name=address]')[0].onclick = this._address_(); //地址选择事件
+                    this._enlarge_(); //注册示意图放大事件
+                    break;
+                case 'login':
+                    console.log('Temporary landing!!!');
+                    break;
+                default:
+                    throw new Error('not page action!');
             }
-        };
-        switch(params){
-            case 'index':
-                document.querySelectorAll('.pullimage').forEach((element, index) => {  // 图片上传
-                    document.querySelectorAll('.pullimage')[index].onclick = domain => {
-                        this._image_(element.name, index);  //触发图片上传
-                    }
-                });
-                document.querySelectorAll('input[name=address]')[0].onclick = this._address_(); //地址选择事件
-                this._enlarge_(); //注册示意图放大事件
-                break;
-            case 'login':
-
-                break;
-            default:
-                break;
+            this.dom.onclick = () => {  //提交
+                try {
+                    this._input_();  //输出表单 内容
+                    Object.keys(this.data).forEach((element, index) => {  //检测 表单内容
+                        if (Object.values(this.data)[index].split('|')[0] != '') {
+                            if (params == 'login') location.href = `./index.html?${this.data['number'].split('|')[0]}`;
+                            location.href = `./quality.html`;
+                        } else {
+                            throw new Error(Object.values(this.data)[index].split('|')[1] != 'null' ? Object.values(this.data)[index].split('|')[1] : `'${element}' cannot be empty!`);
+                        }
+                    });
+                } catch (error) {
+                    this._alert_(error, 1000);
+                }
+            };
+        } catch (error) {
+            console.log(error);
         }
     }
 
-    _address_(){  // 地址选择
+    _address_() {  // 地址选择
         let that = this;
         new PickerExtend({
             trigger: '#address',
             title: '单项选择',
-            wheels: [{data: city}],
-            position:[1], //初始化定位
-            callback:function(indexArr, data){
+            wheels: [{ data: city }],
+            position: [1], //初始化定位
+            callback: function (indexArr, data) {
                 document.querySelectorAll('input[name=address]')[0].value = (() => {
                     let code = [];
-                    data.forEach(element =>{
+                    data.forEach(element => {
                         code.push(element.value);
                     });
                     that.data['address'] = code.join(',');
@@ -72,7 +92,7 @@ class init{
         });
     }
 
-    _enlarge_(params){  //放大图片
+    _enlarge_(params) {  //放大图片
         document.querySelectorAll('.sketchmap').forEach((element, index) => {
             element.onclick = domain => {
                 this._show_('.image-show');
@@ -82,7 +102,7 @@ class init{
         })
     }
 
-    _alert_(xml, timeout, timer){  //提示框
+    _alert_(xml, timeout, timer) {  //提示框
         document.querySelector('.text-mudule').innerHTML = xml;
         document.querySelector('.text-mudule').style.display = 'block';
         timer = setTimeout(() => {
@@ -91,7 +111,7 @@ class init{
         }, timeout)
     }
 
-    _show_(className){  //显示方法
+    _show_(className) {  //显示方法
         document.querySelector('.module').style.display = 'block';
         document.querySelectorAll(className).forEach((element, index) => {
             document.querySelectorAll(className)[index].style.display = 'block';
@@ -101,14 +121,14 @@ class init{
         };
     }
 
-    _clone_(className){  //隐藏方法
+    _clone_(className) {  //隐藏方法
         document.querySelector('.module').style.display = 'none';
-        document.querySelectorAll(className).forEach((element, index) => { 
+        document.querySelectorAll(className).forEach((element, index) => {
             document.querySelectorAll(className)[index].style.display = 'none';
         });
     }
 
-    _image_(name, index){
+    _image_(name, index) {
         document.getElementsByClassName(name)[0].click();
         document.getElementsByClassName(name)[0].onchange = function (e) {
             var localFile = this.files[0];
@@ -149,16 +169,16 @@ class init{
                     //     }
                     // }).then(
                     //     response => {
-                            // let _imgBox = document.createElement('figure'), _img = document.createElement('img'), _clone = document.createElement('svg'), _use = document.createElement('use');
-                            // _imgBox.className = 'hash[imageBox]';
-                            // _img.src = response.data.realPath;
-                            // _imgBox.appendChild(_img);
-                            // _clone.className = 'icon';
-                            // _clone.setAttribute('aria-hidden', "true");
-                            // _use.setAttribute('xlink:href', "#ym-icon-guanbi");
-                            // _clone.appendChild(_use);
-                            // _imgBox.appendChild(_clone);
-                            // photo.appendChild(_imgBox);
+                    // let _imgBox = document.createElement('figure'), _img = document.createElement('img'), _clone = document.createElement('svg'), _use = document.createElement('use');
+                    // _imgBox.className = 'hash[imageBox]';
+                    // _img.src = response.data.realPath;
+                    // _imgBox.appendChild(_img);
+                    // _clone.className = 'icon';
+                    // _clone.setAttribute('aria-hidden', "true");
+                    // _use.setAttribute('xlink:href', "#ym-icon-guanbi");
+                    // _clone.appendChild(_use);
+                    // _imgBox.appendChild(_clone);
+                    // photo.appendChild(_imgBox);
                     //     }
                     // ).catch((error) => {
                     //     console.log(error);

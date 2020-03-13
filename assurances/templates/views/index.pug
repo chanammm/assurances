@@ -21,7 +21,7 @@ html(lang="en")
         .title 
             div 上传设备铭牌
             img.pullimage(src="../images/icon-pull-image.png", name="fileReader")
-            input(type="file" name="fileReader" class="fileReader" style="display:none;")
+            input(type="file" name="fileReader" accept="image/*" multiple class="fileReader" style="display:none;")
             div.sketchmap
                 span 示意图
                 img(src="../images/icon-sketchmap-image.png")
@@ -29,7 +29,7 @@ html(lang="en")
         .title 
             div 上传装机现场图片
             img.pullimage(src="../images/icon-pull-image.png", name="fileReaderTwo")
-            input(type="file" name="fileReaderTwo" class="fileReaderTwo" style="display:none;")
+            input(type="file" name="fileReaderTwo" accept="image/*" multiple class="fileReaderTwo" style="display:none;")
             div.sketchmap
                 span 示意图
                 img(src="../images/icon-sketchmap-shop-image.png")
