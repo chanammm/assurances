@@ -215,11 +215,12 @@ nav img {
   line-height: 40px;
   position: fixed;
   top: 50%;
-  left: 50%;
+  left: 0;
   z-index: 100;
   padding: 4px 30px;
   box-sizing: border-box;
   background-color: black;
+  width: -webkit-fill-available;
 }
 
 .image-show {

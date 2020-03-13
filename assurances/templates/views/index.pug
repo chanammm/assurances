@@ -16,12 +16,12 @@ html(lang="en")
         .title
             img.icons(src="../images/icon-qrcode.png") 
             div.disabled 设备编码
-            input(type="text" name="number" disabled)
+            input(type="text" name="number" disabled )
         .link
         .title 
             div 上传设备铭牌
             img.pullimage(src="../images/icon-pull-image.png", name="fileReader")
-            input(type="file" class="fileReader" style="display:none;")
+            input(type="file" name="fileReader" class="fileReader" style="display:none;")
             div.sketchmap
                 span 示意图
                 img(src="../images/icon-sketchmap-image.png")
@@ -29,7 +29,7 @@ html(lang="en")
         .title 
             div 上传装机现场图片
             img.pullimage(src="../images/icon-pull-image.png", name="fileReaderTwo")
-            input(type="file" class="fileReaderTwo" style="display:none;")
+            input(type="file" name="fileReaderTwo" class="fileReaderTwo" style="display:none;")
             div.sketchmap
                 span 示意图
                 img(src="../images/icon-sketchmap-shop-image.png")
@@ -51,7 +51,7 @@ html(lang="en")
         .title
             img.icons(src="../images/icon-address.png") 
             div.disabled 门店地址
-            input(type="text"  name="address" placeholder="请选择门店地址")
+            input(type="text" id="address" readonly="readonly" name="address" placeholder="选择门店地址")
         .link.ccc
         .title
             .icons
@@ -59,12 +59,12 @@ html(lang="en")
             input(type="text" name="detailed" placeholder="请输入详细地址")
         .link.ccc
         .submit 提交审核
-.module
-.alx-module
-    img(src="../images/icon-module.png", alt="")
-    .box
-        span 审核提交成功，请耐心等待
-        .submit.show 查看设备状态
-.text-mudule 请输入姓名
-.image-show
-    img(src="../images/icon-sketchmap-shop-image.png")
+    .module
+    .alx-module
+        img(src="../images/icon-module.png", alt="")
+        .box
+            span 审核提交成功，请耐心等待
+            .submit.show 查看设备状态
+    .text-mudule
+    .image-show
+        img(src="../images/icon-sketchmap-shop-image.png")

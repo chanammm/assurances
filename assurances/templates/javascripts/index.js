@@ -1,36 +1,75 @@
+"use strict";
 import '../stylesheets/style.min.css';
+import { city } from "./city";
+import PickerExtend from 'picker-extend';
+import axios from 'axios';
 
 class init{
     constructor(){
         this.data = {};
-        document.querySelectorAll('input').forEach((element, index) => {
-            this.data[element.name] = element.value;
-        })
         this.dom = document.querySelector('.submit');
+        this.clone = document.querySelector('.module');
         this._submit_ = this._submit_(location.href.substring(location.href.lastIndexOf('/') + 1, location.href.length - 5));
     }
 
+    _input_(){
+        document.querySelectorAll('input').forEach((element, index) => {
+            this.data[element.name] = element.value +`|${ element.getAttribute('placeholder') }`;
+        });
+    }
+
     _submit_(params){
-        // document.querySelector('.module').addEventListener('click', this._clone_());
-        console.log(document.querySelector('.module'));
+        this.dom.onclick = () => {  //提交
+            try {
+                this._input_();  //输出表单 内容
+                Object.keys(this.data).forEach((element, index) =>{  //检测 表单内容
+                    console.log(this.data)
+                    if(Object.values(this.data)[index].split('|')[0] != ''){
+                        console.log(element)
+                    }else{   
+                        throw new Error(Object.values(this.data)[index].split('|')[1] != 'null' ? Object.values(this.data)[index].split('|')[1]: `'${ element }' cannot be empty!`);
+                    }
+                });
+            } catch (error) {
+                this._alert_(error, 1000);
+            }
+        };
         switch(params){
             case 'index':
-                this.dom.onclick = domain => {
-                    
-                };
-                document.querySelectorAll('.pullimage').forEach((element, index) => {
+                document.querySelectorAll('.pullimage').forEach((element, index) => {  // 图片上传
                     document.querySelectorAll('.pullimage')[index].onclick = domain => {
                         this._image_(element.name, index);  //触发图片上传
                     }
-                })
+                });
+                document.querySelectorAll('input[name=address]')[0].onclick = this._address_(); //地址选择事件
                 this._enlarge_(); //注册示意图放大事件
                 break;
             case 'login':
-                console.log(123)
+
                 break;
             default:
                 break;
         }
+    }
+
+    _address_(){  // 地址选择
+        let that = this;
+        new PickerExtend({
+            trigger: '#address',
+            title: '单项选择',
+            wheels: [{data: city}],
+            position:[1], //初始化定位
+            callback:function(indexArr, data){
+                document.querySelectorAll('input[name=address]')[0].value = (() => {
+                    let code = [];
+                    data.forEach(element =>{
+                        code.push(element.value);
+                    });
+                    that.data['address'] = code.join(',');
+                    return code;
+                })()
+            }
+        });
     }
 
     _enlarge_(params){  //放大图片
@@ -43,11 +82,23 @@ class init{
         })
     }
 
+    _alert_(xml, timeout, timer){  //提示框
+        document.querySelector('.text-mudule').innerHTML = xml;
+        document.querySelector('.text-mudule').style.display = 'block';
+        timer = setTimeout(() => {
+            document.querySelector('.text-mudule').style.display = 'none';
+            timer = null;
+        }, timeout)
+    }
+
     _show_(className){  //显示方法
         document.querySelector('.module').style.display = 'block';
         document.querySelectorAll(className).forEach((element, index) => {
             document.querySelectorAll(className)[index].style.display = 'block';
         });
+        this.clone.onclick = () => {
+            this._clone_(className);
+        };
     }
 
     _clone_(className){  //隐藏方法
