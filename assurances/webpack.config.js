@@ -22,6 +22,12 @@ module.exports = {
         contentBase: './templates/build',
         compress: true
     },
+    watch: true,
+    watchOptions: {
+        poll: 1000,
+        aggregateTimeout: 1000,
+        ignored: /node_modules/
+    },
     output:{
         filename:'[name]_23_aKvs-b8bW2Vg3fwHozO.js',
         path: path.resolve(__dirname, './templates/build/javascripts/')

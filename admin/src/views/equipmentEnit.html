@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="format-detection" content="telephone=no">
+    <meta charset="UTF-8">
+
+    <meta name="description" content="共享咖啡管理后台">
+    <meta name="keywords" content="yuanmeng,ym,圆梦,系统,后台系统,咖啡蜗,蜗牛,大正集团">
+    <meta name="renderer" content="webkit">
+    <link rel="stylesheet" href="../../public/stylesheets/plugin/element.min.css">
+    <script src="../../public/javascripts/plugin/vue.js"></script>
+    <script src="../../public/javascripts/plugin/element.min.js"></script>
+
+    <title>广东圆梦实业发展有限公司</title>
+</head>
+
+<body class="_scrollbar">
+    <div id="c-container-list" style="height: 100%;" data-uri="manage_machine" data-asset="/manage/equipmentList.html"
+        data-goback="../equipmentList.html" v-loading.fullscreen.lock="loading" data-search="manage_machine">
+        <el-container>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="商户ID" prop="adminId">
+                    <el-input v-model="ruleForm.adminId" class="w400" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="商户名称" prop="adminName">
+                    <el-input v-model="ruleForm.adminName" class="w400" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="设备编号" prop="machineNumberToString">
+                    <el-input v-model="ruleForm.machineNumberToString" class="w400" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="经度" prop="machineLongitude">
+                    <el-input v-model="ruleForm.machineLongitude" class="w400" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="纬度" prop="machineLatitude">
+                    <el-input v-model="ruleForm.machineLatitude" class="w400" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="选择地区" prop="province">
+                    <el-cascader size="large" :options="address" v-model="ruleForm.province" @change="handleChange">
+                    </el-cascader>
+                </el-form-item>
+                <el-form-item label="详细地址" prop="machineAddrDesc">
+                    <el-input v-model="ruleForm.machineAddrDesc" class="w400"></el-input>
+                </el-form-item>
+                <el-form-item label="订单生效日期" prop="machineAddrDesc">
+                    <el-date-picker v-model="ruleForm.orderEffectTime" type="datetime" placeholder="选择日期时间">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="选择配置" prop="poiId" v-show="ruleForm.machineType == 2 ? true: false">
+                    <el-select v-model="ruleForm.poiId" placeholder="选择地址配置">
+                        <el-option v-for="item in poiIds" :key="item.poiId" :label="item.addr" :value="item.poiId">
+                        </el-option>
+                    </el-select>
+                    <div>
+                        <el-input v-model="ruleForm.floor" class="w400" placeholder="请输入楼层"></el-input> 层
+                    </div>
+                </el-form-item v-show="ruleForm.machineType != 2 ? true: false">
+                <el-form-item label="图片">
+                    <div style="float: left;margin-right:20px;">
+                        <template v-model="ruleForm.machineScenePicUrl">
+                            <small>场景图片</small>
+                            <el-upload prop="machineScenePicUrl" :action="fileUpdata" list-type="picture-card"
+                                :file-list="imageList.machineScenePicUrl" :limit="num" :data="fileData"
+                                :on-change="fileChange" :on-success="machineSceneSuccess" :on-exceed="fileExceed"
+                                :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisible">
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+                        </template>
+                        <template v-model="ruleForm.planePicUrl">
+                            <small>楼层平面图</small>
+                            <el-upload :action="fileUpdata" list-type="picture-card" :limit="num" :data="fileData"
+                                :file-list="imageList.planePicUrl" :on-change="fileChange" :on-success="planeSuccess"
+                                :on-exceed="fileExceed" :on-preview="handlePictureCardPreview"
+                                :on-remove="handleRemove">
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisibleData">
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+                        </template>
+                    </div>
+                    <div v-show="ruleForm.machineType != 2 ? true: false">
+                        <template v-model="ruleForm.mapMarkerIcon">
+                            <small>地图图标</small>
+                            <el-upload :action="fileUpdata" list-type="picture-card" :limit="num" :data="fileData"
+                                :file-list="imageList.mapMarkerIcon" :on-change="filePicChange"
+                                :on-success="mapMarkerSuccess" :on-exceed="fileExceed"
+                                :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisible">
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+                        </template>
+                        <template v-model="ruleForm.machineUrl">
+                            <small>大楼外景图</small>
+                            <el-upload :action="fileUpdata" list-type="picture-card" :limit="num" :data="fileData"
+                                :file-list="imageList.machineUrl" :on-change="fileChange"
+                                :on-success="machineUrlSuccess" :on-exceed="fileExceed"
+                                :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisibleData">
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+                        </template>
+                    </div>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm(ruleForm)">提交</el-button>
+                </el-form-item>
+
+                <div id="cityg" style="height:500px;width:40%;margin-top:10px;position: fixed;top: 60px;right: 60px;">
+                </div>
+            </el-form>
+
+        </el-container>
+
+    </div>
+
+    <style>
+        #cityg img {
+            width: 40px;
+        }
+    </style>
+    <script src="../../public/javascripts/plugin/jquery.min.js"></script>
+    <!-- 加载地图JSAPI脚本 -->
+    <script
+        src="https://webapi.amap.com/maps?v=1.4.10&key=97434082798d9b20459f18d679bcbdf3&plugin=AMap.Geocoder"></script>
+    <script type="text/javascript"
+        src="https://a.amap.com/jsapi_demos/static/demo-center/js/underscore-min.js"></script>
+    <script type="text/javascript" src="https://a.amap.com/jsapi_demos/static/demo-center/js/backbone-min.js"></script>
+    <script type="text/javascript" src='https://a.amap.com/jsapi_demos/static/demo-center/js/prety-json.js'></script>
+
+</body>
+
+</html>

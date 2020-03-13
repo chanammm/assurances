@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="format-detection" content="telephone=no">
+    <meta charset="UTF-8">
+
+    <meta name="description" content="共享咖啡管理后台">
+    <meta name="keywords" content="yuanmeng,ym,圆梦,系统,后台系统,咖啡蜗,蜗牛,大正集团">
+    <meta name="renderer" content="webkit">
+    <link rel="stylesheet" href="../../public/stylesheets/plugin/element.min.css">
+    <script src="../../public/javascripts/plugin/vue.js"></script>
+    <script src="../../public/javascripts/plugin/element.min.js"></script>
+
+    <title>广东圆梦实业发展有限公司</title>
+</head>
+
+<body class="_scrollbar">
+    <div id="c-container-list" style="height: 100%;" data-uri="manage_product" data-asset="/manage/productList.html"
+        data-goback="../productList.html" v-loading.fullscreen.lock="loading" data-search="manage_product">
+        <el-container>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="使用配方" prop="formulaId">
+                    <el-select v-model="ruleForm.formulaId" placeholder="选择配方" @change="tagChange({ID:ruleForm.formulaId,_arr:formulaIds})">
+                        <el-option v-for="item in formulaIds" :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="产品名称" prop="productName">
+                    <el-input v-model="ruleForm.productName" class="w400"></el-input>
+                </el-form-item>
+                <el-form-item label="产品原价" prop="originPrice">
+                    <el-input v-model="ruleForm.originPrice" class="w400"></el-input>
+                </el-form-item>
+                <el-form-item label="产品价格" prop="productPrice">
+                    <el-input v-model="ruleForm.productPrice" class="w400"></el-input>
+                </el-form-item>
+
+                <el-form-item label="产品图片">
+                    <template v-model="ruleForm.productMachinePicurl">
+                        <small>机器图片</small>
+                        <el-upload prop="productMachinePicurl" :action="fileUpdata"
+                            list-type="picture-card" :file-list="imageList.machine" :limit="num" :data="fileData" :on-change="fileChange"
+                            :on-success="fileMachineSuccess" :on-exceed="fileExceed" :on-preview="handlePictureCardPreview"
+                            :on-remove="handleRemove">
+                            <i class="el-icon-plus"></i>
+                        </el-upload>
+                        <el-dialog :visible.sync="dialogVisible">
+                            <img width="100%" :src="dialogImageUrl" alt="">
+                        </el-dialog>
+                    </template>
+                    <template v-model="ruleForm.productPicurl">
+                        <small>手机端图片</small>
+                        <el-upload :action="fileUpdata" list-type="picture-card"
+                            :limit="num" :data="fileData" :file-list="imageList.product" :on-change="filePicChange"
+                            :on-success="filePicSuccess" :on-exceed="fileExceed" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" >
+                            <i class="el-icon-plus"></i>
+                        </el-upload>
+                        <el-dialog :visible.sync="dialogVisible">
+                            <img width="100%" :src="dialogImageUrl" alt="">
+                        </el-dialog>
+                    </template>
+                    <div v-show="samllfileUpdata">
+                        <template  v-model="productMachineDetailPicurl">
+                            <small>详情图片</small>
+                            <el-upload :action="fileUpdata" list-type="picture-card"
+                                :limit="num" :data="fileData" :file-list="imageList.detail" :on-change="fileChange"
+                                :on-success="fileDateilSuccess" :on-exceed="fileExceed" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisibleData">
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+                        </template>
+                    </div>
+
+                </el-form-item>
+
+                <el-form-item label="排序" prop="productRank">
+                    <el-input v-model="ruleForm.productRank" class="w400"></el-input>
+                </el-form-item>
+
+
+                <el-form-item label="产品属性" prop="operateType">
+                    <el-radio-group v-model="ruleForm.operateType">
+                        <el-radio :label="0" border>普通</el-radio>
+                        <el-radio :label="1" border>热卖</el-radio>
+                        <el-radio :label="2" border>最新</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+
+                <el-form-item label="是否上架" prop="productStatus">
+                    <el-radio-group v-model="ruleForm.productStatus">
+                        <el-radio :label="1" border>上架</el-radio>
+                        <el-radio :label="0" border>下架</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+
+                <el-form-item label="冷热状态" prop="productTemperature">
+                    <el-radio-group v-model="ruleForm.productTemperature">
+                        <el-radio :label="0" border :disabled="radioclod">冷</el-radio>
+                        <el-radio :label="1" border>热</el-radio>
+                        <!-- <el-radio :label="2" border>冷&热</el-radio> -->
+                    </el-radio-group>
+                </el-form-item>
+
+                <el-form-item label="口味信息" prop="bunkerNumberArr">
+                    <template>
+                        <el-checkbox-group v-model="ruleForm.bunkerNumberArr" :max="3">
+                            <el-checkbox v-for="box in productFlavorList" :label="box.value" :key="box.value" :checked="box.hide != 1 ? true : false">{{box.label}}</el-checkbox>
+                        </el-checkbox-group>
+                      </template>
+                </el-form-item>
+
+                <el-form-item label="产品说明" prop="productComment">
+                    <el-input type="textarea" v-model="ruleForm.productComment" class="w400"></el-input>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm(ruleForm)">提交</el-button>
+                    <!-- <el-button @click="resetForm(ruleForm)">重置</el-button> -->
+                </el-form-item>
+            </el-form>
+        </el-container>
+    </div>
+</body>
+
+</html>
