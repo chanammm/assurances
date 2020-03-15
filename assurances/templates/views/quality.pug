@@ -10,41 +10,42 @@ html(lang="en")
   head
     title 质保信息
   body
-    div
+    div.ban
         img.banner.qualiybanner(src="../images/nav-top-banner.png")
     nav 
-        span 已激活
+        span 
         img.banner(src="../images/product.png")
     .domain.qualiydomain
         .title
             div.disabled 设备名称
-            span V单头意式半自动咖啡机
+            span(name="machineName") ???
         .link.ccc
         .title
             div.disabled 规格型号
-            span V1
+            span(name="machineType") ???
         .link.ccc
         .title
             div.disabled 色系
-            span 白色
+            span(name="colourScheme") ???
         .link.ccc
         .title
             div.disabled 规格/参数
-            span 220V/50Hz 2400W
+            span(name="machineParameter") ???
         .link
         .title
             div.disabled 设备编码
-            span F1011904705
+            span(name="machineSn") ???
         .link.ccc
         .title
             div.disabled 出库单号
-            span 88888888888
+            span(name="orderNum") ???
         .link.ccc
         .title
             div.disabled 物料编号
-            span 11111111111
+            span(name="coding") ???
         .link.ccc
         .title#time
             div.disabled 维保有效期至
-            span 2021.02.02
+            span(name="expireTime") ???
         .link.ccc
+    .text-mudule

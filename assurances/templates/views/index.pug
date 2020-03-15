@@ -16,12 +16,12 @@ html(lang="en")
         .title
             img.icons(src="../images/icon-qrcode.png") 
             div.disabled 设备编码
-            input(type="text" name="number" disabled )
+            input(type="text" name="machineSn" disabled )
         .link
         .title 
             div 上传设备铭牌
             img.pullimage(src="../images/icon-pull-image.png", name="fileReader")
-            input(type="file" name="fileReader" accept="image/*" multiple class="fileReader" style="display:none;")
+            input(type="file" name="nameplatePic" accept="image/*" multiple class="fileReader" style="display:none;")
             div.sketchmap
                 span 示意图
                 img(src="../images/icon-sketchmap-image.png")
@@ -29,34 +29,34 @@ html(lang="en")
         .title 
             div 上传装机现场图片
             img.pullimage(src="../images/icon-pull-image.png", name="fileReaderTwo")
-            input(type="file" name="fileReaderTwo" accept="image/*" multiple class="fileReaderTwo" style="display:none;")
+            input(type="file" name="installPic" accept="image/*" multiple class="fileReaderTwo" style="display:none;")
             div.sketchmap
                 span 示意图
                 img(src="../images/icon-sketchmap-shop-image.png")
         .title
             img.icons(src="../images/icon-user.png") 
             div.disabled 姓名
-            input(type="text" name="name" placeholder="请输入姓名")
+            input(type="text" name="clientName" placeholder="请输入姓名")
         .link.ccc
         .title
             img.icons(src="../images/icon-call.png") 
             div.disabled 电话
-            input(type="text" name="phone" placeholder="请输入电话")
+            input(type="text" name="clientPhone" placeholder="请输入电话")
         .link.ccc
         .title
             img.icons(src="../images/icon-user-shop.png") 
             div.disabled 经销商
-            input(type="text" name="shopName" placeholder="请输入经销商")
+            input(type="text" name="dealer" placeholder="请输入经销商")
         .link.ccc
         .title
             img.icons(src="../images/icon-address.png") 
             div.disabled 门店地址
-            input(type="text" id="address" readonly="readonly" name="address" placeholder="选择门店地址")
+            input(type="text" id="address" readonly="readonly" name="province" placeholder="选择门店地址")
         .link.ccc
         .title
             .icons
             div.disabled 详细地址
-            input(type="text" name="detailed" placeholder="请输入详细地址")
+            input(type="text" name="address" placeholder="请输入详细地址")
         .link.ccc
         .submit 提交审核
     .module

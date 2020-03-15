@@ -11,7 +11,7 @@ body {
   overflow-x: hidden;
   margin: 0 auto;
   font-size: 1.2rem;
-  background-color: rgba(35, 24, 21, 0.3);
+  background-color: #f0f0ee;
 }
 
 body input {

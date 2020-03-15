@@ -3,11 +3,12 @@ import '../stylesheets/style.min.css';
 import { city } from "./city";
 import PickerExtend from 'picker-extend';
 import axios from 'axios';
+import qs from 'qs';
 
-axios.defaults.baseURL = '';
-axios.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+axios.defaults.baseURL = 'http://test.cbcoffee.cn:8090/';
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 axios.defaults.crossDomain = true;
-axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
+// axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
 axios.defaults.headers.common['Authorization'] = ''; // 设置请求头为 Authorization
 //配置发送请求前的拦截器 可以设置token信息 
 axios.interceptors.request.use(config => {
@@ -24,6 +25,7 @@ class init {
         this.dom = document.querySelector('.submit');
         this.clone = document.querySelector('.module');
         this._submit_ = this._submit_(location.href.substring(location.href.lastIndexOf('/') + 1).split('.')[0]);
+        this.bool = true;
     }
 
     _input_() {
@@ -37,7 +39,7 @@ class init {
             switch (params) {
                 case 'index':
                     if (location.href.split('?').length < 2) location.href = './login.html';
-                    document.querySelector('input[name=number]').value = location.href.split('?')[1];
+                    document.querySelector('input[name=machineSn]').value = location.href.split('?')[1];
                     document.querySelectorAll('.pullimage').forEach((element, index) => {  // 图片上传
                         document.querySelectorAll('.pullimage')[index].onclick = domain => {
                             this._image_(element.name, index);  //触发图片上传
@@ -50,19 +52,91 @@ class init {
                     console.log('Temporary landing!!!');
                     break;
                 default:
+                    axios.get('find_machine_detail?machineSn=' + location.href.split('?')[1]).then((params) => {
+                        if (params.data.state == 200) {
+                            document.querySelectorAll('.qualiydomain>div>span').forEach((domain, index)=> {
+                                Object.keys(params.data.data).forEach((element,i) => {
+                                    if(element == domain.getAttribute('name')){
+                                        document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = Object.values(params.data.data)[i];
+                                    }
+                                })
+                                if(params.data.data.auditStatus == 1){
+                                    document.querySelector(`#time`).style.display = 'block';
+                                    document.querySelector(`nav>span`).innerHTML = '已激活';
+                                    
+                                    // nav-top-banner-ccc
+                                }else if(params.data.data.auditStatus == 2){
+                                    document.querySelector(`nav>span`).innerHTML = '未通过';
+                                    document.querySelector(`#time`).style.display = 'none';
+                                    document.querySelector(`.ban>img`).setAttribute('src', '../images/nav-top-banner-ccc.png');
+                                }else{
+                                    document.querySelector(`nav>span`).innerHTML = '审核中';
+                                    document.querySelector(`#time`).style.display = 'none';
+                                    document.querySelector(`.ban>img`).setAttribute('src', '../images/nav-top-banner-ccc.png');
+                                }
+                                // qualiydomain
+                            }
+                            ) 
+                        } else {
+                            this._alert_(params.data.msg, 1000);
+                        }
+                    });
                     throw new Error('not page action!');
             }
-            this.dom.onclick = () => {  //提交
+            this.dom.onclick = (param = {}) => {  //提交
                 try {
                     this._input_();  //输出表单 内容
                     Object.keys(this.data).forEach((element, index) => {  //检测 表单内容
                         if (Object.values(this.data)[index].split('|')[0] != '') {
-                            if (params == 'login') location.href = `./index.html?${this.data['number'].split('|')[0]}`;
-                            location.href = `./quality.html`;
+                            if (params == 'login') {
+                                if(!this.bool){
+                                    throw new Error('进行中,可能网络稍有延迟~~~');
+                                }
+                                this.bool = false;
+                                axios.get('check_activate?machineSn=' + Object.values(this.data)[index].split('|')[0]).then((params) => {
+                                    this.bool = true;
+                                    if (params.data.state == 200) {
+                                        if (params.data.data.isActivate == 0) {
+                                            location.href = `./index.html?${this.data['machineSn'].split('|')[0]}`;
+                                        }else{
+                                            location.href = `./quality.html?${this.data['machineSn'].split('|')[0]}`;
+                                        }
+                                    } else {
+                                        this._alert_(params.data.msg, 1000);
+                                    }
+                                })
+                            }
                         } else {
                             throw new Error(Object.values(this.data)[index].split('|')[1] != 'null' ? Object.values(this.data)[index].split('|')[1] : `'${element}' cannot be empty!`);
                         }
                     });
+                    if(params == 'index'){
+                        Object.keys(this.data).forEach((element, index) => {
+                            param[element] = Object.values(this.data)[index].split('|')[0];
+                        })
+                        param['district'] = param['province'].split(',')[2];
+                        param['city'] = param['province'].split(',')[1];
+                        param['province'] = param['province'].split(',')[0];
+                        if(!this.bool){
+                            throw new Error('进行中,可能网络稍有延迟~~~');
+                        }
+                        this.bool = false;
+                        axios.post('commit_activate', qs.stringify(param)).then(params => {
+                            if (params.data.state == 200) {
+                                this.bool = false;
+                                this._alert_(params.data.msg, 1000);
+                                this._show_('.alx-module');
+                                document.querySelector('.show').onclick = function(){
+                                    location.href = `./quality.html?${ param.machineSn }`;
+                                }
+                            } else {
+                                this._alert_(params.data.msg, 1000);
+                            }
+                        })
+                            .catch(function (error) {
+    
+                            })
+                    }
                 } catch (error) {
                     this._alert_(error, 1000);
                 }
@@ -80,7 +154,7 @@ class init {
             wheels: [{ data: city }],
             position: [1], //初始化定位
             callback: function (indexArr, data) {
-                document.querySelectorAll('input[name=address]')[0].value = (() => {
+                document.querySelectorAll('input[name=province]')[0].value = (() => {
                     let code = [];
                     data.forEach(element => {
                         code.push(element.value);
@@ -102,7 +176,7 @@ class init {
         })
     }
 
-    _alert_(xml, timeout, timer) {  //提示框
+    _alert_(xml, timeout, timer = null) {  //提示框
         document.querySelector('.text-mudule').innerHTML = xml;
         document.querySelector('.text-mudule').style.display = 'block';
         timer = setTimeout(() => {
