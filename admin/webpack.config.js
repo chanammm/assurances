@@ -5,11 +5,11 @@ var [path, HtmlWebpackPlugin, MiniCssExtractPlugin, optimizecssassets, uglifyjs,
 
 
 
-fs.readdir('./src/views/', (err,files) => {  //拉取views 目录下的所有文件 -- 
-    console.log(files.forEach(Element => {
-        console.log(Element)
-    }));
-})
+// fs.readdir('./src/views/', (err,files) => {  //拉取views 目录下的所有文件 -- 
+//     console.log(files.forEach(Element => {
+//         console.log(Element)
+//     }));
+// })
 
 module.exports = {
     mode: 'development',  //模式 production development
@@ -79,6 +79,36 @@ module.exports = {
         new HtmlWebpackPlugin({  //user
             template: './src/views/user.html',
             filename: '../views/user.html',
+            minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true
+            },
+            hash: true,
+            chunks: ['configration', 'list']
+        }),
+        new HtmlWebpackPlugin({  //assets
+            template: './src/views/assets.html',
+            filename: '../views/assets.html',
+            minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true
+            },
+            hash: true,
+            chunks: ['configration', 'list']
+        }),
+        new HtmlWebpackPlugin({  //customer
+            template: './src/views/customer.html',
+            filename: '../views/customer.html',
+            minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true
+            },
+            hash: true,
+            chunks: ['configration', 'list']
+        }),
+        new HtmlWebpackPlugin({  //machine
+            template: './src/views/machine.html',
+            filename: '../views/machine.html',
             minify: {
                 removeAttributeQuotes: true,
                 collapseWhitespace: true

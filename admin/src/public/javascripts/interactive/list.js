@@ -1,3 +1,4 @@
+
 if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) {
     window.onload = function (params) {
         for (let i = 0; i < document.getElementsByClassName('el-dialog').length; i++) {
@@ -32,185 +33,49 @@ window.addEventListener('pageshow', function (params) {
         el: '#c-container-list',
         data: () => {
             return {
-                fileUpdata: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Files_ : parent.all.json._j.URLS.ForMal_Files_) + 'upload_file',
+                fileUpdata: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Files_ : parent.all.json._j.URLS.ForMal_Files_) + 'picture_file_upload',
                 loading: false,
                 testAdmin: ym.init.COMPILESTR.decrypt(JSON.parse(sessionStorage.getItem('_a'))._i) == "yuanmenghhx" || ym.init.COMPILESTR.decrypt(JSON.parse(sessionStorage.getItem('_a'))._i) == "yuanmengKSX" ? false : true,  //指定的账号不能显示订单查看
                 more: false,
                 tableData: [],
+                UnFormData: [],
+                UnTableFormData:[],
                 currentPage: 1,
                 pageSize: 20,
                 total: 0,
-                page: 1,
-                select: '',
-                searchVal: '',
-                searchName: 'name',
-                search: '',  //优惠券 table 搜索
-                listSearch: {
-                    hasTest: 0,  //默认是排除测试数据
-                    timeUnit: 3, //默认查询的是以日为单位的统计日志
-                    _time_: ''
-                },  //新的列表查询对象
-                selectLong: '',
-                machineNumbers: {
-                    machineCount: 0
-                },
-                selectFil: '',
-                selectMater: '',
-                dateLog: '',
-                InputAndVisible: false, //列表操作
-                formData: {
-                    machineType: 1,
-                    name: '',
-                    mUpdateUrl: '',  //应用更新
-                    madTitle: '',
-                    madOrder: '',
-                    madUrl: '',
-                    madId: '',
-                    adminName: '', //超级管理员
-                    adminPwd: '',
-                    realName: '',
-                    adminMobile: '',
-                    named: '',
-                    roleId: '',
-                    isShow: 1,  //是否显示
-                    isSys: 0, //是否系统配置
-                    disableConf: false, //disable 是否可操作
-                    disableConfMahineName: '', //机器类型名
-                    machineBunkerConfigAllId: '',//绑定机器的配置ID
-                    numberBigConf: [  //料仓配置
-                        {
-                            name: '',
-                            isShow: 1,
-                            number: 1
-                        },
-                        {
-                            name: '',
-                            isShow: 1,
-                            number: 2
-                        },
-                        {
-                            name: '',
-                            isShow: 1,
-                            number: 3
-                        },
-                        {
-                            name: '',
-                            isShow: 1,
-                            number: 4
-                        },
-                        {
-                            name: '',
-                            isShow: 1,
-                            number: 5
-                        },
-                        {
-                            name: '',
-                            isShow: 1,
-                            number: 6
-                        },
-                        {
-                            name: '水',
-                            isShow: 1,
-                            number: 100
-                        },
-                        {
-                            name: '杯子',
-                            isShow: 1,
-                            number: 160
-                        },
-                        {
-                            name: '咖啡',
-                            isShow: 1,
-                            number: 170
-                        },
-                    ],
-                    numberSmallConf: [
-                        {
-                            name: '水',
-                            isShow: 1,
-                            number: 100
-                        },
-                        {
-                            name: '咖啡',
-                            isShow: 1,
-                            number: 170
-                        },
-                        {
-                            name: '牛奶',
-                            isShow: 1,
-                            number: 180
-                        }
-                    ],
-                    has: '',
-                    bunkerConfigName: '',
-                    raffleName: '',   //小程序大转盘配置
-                    allowConsumeChance: 0,
-                    allowMemberConvert: 0,
-                    allowShareChance: 0,
-                    convertMilliliter: 0,
-                    maxLuckyValue: 500,
-                    status: 1,
-                    allowGrant: 0, //营销商户配置
-                    grantMilliliter: 0, //营销商户配置
-                    allowShare: 0, //营销商户配置
-                    shareMilliliter: 0, //营销商户配置
-                    allowSignIn: 0, //营销商户配置
-                    signInMilliliter: 0, //营销商户配置
-                    allowChangeCup: 0, //营销商户配置
-                    changeMilliliter: 0, //营销商户配置
-                    convertMilliliter: 0, //营销商户配置
-                },
-                imageList: {
-                    mUpdateUrl: [], //图片li
-                    madUrl: [],     //视频广告
-                },
-                TableAndVisible: false,
-                TableFormData: [],
-                couponUnFormData: [],  //礼券明细 de 窗口
+                formData: {},
+                SearchTableAndVisible: false,
                 UpdateTableAndVisible: false,
-                UpdateTableFormData: [],
-                listId: '',
-                productCount: 0,
-                productId: [],
                 detailTableAndVisible: false,
-                detailTableFormData: [],
-                options: [],
-                unbinadmin: {
-                    adminIds: '',
-                    maintainerName: '',  //这里是运维
-                    maintainerPhone: '',
-                    bindMachine: '',
-                    state: ''
-                },
-                addressTable: false, //用户地址 
-                addressTables: [],//地址数组
-                pageTableNum: 1, //循环数组起始值
-                pageTimerOut: false, // 终止值
-                pageCount: 0, //总数值
-                UnFormData: [],
-                adminIds: [],
-                listIds: [],
-                machineNumber: [],
-                restaurants: [],  //用户ID搜索相关
-                state: '',
-                timeout: null,
-                userIds: [],
-                userIdts: [],
-                userMode: [],
-                machineLogs: [],  //设备日志
-                machineLogViews: false,
-                fileData: _data,
-                num: 1,
+                TableAndVisible: false,
                 dialogVisible: false,
+                adoptModule: false,
                 dialogImageUrl: '',
-                adevtmodel: false,  //视频添加/编辑
-                adIds: [],
-                html: '',
-                bunkerConf: {
-                    name: '',
-                    time: ''
+                data: {},
+                num: 1,
+                SearchTableFormData: {
+                    realName: '',
+                    workCount: '',
+                    auditCount: '',
+                    indexCount: '',
+                    income: '',
+                    loginTime: '',
+                    loginIp: '',
+                    registerIp: '',
+                    classifyName: '',  //零件
+                    parentId: '',
+                    parentName: '',
+                    sort: '',
+                    level: '',
+                    remark: '',
+                    id: ''
                 },
-                bunkerConfNumber: true, //大小机器的料仓显示
+                imageList:{
+                    machinePic: []
+                },
+                fileData:{
+                    
+                },
                 pickerOptions: {  //时间节点
                     shortcuts: [{
                         text: '最近一周',
@@ -316,6 +181,7 @@ window.addEventListener('pageshow', function (params) {
         },
         created: function () {
             this.list();
+            window.is = this;
         },
         methods: {
             IError(err) {
@@ -326,14 +192,14 @@ window.addEventListener('pageshow', function (params) {
                         parent.location.href = `../login.htm?hash:[nK6t7a]`;
                     }
                 }, 1000);
-                this.$message.error('错了哦!' + err);
+                this.$message.error('事务提醒：' + err);
             },
             ISuccessfull(e) {
                 setTimeout(() => {
                     this.loading = false;
                 }, 1000);
                 this.$message({
-                    message: '成功了哦!,' + e,
+                    message: '事务提醒：,' + e,
                     type: 'success'
                 });
             },
@@ -370,29 +236,9 @@ window.addEventListener('pageshow', function (params) {
                         }
                     }
                 }
-                _data_ = Object.assign({  //初始对象
-                    id: ym.init.COMPILESTR.decrypt(token.id),
-                    token: ym.init.COMPILESTR.decrypt(token.asset),
-                    url: u
-                }, params)
+
                 it.loading = true;
 
-                if (uri == 'manage_prodcut_list_list') _data_['type'] = 1;  //临时处理存在此接口存在type 数值问题
-                if (uri == 'manage_machine_version') _data_['type'] = 1;
-                if (uri == 'find_machine_advertisement_list') _data_['type'] = 1;
-                if (uri == 'manage_advertisement_list_list') _data_['type'] = 1;
-                if (uri == 'client_user_list') _data_['type'] = 1;
-                if (uri == 'manage_dividend_list') _data_['type'] = 1;
-                if (uri == 'find_order_list') {   //处理订单的操作
-                    let _machin_ = parent.document.getElementById('tagHref').getAttribute('src').split('*'); // 处理从设备列表过来的订单查看
-                    _data_['name'] = JSON.stringify(
-                        {
-                            machineNumber: _machin_.length > 1 ? JSON.parse(decodeURI(_machin_[1])).machineNumber : '',
-                            orderId: params ? params['name'] : ''
-                        }
-                    )
-                    _data_['url'] = '/manage/orderList.html';
-                }
                 if (uri == 'admin_statistics_list' || uri == 'machine_statistics_list' || uri == 'admin_statistics_log_list') {  //新商户统计
                     _data_['startDate'] = _data_['startDate'] || ym.init.getDateTime(new Date().setTime(new Date().getTime() - 3600 * 1000 * 24 * 7)).split(' ')[0];
                     _data_['endDate'] = _data_['endDate'] || ym.init.getDateTime(new Date()).split(' ')[0];
@@ -402,365 +248,126 @@ window.addEventListener('pageshow', function (params) {
                         _data_['timeUnit'] = params ? params['timeUnit'] : it.listSearch.timeUnit;
                     }
                 };
+
                 _data_['page'] = !bool ? (() => {
                     it.currentPage = 1;
                     return it.currentPage
                 })() : it.page;
-                ym.init.XML({
-                    method: (uri == 'find_machine_poi_list' || uri == 'get_activity_list' || uri == 'statistics_list' || uri == 'maintainer_list' || uri == 'sys_draw_raffle_info' || uri == 'sys_user_raffle_share_list' ? "GET" : 'POST'),
-                    uri: token._j.URLS.Development_Server_ + uri,
-                    async: false,
-                    xmldata: _data_,
-                    done: function (res) {
-                        ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                            _data_ = {}; //清空
-                            
-                            xml = res.data;
-
-                            it.total = parseInt(res.totalCount ? res.totalCount : res.pageCount * 20);//数据总条数
-                            // it.currentPage = parseInt(res.pageCount); 
-                            it.tableData = xml;
-                            setTimeout(() => {
-                                it.loading = false;
-                            }, 500)
-                        })()
-                            :
-                            it.IError(res.statusCode.msg);
+                _data_['pageSize'] = 20;
+                _data_ = qs.stringify(_data_);
+                axios.post(uri, _data_).then(params => {
+                    let xml = [], data = params.data;
+                    data.total ? it.total = parseInt(data.total) : null;
+                    data.pageSize ? it.currentPage = parseInt(data.pageSize) : null;  //数据总条数
+                    if(data.state == 200){
+                        if(uri == 'page_permission_tree'){
+                            data.list.forEach((element, index) => {
+                                if (element.lowers) {
+                                    element['hasChildren'] = true;
+                                    element['children'] = element.lowers;
+                                }
+                                xml.push(element);
+                            })
+                        }else{
+                            xml = data.page.records;
+                        }
                     }
+                    it.tableData = xml;
+                    setTimeout(() => {
+                        it.loading = false;
+                    }, 1000);
                 })
             },
             crud(arg) {
                 window.parent.document.getElementById('tagHref').setAttribute('src', `../${arg.uri}.html?[hash]${arg.enitId ? '*' + encodeURI(JSON.stringify(arg.enitId)) : ''}`); // 编辑带参数
             },
-            //列表操作
-            //清单列表
-            listoperation(e) {
-                const it = this;
-                switch (e._tag) {
-                    case 'manage_prodcut_list_list':
-                        switch (e._type) {
-                            case "A":
-                                _data['type'] = 6;
-                                _data['machineType'] = e._evt.machineType;
-                                _data['name'] = e._evt.name;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: false,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                it.ISuccessfull(res.statusCode.msg);
-                                                it.InputAndVisible = false
-                                                it.list();  //刷新列表
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            case "S":
-                                _data['type'] = 2;
-                                _data['page'] = 1;
-                                _data['listId'] = e._evt.listId;
-                                it.listId = e._evt.listId;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: false,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            it.TableFormData = [];
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                res.productShowList.forEach(element => {
-                                                    it.TableFormData.push({
-                                                        productId: element.productId,
-                                                        productName: element.productName,
-                                                        productPrice: parseFloat(element.productPrice / 100).toFixed(2),
-                                                        formulaName: element.formulaName,
-                                                        bunkerNumber: element.bunkerNumber,
-                                                        createTime: ym.init.getDateTime(element.createTime).split(' ')[0],
-                                                        productRank: element.productRank,
-                                                        machineType: it.StatusName.get('free').machineType.get(element.machineType)
-                                                    });
-                                                });
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            case "E":
-                                _data['type'] = 3;
-                                _data['listId'] = it.listId;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: false,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            it.UpdateTableFormData = [];
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                res.productInfoList.forEach((element, index) => {
-                                                    it.UpdateTableFormData.push({
-                                                        productId: element.productId,
-                                                        productName: element.productName,
-                                                        productPrice: parseFloat(element.productPrice / 100).toFixed(2),
-                                                        productPicurl: element.productPicurl,
-                                                        formulaName: element.formulaName,
-                                                        bunkerNumber: element.bunkerNumber,
-                                                        createTime: ym.init.getDateTime(element.createTime).split(' ')[0],
-                                                        productRank: element.productRank,
-                                                        machineType: it.StatusName.get('free').machineType.get(element.machineType),
-                                                        productComment: element.productComment
-                                                    });
-                                                    if (res.productIdList) {
-                                                        res.productIdList.forEach(e => {
-                                                            if (e == element.productId) {
-                                                                it.$nextTick(function () {
-                                                                    it.tableChecked(index);  //每次更新了数据，触发这个函数即可。
-                                                                });
-                                                            }
-                                                        })
-                                                    };
-                                                });
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            case "P":  //编辑清单
-                                _data['type'] = 4;
-                                _data['listId'] = it.listId;
-                                _data['productId'] = it.productId;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: false,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            it.UpdateTableFormData = [];
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                it.ISuccessfull(res.statusCode.msg);
-                                                it.UpdateTableAndVisible = false;
-                                                it.listoperation({ _tag: 'manage_prodcut_list_list', _evt: { listId: it.listId }, _type: 'S' });  //刷新列表
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            case "D":
-                                _data['type'] = 5;
-                                _data['listId'] = e._evt.listId;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: true,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                it.ISuccessfull(res.statusCode.msg);
-                                                it.list()  //刷新列表
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    case 'manage_advertisement_list_list':   //machine vedio detail list
-                        switch (e._type) {
-                            case "A":
-                                _data['type'] = 6;
-                                _data['name'] = e._evt.name;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: false,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                it.ISuccessfull(res.statusCode.msg);
-                                                it.InputAndVisible = false
-                                                delete _data['name']
-                                                it.list();  //刷新列表
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            case "S":
-                                _data['type'] = 2;
-                                _data['page'] = 1;
-                                _data['listId'] = e._evt.listId;
-                                it.listId = e._evt.listId;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: false,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            it.TableFormData = [];
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                res.advertisementList.forEach(element => {
-                                                    it.TableFormData.push({
-                                                        madId: element.madId,
-                                                        madOrder: element.madOrder,
-                                                        // madSize: element.madSize,  //视频大小
-                                                        madStatus: (element.madStatus ? '上架' : '下架'),
-                                                        madTime: ym.init.getDateTime(element.madTime).split(' ')[0],
-                                                        madTitle: element.madTitle,
-                                                        // madType: element.madType,  //广告类型
-                                                        madUrl: element.madUrl
-                                                    });
-                                                });
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            case "E":
-                                _data['type'] = 3;
-                                _data['listId'] = it.listId;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: false,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            it.UpdateTableFormData = [];
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                res.advertisementInfoList.forEach((element, index) => {
-                                                    it.UpdateTableFormData.push({
-                                                        madId: element.madId,
-                                                        madOrder: element.madOrder,
-                                                        // madSize: element.madSize,
-                                                        madStatus: (element.madStatus ? '上架' : '下架'),
-                                                        madTime: ym.init.getDateTime(element.madTime).split(' ')[0],
-                                                        madTitle: element.madTitle,
-                                                        // madType: element.madType,
-                                                        madUrl: element.madUrl
-                                                    });
-                                                    if (res.adIdList) {
-                                                        res.adIdList.forEach(e => {
-                                                            if (e == element.madId) {
-                                                                it.$nextTick(function () {
-                                                                    it.tableChecked(index);  //每次更新了数据，触发这个函数即可。
-                                                                });
-                                                            }
-                                                        })
-                                                    };
-                                                });
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            case "P":  //编辑清单
-                                _data['type'] = 4;
-                                _data['listId'] = it.listId;
-                                _data['adId'] = it.adIds;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: false,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            it.UpdateTableFormData = [];
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                it.ISuccessfull(res.statusCode.msg);
-                                                it.UpdateTableAndVisible = false;
-                                                it.listoperation({ _tag: 'manage_advertisement_list_list', _evt: { listId: it.listId }, _type: 'S' });  //刷新列表
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            case "D":
-                                _data['type'] = 5;
-                                _data['listId'] = e._evt.listId;
-                                ym.init.XML({
-                                    method: 'POST',
-                                    uri: token._j.URLS.Development_Server_ + uri,
-                                    async: true,
-                                    xmldata: _data,
-                                    done: function (res) {
-                                        try {
-                                            ym.init.RegCode(token._j.successfull).test(res.statusCode.status) ? (() => {
-                                                it.ISuccessfull(res.statusCode.msg);
-                                                it.list()  //刷新列表
-                                            })() :
-                                                (() => {
-                                                    throw "收集到错误：\n\n" + res.statusCode.msg;
-                                                })()
-                                        } catch (error) {
-                                            it.IError(error);
-                                        }
-                                    }
-                                });
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    default:
-                        break;
-                }
+            loadTree(tree, treeNode, resolve) {   //树结构表格
+                setTimeout(() => {
+                    resolve(tree.children);
+                }, 500)
             },
+            //新增 权限
+            assets(params) {
+                is.loading = true;
+                params.parentId ? params.parentId : params['parentId'] = -1;
+                params.permissionWeight == 1 ? params.requestUri = -1 : null;
+                axios.post('create_permission', qs.stringify(params)).then(params => {
+                    is.data = params.data;
+                    if (is.data.state == 200) {
+                        is.ISuccessfull(is.data.msg);
+                        is.list();
+                        is.UpdateTableAndVisible = false;
+                    } else {
+                        is.IError(is.data.msg);
+                    }
+                    setTimeout(() => {
+                        is.loading = false;
+                    }, 1000);
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+            //查看 角色已赋予 权限
+            serchAssetes(params) {
+                axios.post('role_page_permission', qs.stringify({
+                    roleId: params
+                })).then(res => {
+                    if (res.data.state == 200) {
+                        is.detailTableAndVisible = true;
+                        is.UnFormData = res.data.list;
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+            //查看 所有 权限 树结构
+            serchAssetesAll(params) {
+                axios.post('page_permission_tree').then(res => {
+                    if (res.data.state == 200) {
+                        is.TableAndVisible = true;
+                        is.UnTableFormData = res.data.list;
+                        res.data.list.forEach((element, index) => {
+                            params.forEach((els) => {
+                                if(els.permissionId == element.permissionId){
+                                    it.$nextTick(function () {
+                                        is.tableChecked(index);  //每次更新了数据，触发这个函数即可。
+                                    });
+                                }
+                            })
+                            
+                        })
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+            //提交绑定
+            bindingAction(params) {
+                axios.get('set_permission_role', {
+                    params: {
+                        permissionId: params.permissionId, roleId: params.adminId
+                    }
+                }).then(params => {
+                    is.data = params.data;
+                    if (is.data.state == 200) {
+                        is.ISuccessfull(is.data.msg);
+                        is.detailTableAndVisible = false;
+                    } else {
+                        is.IError(is.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
             handleSelectionChange(val) {  //下拉选项
                 this.multipleSelection = val;
                 this.productCount = val.length;
@@ -779,6 +386,136 @@ window.addEventListener('pageshow', function (params) {
                     this.userMode.push(e || []); //批量操作用户类型
                 });
             },
+
+            tableChecked(e) {  //表格打勾已选择回显 
+                this.$refs.multipleTable.toggleRowSelection(this.tableData[e], true);
+            },
+
+
+            //查看客户详细
+            customerDest(params){
+                axios.get('machine_client_detail', {
+                    params: {
+                        clientId: params
+                    }
+                }).then(res => {
+                    if (res.data.state == 200) {
+                        is.SearchTableAndVisible = true;
+                        is.SearchTableFormData = res.data;
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+            //新增设备
+            machine(params){
+                //create_machine
+                //is.data.machinePic
+                document.querySelectorAll('#machine>div>div>div>input').forEach((element, index) => {
+                    console.log(element);
+                })
+                
+                params['machinePic'] = is.data.machinePic;
+                params['exWarehouseTime'] = ym.init.getDateTime(params.exWarehouseTime).split(' ')[0];
+                axios.post('create_machine', qs.stringify(params)).then(res => {
+                    if (res.data.state == 200) {
+                        is.UpdateTableAndVisible = false;
+                        is.list();
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+            //查看设备详细
+            machineDest(params){
+                axios.get('sys_machine_detail', {
+                    params: {
+                        machineId: params
+                    }
+                }).then(res => {
+                    if (res.data.state == 200) {
+                        is.SearchTableAndVisible = true;
+                        if(res.data.data.status == 1){
+                           is.adoptModule = true; 
+                        }else{
+                            is.adoptModule = false; 
+                        }
+                        // Object.keys(res.data.data).forEach((element, index))
+                        is.SearchTableFormData = res.data.data;
+                        setTimeout(() => {
+                            if(res.data.data.auditStatus == 2){
+                                document.getElementById('adopt').innerHTML = '审核不通过!';
+                                document.getElementById('adopt').style.color = 'red';
+                            }
+                        }, 0)
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+            adopt(params, bool){
+                axios.get('audit_machine', {
+                    params: {
+                        auditResult: +bool + 1,
+                        machineId: params.machineId
+                    }
+                }).then(res => {
+                    if (res.data.state == 200) {
+                        is.SearchTableAndVisible = false;
+                        is.ISuccessfull(res.data.msg);
+                        is.list();
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             filterTag(value, row) {
                 return row.machineType === value;
             },
@@ -969,7 +706,7 @@ window.addEventListener('pageshow', function (params) {
                             async: false,
                             xmldata: _data,
                             done: function (res) {
-                                if(res.statusCode.status != 6666) return false;
+                                if (res.statusCode.status != 6666) return false;
                                 res.logList.forEach(e => {
                                     it.TableFormData.push({
                                         logId: e.logId,
@@ -1216,15 +953,14 @@ window.addEventListener('pageshow', function (params) {
                 this.IError('只允许单个上传')
             },
             machineSceneSuccess(e) {
-                this.formData.mUpdateUrl = e.realPath;  // 应用地址
-                this.formData.madUrl = e.realPath;  //视频地址
+                is.data['machinePic'] = e.data.path;
             },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
             },
             handlePictureCardPreview(file) {  //点击查看放大的时候
                 this.dialogVisible = true;
-                this.dialogImageUrl = 'http://www.cbcoffee.cn/rundev/manage/images/Android.svg';
+                this.dialogImageUrl = file.url;
             },
             machineVersion(_idata) {
                 const it = this;
@@ -2334,14 +2070,14 @@ window.addEventListener('pageshow', function (params) {
                     _data['adminId'] = params.adminId;
                     _data['adminMarketingConfigId'] = params.adminMarketingConfigId;
                     _data['allowGrant'] = params.allowGrant;
-                    params.allowGrant != 1 ? null : _data['grantMilliliter'] = params.grantMilliliter > 0 && params.grantMilliliter < params.convertMilliliter ? params.grantMilliliter: it.IError('数值异常！');
+                    params.allowGrant != 1 ? null : _data['grantMilliliter'] = params.grantMilliliter > 0 && params.grantMilliliter < params.convertMilliliter ? params.grantMilliliter : it.IError('数值异常！');
                     _data['allowShare'] = params.allowShare;
-                    params.allowShare != 1 ? null : _data['shareMilliliter'] = params.shareMilliliter > 0 && params.shareMilliliter < params.convertMilliliter ? params.shareMilliliter: it.IError('数值异常！');
+                    params.allowShare != 1 ? null : _data['shareMilliliter'] = params.shareMilliliter > 0 && params.shareMilliliter < params.convertMilliliter ? params.shareMilliliter : it.IError('数值异常！');
                     _data['allowSignIn'] = params.allowSignIn;
-                    params.allowSignIn != 1 ? null : _data['signInMilliliter'] = params.signInMilliliter > 0 && params.signInMilliliter < params.convertMilliliter ? params.signInMilliliter: it.IError('数值异常！');
-                    _data['allowChangeCup'] = params.allowChangeCup; 
-                    params.allowChangeCup != 1 ? null : _data['changeMilliliter'] = params.changeMilliliter > 0 && params.changeMilliliter < params.convertMilliliter ? params.changeMilliliter: it.IError('数值异常！');
-                    _data['convertMilliliter'] = params.convertMilliliter > 0 ? params.convertMilliliter: it.IError('数值异常！');
+                    params.allowSignIn != 1 ? null : _data['signInMilliliter'] = params.signInMilliliter > 0 && params.signInMilliliter < params.convertMilliliter ? params.signInMilliliter : it.IError('数值异常！');
+                    _data['allowChangeCup'] = params.allowChangeCup;
+                    params.allowChangeCup != 1 ? null : _data['changeMilliliter'] = params.changeMilliliter > 0 && params.changeMilliliter < params.convertMilliliter ? params.changeMilliliter : it.IError('数值异常！');
+                    _data['convertMilliliter'] = params.convertMilliliter > 0 ? params.convertMilliliter : it.IError('数值异常！');
                     ym.init.XML({
                         method: 'POST',
                         uri: token._j.URLS.Development_Server_ + 'update_admin_marketing_config',
@@ -2386,7 +2122,7 @@ window.addEventListener('pageshow', function (params) {
                 }
             },
 
-            couponList(params){ //用户礼券 窗口 列表
+            couponList(params) { //用户礼券 窗口 列表
                 console.log(params);
                 let it = this;
                 // params ? pasessionStorage.setItem('params', params.userId) : params.userId = sessionStorage.getItem('params');
@@ -2414,14 +2150,14 @@ window.addEventListener('pageshow', function (params) {
                 })
             },
 
-            exportMachineLog(_event, typeUrl){
+            exportMachineLog(_event, typeUrl) {
                 const it = this;
                 it.loading = true
-                _event.machineNumber ? _data['machineNumber'] =  _event.machineNumber : null;
+                _event.machineNumber ? _data['machineNumber'] = _event.machineNumber : null;
                 _event.startTime ? _data['startTime'] = _event.startTime[0] : null;
                 _event.startTime ? _data['endTime'] = _event.startTime[1] : null;
                 _event.machineType ? _data['machineType'] = _event.machineType : null;
-                _event.status ? _data['status'] =  _event.status : null;
+                _event.status ? _data['status'] = _event.status : null;
                 ym.init.XML({
                     method: 'POST',
                     uri: token._j.URLS.Development_Server_ + typeUrl,

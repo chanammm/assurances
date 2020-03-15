@@ -6,23 +6,21 @@
     <meta name="format-detection" content="telephone=no">
     <meta charset="UTF-8">
 
-    <meta name="description" content="共享咖啡管理后台">
-    <meta name="keywords" content="yuanmeng,ym,圆梦,系统,后台系统,咖啡蜗,蜗牛,大正集团">
     <meta name="renderer" content="webkit">
     <link rel="stylesheet" href="../../public/stylesheets/plugin/element.min.css">
     <script src="../../public/javascripts/plugin/vue.js"></script>
     <script src="../../public/javascripts/plugin/element.min.js"></script>
 
-    <title>广东圆梦实业发展有限公司</title>
+    <title></title>
 </head>
 
 
 <body class="_scrollbar">
-    <div id="c-container-list" style="height: 100%;" data-uri="sys_admin_list" v-loading.fullscreen.lock="loading">
+    <div id="c-container-list" style="height: 100%;" data-uri="sys_role_list" v-loading.fullscreen.lock="loading">
         <el-container>
             <el-main>
                 <el-form>
-                    <div style="margin: 10px 0">
+                    <!-- <div style="margin: 10px 0">
                         <el-button type="primary"
                             @click="detailTableAndVisible = true;UnFormData = tableData;unbinadmin = {};select_user = '';user_type = 1; grantCount = '';overdueTime = '';user_state = 1;">
                             操作用户
@@ -47,58 +45,26 @@
                         </el-select>
                     </div>
 
-                    <div class="_search_centent">
-                        <el-button>会员类型</el-button>
-                        <el-select v-model="listSearch.memberId" slot="prepend" placeholder="请选择">
-                            <el-option label="不限" value=""></el-option>
-                            <el-option label="月卡会员" value="7"></el-option>
-                            <el-option label="女神礼包" value="11"></el-option>
-                            <el-option label="春日套餐" value="12"></el-option>
-                            <el-option label="520套餐" value="13"></el-option>
-                            <el-option label="季卡会员" value="8"></el-option>
-                            <el-option label="年卡会员" value="9"></el-option>
-                        </el-select>
-                    </div>
-
                     <el-button icon="el-icon-search" class="_search_btn" @click="list(listSearch)">搜索
-                    </el-button>
+                    </el-button> -->
                 </el-form>
                 <template>
                     <el-table :data="tableData" stripe style="width: 100%" border>
-                        <el-table-column prop="userId" label="ID"></el-table-column>
-                        <el-table-column prop="headPicUrl" label="头像" width="80">
+                        <el-table-column prop="roleId" label="secretID"></el-table-column>
+                        <el-table-column prop="roleName" label="name"></el-table-column>
+                        <el-table-column prop="status" label="状态">
                             <template slot-scope="scope">
-                                <el-popover trigger="hover" placement="top">
-                                    <el-image :src="scope.row.headPicUrl" :preview-src-list="scope.row.headPicUrl"
-                                        style="text-align: center;"></el-image>
-                                    <div slot="reference" class="name-wrapper">
-                                        <el-image :src="scope.row.headPicUrl" :preview-src-list="scope.row.headPicUrl"
-                                            lazy></el-image>
-                                    </div>
-                                </el-popover>
+                                {{ scope.row.status == 1 ? '正常' : '冻结' }} 
                             </template>
                         </el-table-column>
-                        <el-table-column prop="nickName" label="昵称"></el-table-column>
-                        <el-table-column prop="mobile" label="手机号码"></el-table-column>
-                        <el-table-column prop="userType" label="用户类型"></el-table-column>
-                        <el-table-column prop="source" label="用户来源"></el-table-column>
-                        <el-table-column prop="userStatus" label="状态"></el-table-column>
-                        <el-table-column prop="registerTime" label="注册时间"></el-table-column>
-                        <el-table-column prop="memberMilliliter" label="会员流量"></el-table-column>
-                        <el-table-column prop="compensateMilliliter" label="补偿流量"></el-table-column>
+                        <el-table-column prop="createTime" label="注册时间"></el-table-column>
+
 
                         <el-table-column fixed="right" label="操作">
                             <template slot-scope="scope">
                                 <el-button type="text" size="small"
-                                    @click="TableAndVisible = true; searchAPIs({ _uri:  'find_user_milliliter_log', _id: scope.row.userId}); TableFormData = [];">
-                                    日志
-                                </el-button>
-                                <el-button type="text" size="small" @click="UpdateTableAndVisible = true; couponList(scope.row);couponUnFormData = []">
-                                    礼券
-                                </el-button>
-                                <el-button type="text" size="small"
-                                    @click="addressTable = true;addressTables = []; addressTableList({userId:scope.row.userId});">
-                                    地址
+                                    @click="serchAssetes(scope.row.roleId)">
+                                    权限
                                 </el-button>
                             </template>
                         </el-table-column>
@@ -110,6 +76,54 @@
                     layout="total, sizes, prev, pager, next, jumper" :total="total">
                 </el-pagination>
 
+
+                <el-dialog title="已捆绑权限" :visible.sync="detailTableAndVisible">
+                        <div style="margin-bottom:20px;">
+                            <el-button @click="serchAssetesAll(UnFormData)" type="primary">增加绑定<i
+                                class="el-icon-plus el-icon--right"></i></el-button>
+                        </div>
+                        <el-table :data="UnFormData" height="400px">
+                            <el-table-column property="permissionId" label="权限ID"></el-table-column>
+                            <el-table-column property="permissionName" label="权限名称"></el-table-column>
+                            <el-table-column property="parentId" label="上级ID">
+                                <template slot-scope="scope">
+                                    {{ scope.row.parentId == -1 ? '无' : scope.row.parentId}} 
+                                </template>
+                            </el-table-column>
+                            <el-table-column property="permissionWeight" label="权限级别">
+                                <template slot-scope="scope">
+                                    {{ scope.row.permissionWeight + '级' }} 
+                                </template>
+                            </el-table-column>
+                            <el-table-column fixed="right" label="操作">
+                                <template slot-scope="scope">
+                                    <el-button type="text" size="small"
+                                        @click="IError('未开启')">
+                                        解除
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                </el-dialog>
+
+                <el-dialog title="增加绑定" :visible.sync="TableAndVisible">
+                    <el-table :data="UnTableFormData" width="50%" height="400px" style="margin: 10px 0" tooltip-effect="dark"
+                        @selection-change="handleSelectionChange" ref="multipleTable">
+                        <el-table-column type="selection"></el-table-column>
+                        <el-table-column property="permissionId" label="权限ID"></el-table-column>
+                        <el-table-column property="permissionName" label="名称"></el-table-column>
+                        <el-table-column property="requestUri" label="地址"></el-table-column>
+                        <el-table-column property="sort" label="排序"></el-table-column>
+                    </el-table>
+                    <template>
+                        <div style="margin-top: 10px">
+                            <el-button type="primary" @click="bindUser()">
+                                绑定
+                            </el-button>
+                        </div>
+                    </template>
+                </el-dialog>
+<!-- 
                 <el-dialog title="批量操作用户" :visible.sync="detailTableAndVisible">
                     <el-form :model="unbinadmin">
                         <el-autocomplete v-model="state" :fetch-suggestions="querySearchAsync" placeholder="请输入用户名"
@@ -187,9 +201,9 @@
                             </div>
                         </template>
                     </el-form>
-                </el-dialog>
+                </el-dialog> -->
 
-                <el-dialog title="毫升数日志" :visible.sync="TableAndVisible" width="70%">
+                <!-- <el-dialog title="毫升数日志" :visible.sync="TableAndVisible" width="70%">
                     <el-table :data="TableFormData" height="600px" border>
                         <el-table-column property="logId" label="ID"></el-table-column>
                         <el-table-column property="createTime" label="创建时间"></el-table-column>
@@ -199,7 +213,6 @@
                 </el-dialog>
 
                 <el-dialog title="礼券明细" :visible.sync="UpdateTableAndVisible" width="70%">
-                    <!-- v-infinite-scroll="couponList" infinite-scroll-immediate="true" -->
                     <el-table :data="couponUnFormData" height="400px" style="margin: 10px 0" border>
                         <el-table-column property="rCouponId" label="ID"></el-table-column>
                         <el-table-column property="couponName" label="名称"></el-table-column>
@@ -215,7 +228,7 @@
                         <el-table-column property="phone" label="手机号"></el-table-column>
                         <el-table-column property="address" label="地址"></el-table-column>
                     </el-table>
-                </el-dialog>
+                </el-dialog> -->
 
             </el-main>
         </el-container>

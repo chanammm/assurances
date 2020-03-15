@@ -38,7 +38,7 @@ new Vue({
                 adminMobile: '',
                 state: ''
             },
-            adminName: ym.init.COMPILESTR.decrypt(JSON.parse(sessionStorage.getItem('_a'))._i),
+            adminName: JSON.parse(sessionStorage.getItem('_a'))._i,
             drawer: false
         }
     },
@@ -75,47 +75,21 @@ new Vue({
             'el-icon-s-tools',
             'el-icon-toilet-paper',
             'el-icon-s-unfold'
-        ], _lists = {
-            _admin: [
-                'tables',
-                'u_Journal'
-            ],
-            _system: [
-                'user',
-            ],
-            _shop: [
-                'equipmentList',
-                'machineAmap',
-                'chartsFinance',
-                'orderList',
-                'orderEverDayList',
-                'RepairPersonnelList'
-            ]
-        }, num = 0;
-        for (let i = 0; i < tag.length - 1; i++) {
+        ], num = 0;
+        for (let i = 0; i < tag.length; i++) {
             _tag += `<el-submenu index="${i + 1}">
             <template slot="title">
                 <i class="${icons[i]}"></i>
                 <span>${tag[i].permissionName}</span>
             </template>
             <el-menu-item-group>`;
-            for (let j = 0; j < tag[i].pageInfoList.length; j++) {
-                // _tag += `<el-menu-item @click=Href({'uri':'${tag[i].pageInfoList[j].pageUrl}','title':'${tag[i].pageInfoList[j].pageName}'}) index="${i + 1}-${j}">${tag[i].pageInfoList[j].pageName}</el-menu-item>`;
-                switch (tag.length) {  //启用本地路由
-                    case 10:
-                        _tag += `<el-menu-item u="${_lists._system[num]}" v-on:click=Href({'uri':'../${_lists._system[num]}.html?hash:iforx${parseInt(13 * num / j + 2)}','title':'${tag[i].pageInfoList[j].pageName}'}) index="${i + 1}-${j}">${tag[i].pageInfoList[j].pageName}</el-menu-item>`;
-                        break;
-                    case 3:
-                        _tag += `<el-menu-item v-on:click=Href({'uri':'../${_lists._admin[num]}.html?hash:iforx${parseInt(13 * num / j + 2)}','title':'${tag[i].pageInfoList[j].pageName}'}) index="${i + 1}-${j}">${tag[i].pageInfoList[j].pageName}</el-menu-item>`;
-                        break;
-                    default:
-                        _tag += `<el-menu-item v-on:click=Href({'uri':'../${_lists._shop[num]}.html?hash:iforx${parseInt(13 * num / j + 2)}','title':'${tag[i].pageInfoList[j].pageName}'}) index="${i + 1}-${j}">${tag[i].pageInfoList[j].pageName}</el-menu-item>`;
-                        break;
-                };
-                num++;
-            };
-            _tag += `</el-menu-item-group>
-    </el-submenu>`;
+                if(tag[i].lowers){
+                    tag[i].lowers.forEach((element, index) => {
+                        _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i + 1}">${element.permissionName}
+                        </el-menu-item>`;
+                    })
+                }
+            _tag += `</el-menu-item-group></el-submenu>`;
 
         };
         document.getElementsByClassName('menu')[0].innerHTML = _tag;

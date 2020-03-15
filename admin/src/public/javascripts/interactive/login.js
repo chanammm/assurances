@@ -4,15 +4,6 @@ if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) {
         document.getElementsByClassName('login')[0].style.background = 'none';
     }
 }
-import axios from 'axios';
-import qs from 'qs';
-axios.defaults.baseURL = 'http://192.168.0.122:8080/';
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
-axios.defaults.crossDomain = true;
-// axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
-axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('token') ? JSON.parse(sessionStorage.getItem('token')).asset.secret : ''; // 设置请求头为 Authorization
-
-
 new Vue({
     el: '#app',
     data: () => {
@@ -68,7 +59,7 @@ new Vue({
                         axios.defaults.headers.common['Authorization'] = JSON.parse(sessionStorage.getItem('token')).asset.secret; // 设置请求头为 Authorization
                         axios.post('admin_role_permissions').then(params => {
                             sessionStorage.setItem('_a', JSON.stringify({ _u: ':hash(iox*)', _i: user.value }))  //管理员信息
-                            sessionStorage.setItem('tag', JSON.stringify(params.data.data.resourcePermissions));
+                            sessionStorage.setItem('tag', JSON.stringify(params.data.data.pagePermissions));
                             setTimeout(() => {
                                 location.href = "./views/common/index.htm?hash:" + ym.init.GETRANDOM(8);
                             }, 500);
