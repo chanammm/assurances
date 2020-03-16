@@ -11,13 +11,30 @@ axios.defaults.crossDomain = true;
 // axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
 axios.defaults.headers.common['Authorization'] = ''; // 设置请求头为 Authorization
 //配置发送请求前的拦截器 可以设置token信息 
-axios.interceptors.request.use(config => {
-    //loading开始
-    return config;
-}, error => {
-    //出错，也要loading结束
-    return Promise.reject(error);
-});
+axios.interceptors.request.use(
+	config => {
+		// 在发送请求之前做什么
+		if (config.method === "post") {
+		} else {
+		}
+		return config;
+	},
+	error => {
+		return Promise.reject(error);
+	})
+axios.interceptors.response.use(
+	response => {
+		if (response.status === 200) {
+			return Promise.resolve(response);
+		} else {
+			return Promise.reject(response);
+		}
+	},
+	error => {
+		console.log(error)
+		return Promise.reject(error.response);
+	}
+)
 
 class init {
     constructor() {
@@ -30,7 +47,9 @@ class init {
 
     _input_() {
         document.querySelectorAll('input').forEach((element, index) => {
-            this.data[element.name] = element.value + `|${element.getAttribute('placeholder')}`;
+            if(element.name != 'installPic' && element.name != 'nameplatePic'){
+                this.data[element.name] = element.value + `|${element.getAttribute('placeholder')}`;
+            }
         });
     }
 
@@ -57,13 +76,16 @@ class init {
                             document.querySelectorAll('.qualiydomain>div>span').forEach((domain, index)=> {
                                 Object.keys(params.data.data).forEach((element,i) => {
                                     if(element == domain.getAttribute('name')){
-                                        document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = Object.values(params.data.data)[i];
+                                        if(Object.values(params.data.data)[i] == '-1'){
+                                            document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = '无';
+                                        }else{
+                                            document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = Object.values(params.data.data)[i];
+                                        }
                                     }
                                 })
                                 if(params.data.data.auditStatus == 1){
                                     document.querySelector(`#time`).style.display = 'block';
                                     document.querySelector(`nav>span`).innerHTML = '已激活';
-                                    
                                     // nav-top-banner-ccc
                                 }else if(params.data.data.auditStatus == 2){
                                     document.querySelector(`nav>span`).innerHTML = '未通过';
@@ -75,12 +97,13 @@ class init {
                                     document.querySelector(`.ban>img`).setAttribute('src', '../images/nav-top-banner-ccc.png');
                                 }
                                 // qualiydomain
-                            }
-                            ) 
+                            })
+                            params.data.data.machinePic != -1 ? document.querySelectorAll('.banner')[1].setAttribute('src',  params.data.data.machinePic) : null;
                         } else {
                             this._alert_(params.data.msg, 1000);
                         }
                     });
+                    sessionStorage.clear();
                     throw new Error('not page action!');
             }
             this.dom.onclick = (param = {}) => {  //提交
@@ -122,16 +145,20 @@ class init {
                         }
                         this.bool = false;
                         axios.post('commit_activate', qs.stringify(param)).then(params => {
+                            this.bool = true;
                             if (params.data.state == 200) {
-                                this.bool = false;
-                                this._alert_(params.data.msg, 1000);
+                                // this._alert_(params.data.msg, 1000);
                                 this._show_('.alx-module');
-                                document.querySelector('.show').onclick = function(){
-                                    location.href = `./quality.html?${ param.machineSn }`;
-                                }
+                                sessionStorage.setItem('page', true);
                             } else {
                                 this._alert_(params.data.msg, 1000);
+                                if(sessionStorage.getItem('page')){
+                                    this._show_('.alx-module');
+                                }
                             }
+                            document.querySelector('.show').onclick = function(){
+                                location.href = `./quality.html?${ param.machineSn }`;
+                            };
                         })
                             .catch(function (error) {
     
@@ -203,60 +230,55 @@ class init {
     }
 
     _image_(name, index) {
-        document.getElementsByClassName(name)[0].click();
-        document.getElementsByClassName(name)[0].onchange = function (e) {
+        let that = this;
+        // document.getElementsByClassName(name)[0].click();
+        document.querySelector(`input[name=${ name }]`).click();
+        document.querySelector(`input[name=${ name }]`).onchange = function (e) {
             var localFile = this.files[0];
             var reader = new FileReader();
             var content;
             reader.onload = function (event) {
                 content = event.target.result;
-
-                //暂定
                 document.querySelectorAll('.pullimage')[index].setAttribute('src', content);
-
                 compress(content, 450, function (contentFile) {
-                    // push image
-                    // let _$file = new FormData();
-                    // _$file.append('maintainerId', assign.maintainerId);
-                    // _$file.append('type', 18);
-                    // _$file.append('file', contentFile, 'machineNumber_' + Math.random() + '.png');
-                    // axios({
-                    //     method: "POST",
-                    //     url: filePush,
-                    //     data: _$file,
-                    //     processData: false,
-                    //     traditional: true,
-                    //     contentType: false,
-                    //     headers: {
-                    //         "Content-Type": false
-                    //     },
-                    //     onUploadProgress: function (progressEvent) { //原生获取上传进度的事件
-                    //         if (progressEvent.lengthComputable) {
-                    //             //属性lengthComputable主要表明总共需要完成的工作量和已经完成的工作是否可以被测量
-                    //             //如果lengthComputable为false，就获取不到progressEvent.total和progressEvent.loaded
-                    //             if (progressEvent.total % progressEvent.loaded == +false) {
-                    //                 setTimeout(() => {
-                    //                     loading.style.display = 'none';
-                    //                 }, 2000)
-                    //             }
-                    //         }
-                    //     }
-                    // }).then(
-                    //     response => {
-                    // let _imgBox = document.createElement('figure'), _img = document.createElement('img'), _clone = document.createElement('svg'), _use = document.createElement('use');
-                    // _imgBox.className = 'hash[imageBox]';
-                    // _img.src = response.data.realPath;
-                    // _imgBox.appendChild(_img);
-                    // _clone.className = 'icon';
-                    // _clone.setAttribute('aria-hidden', "true");
-                    // _use.setAttribute('xlink:href', "#ym-icon-guanbi");
-                    // _clone.appendChild(_use);
-                    // _imgBox.appendChild(_clone);
-                    // photo.appendChild(_imgBox);
-                    //     }
-                    // ).catch((error) => {
-                    //     console.log(error);
-                    // })
+                    let _$file = new FormData();
+                    _$file.append('file', contentFile, 'machineNumber_' + Math.random() + '.png');
+                    axios({
+                        method: "POST",
+                        url: 'http://test.cbcoffee.cn:8085/picture_file_upload',
+                        data: _$file,
+                        processData: false,
+                        traditional: true,
+                        contentType: false,
+                        headers: {
+                            "Content-Type": false
+                        },
+                        transformRequest: [function (data) {
+                            return data
+                        }],
+                        onUploadProgress: function (progressEvent) { //原生获取上传进度的事件
+                            if (progressEvent.lengthComputable) {
+                                document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML =  '上传图片进度' +(progressEvent.loaded / progressEvent.total * 100 | 0) +'%';
+                                if (progressEvent.total % progressEvent.loaded == +false) {
+                                    setTimeout(() => {
+                                        document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML = '';
+                                    }, 2000)
+                                }
+                            }
+                        }
+                    }).then(
+                        response => {
+                            if(response.data.state == 200){
+                                // document.querySelectorAll('.pullimage')[index].setAttribute('src', response.data.data.path);
+                                that.data[name] = response.data.data.path;
+                            }else{
+                                document.querySelectorAll('.pullimage')[index].setAttribute('src', '');
+                                that._alert_(response.data.msg, 1000);
+                            }
+                        }
+                    ).catch((error) => {
+                        console.log(error);
+                    })
                 });
             };
             reader.onerror = function () {
@@ -286,6 +308,7 @@ class init {
                 console.log(content.length * 1024);
                 //进行压缩
                 content = canvas.toDataURL("image/jpeg", 0.2);
+                //压缩后
                 console.log(content.length * 1024);
                 let blob = dataURItoBlob(content);
                 callback(blob);

@@ -20,16 +20,18 @@ html(lang="en")
         .link
         .title 
             div 上传设备铭牌
-            img.pullimage(src="../images/icon-pull-image.png", name="fileReader")
-            input(type="file" name="nameplatePic" accept="image/*" multiple class="fileReader" style="display:none;")
+            img.pullimage(src="../images/icon-pull-image.png", name="nameplatePic")
+            code.text
+            input(type="file" name="nameplatePic" accept="image/*" multiple class="fileReader" style="display:none;" placeholder="请上传设备铭牌")
             div.sketchmap
                 span 示意图
                 img(src="../images/icon-sketchmap-image.png")
         .link.ccc
         .title 
             div 上传装机现场图片
-            img.pullimage(src="../images/icon-pull-image.png", name="fileReaderTwo")
-            input(type="file" name="installPic" accept="image/*" multiple class="fileReaderTwo" style="display:none;")
+            img.pullimage(src="../images/icon-pull-image.png", name="installPic")
+            code.text
+            input(type="file" name="installPic" accept="image/*" multiple class="fileReaderTwo" style="display:none;" placeholder="请上传装机现场图片")
             div.sketchmap
                 span 示意图
                 img(src="../images/icon-sketchmap-shop-image.png")
@@ -41,7 +43,7 @@ html(lang="en")
         .title
             img.icons(src="../images/icon-call.png") 
             div.disabled 电话
-            input(type="text" name="clientPhone" placeholder="请输入电话")
+            input(type="nubmer" name="clientPhone" placeholder="请输入电话")
         .link.ccc
         .title
             img.icons(src="../images/icon-user-shop.png") 
@@ -68,3 +70,4 @@ html(lang="en")
     .text-mudule
     .image-show
         img(src="../images/icon-sketchmap-shop-image.png")
+    .oneHoold

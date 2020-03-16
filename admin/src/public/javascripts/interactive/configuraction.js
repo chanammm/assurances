@@ -35,7 +35,6 @@ axios.interceptors.response.use(
 	response => {
 		// 如果返回的状态码为200，说明接口请求成功，可以正常拿到数据
 		// 否则的话抛出错误
-		console.log(response)
 		if (response.status === 200) {
 			if(response.data.state === 201){
 				window.ym.init.MBOX('事务提示：登陆已失效，请重新登陆');

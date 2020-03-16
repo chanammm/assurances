@@ -34,6 +34,10 @@ window.addEventListener('pageshow', function (params) {
         data: () => {
             return {
                 fileUpdata: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Files_ : parent.all.json._j.URLS.ForMal_Files_) + 'picture_file_upload',
+                fileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'import_machine_by_excel',
+                fileUpdataExcData: {
+                    Authorization: JSON.parse(sessionStorage.getItem('token')).asset.secret
+                },
                 loading: false,
                 testAdmin: ym.init.COMPILESTR.decrypt(JSON.parse(sessionStorage.getItem('_a'))._i) == "yuanmenghhx" || ym.init.COMPILESTR.decrypt(JSON.parse(sessionStorage.getItem('_a'))._i) == "yuanmengKSX" ? false : true,  //指定的账号不能显示订单查看
                 more: false,
@@ -42,6 +46,7 @@ window.addEventListener('pageshow', function (params) {
                 UnTableFormData:[],
                 currentPage: 1,
                 pageSize: 20,
+                page: 1,
                 total: 0,
                 formData: {},
                 SearchTableAndVisible: false,
@@ -50,9 +55,13 @@ window.addEventListener('pageshow', function (params) {
                 TableAndVisible: false,
                 dialogVisible: false,
                 adoptModule: false,
+                errorExe: false,
                 dialogImageUrl: '',
+                fileList: [],
                 data: {},
                 num: 1,
+                listSearch: {
+                },  //新的列表查询对象
                 SearchTableFormData: {
                     realName: '',
                     workCount: '',
@@ -211,54 +220,23 @@ window.addEventListener('pageshow', function (params) {
                 this.page = e;
                 this.list(this.pageparams ? this.pageparams : null, true);
             },
-            list(params, bool) {
+            list(params = {}, bool) {
                 let _data_ = {}, it = this, xml = [];
                 if (params) {
                     it.pageparams = params; //保存搜索条件
-                    params._name_ && params._value_ ? params[params._name_] = params._value_ : null;  //第一搜索key of value
-                    if (params._time_) {
-                        params['startDate'] = ym.init.getDateTime(params._time_[0]).split(' ')[0];
-                        params['endDate'] = ym.init.getDateTime(params._time_[1]).split(' ')[0];
-                        if (uri == 'statistics_shop' || uri == 'find_order_list') {
-                            params['startTime'] = params['startDate'];
-                            params['endTime'] = params['endDate'];
-                            delete params['startDate']
-                            delete params['endDate']
-                        }
-                        if (uri == 'admin_statistics_log_list') {
-                            if (params.timeUnit == 2) {
-                                params['startDate'] = params['startDate'].substring(0, params['startDate'].lastIndexOf('-'));
-                                params['endDate'] = params['endDate'].substring(0, params['endDate'].lastIndexOf('-'));
-                            } else if (params.timeUnit == 1) {
-                                params['startDate'] = params['startDate'].split('-')[0];
-                                params['endDate'] = params['endDate'].split('-')[0];
-                            }
-                        }
-                    }
+                    params._name_ ? params[params._name_] = params._value_ : null;
                 }
-
                 it.loading = true;
-
-                if (uri == 'admin_statistics_list' || uri == 'machine_statistics_list' || uri == 'admin_statistics_log_list') {  //新商户统计
-                    _data_['startDate'] = _data_['startDate'] || ym.init.getDateTime(new Date().setTime(new Date().getTime() - 3600 * 1000 * 24 * 7)).split(' ')[0];
-                    _data_['endDate'] = _data_['endDate'] || ym.init.getDateTime(new Date()).split(' ')[0];
-                    it.listSearch._time_ = [_data_['startDate'], _data_['endDate']]
-                    _data_['hasTest'] = _data_['hasTest'] || it.listSearch.hasTest;
-                    if (uri == 'admin_statistics_log_list') {
-                        _data_['timeUnit'] = params ? params['timeUnit'] : it.listSearch.timeUnit;
-                    }
-                };
-
-                _data_['page'] = !bool ? (() => {
+                params['page'] = !bool ? (() => {
                     it.currentPage = 1;
                     return it.currentPage
                 })() : it.page;
-                _data_['pageSize'] = 20;
-                _data_ = qs.stringify(_data_);
+                params['pageSize'] = 20;
+                _data_ = qs.stringify(params);
                 axios.post(uri, _data_).then(params => {
                     let xml = [], data = params.data;
-                    data.total ? it.total = parseInt(data.total) : null;
-                    data.pageSize ? it.currentPage = parseInt(data.pageSize) : null;  //数据总条数
+                    data.page.total ? it.total = parseInt(data.page.total) : null;
+                    // data.page.pages ? it.currentPage= parseInt(data.page.pages) : null;
                     if(data.state == 200){
                         if(uri == 'page_permission_tree'){
                             data.list.forEach((element, index) => {
@@ -271,6 +249,9 @@ window.addEventListener('pageshow', function (params) {
                         }else{
                             xml = data.page.records;
                         }
+                    }else{
+                        is.IError(is.data.msg);
+                        is.loading = false;
                     }
                     it.tableData = xml;
                     setTimeout(() => {
@@ -435,7 +416,7 @@ window.addEventListener('pageshow', function (params) {
             },
 
             //查看设备详细
-            machineDest(params){
+            machineDest(params, timer = null){
                 axios.get('sys_machine_detail', {
                     params: {
                         machineId: params
@@ -450,11 +431,15 @@ window.addEventListener('pageshow', function (params) {
                         }
                         // Object.keys(res.data.data).forEach((element, index))
                         is.SearchTableFormData = res.data.data;
-                        setTimeout(() => {
+                        timer = setTimeout(() => {
                             if(res.data.data.auditStatus == 2){
-                                document.getElementById('adopt').innerHTML = '审核不通过!';
-                                document.getElementById('adopt').style.color = 'red';
+                                document.getElementById('adopt-error').style.display = 'block';
+                                document.getElementById('adopt').style.display = 'none';
+                            }else{
+                                document.getElementById('adopt-error').style.display = 'none';
+                                document.getElementById('adopt').style.display = 'block';
                             }
+                            timer = null;
                         }, 0)
                     } else {
                         is.IError(res.data.msg);
@@ -464,7 +449,7 @@ window.addEventListener('pageshow', function (params) {
                         is.IError(error);
                     })
             },
-
+            //审核 工单
             adopt(params, bool){
                 axios.get('audit_machine', {
                     params: {
@@ -484,7 +469,28 @@ window.addEventListener('pageshow', function (params) {
                         is.IError(error);
                     })
             },
-
+            //上传EX
+            ExecSceneSuccess(file){
+                if(file.state == 200){
+                    this.data['Execfile'] = file.data.failFilePath;
+                    if(file.data.fail > 0){
+                        is.errorExe = true;
+                        is.fileList = [];
+                        is.$nextTick(function () {
+                            document.getElementById('ahrefDownload').onclick = function(){
+                                parent.window.open(file.data.failFilePath,'_blank');
+                            };
+                        });
+                        return false;
+                    }
+                    this.ISuccessfull('上传成功！');
+                }else{
+                    is.IError(file.msg);
+                }
+            },
+            exeLength(error){
+                is.IError('文件上传超出处理限制个数');
+            },
 
 
 

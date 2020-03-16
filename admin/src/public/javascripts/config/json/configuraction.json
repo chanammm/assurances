@@ -30,7 +30,7 @@
     "Buckets": null,
     "Backups": "location this JSON",
     "URLS": {
-        "ForMal_Files_": "http://test.cbcoffee.cn:8080/",
+        "ForMal_Files_": "http://test.cbcoffee.cn:8085/",
         "Development_Server_": "http://test.cbcoffee.cn:8080/",
         "Development_Files_": "http://test.cbcoffee.cn:8085/"
     },

@@ -85,8 +85,15 @@ new Vue({
             <el-menu-item-group>`;
                 if(tag[i].lowers){
                     tag[i].lowers.forEach((element, index) => {
-                        _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i + 1}">${element.permissionName}
-                        </el-menu-item>`;
+                        if(process.env.NODE_ENV == "development"){
+                            _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i + 1}">${element.permissionName}
+                            </el-menu-item>`;
+                        }else{
+                            console.log(element.requestUri.substring(element.requestUri.lastIndexOf('/') + 1).split('.')[0])
+                            element.requestUri = `/rundev/assurances/admin/views/${ element.requestUri.substring(element.requestUri.lastIndexOf('/') + 1).split('.')[0] }`;
+                            _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i + 1}">${element.permissionName}
+                            </el-menu-item>`;
+                        }
                     })
                 }
             _tag += `</el-menu-item-group></el-submenu>`;
