@@ -116,6 +116,36 @@ module.exports = {
             hash: true,
             chunks: ['configration', 'list']
         }),
+        new HtmlWebpackPlugin({  //devicemanage
+            template: './src/views/devicemanage.html',
+            filename: '../views/devicemanage.html',
+            minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true
+            },
+            hash: true,
+            chunks: ['configration', 'list']
+        }),
+        new HtmlWebpackPlugin({  //addressmanage
+            template: './src/views/addressmanage.html',
+            filename: '../views/addressmanage.html',
+            minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true
+            },
+            hash: true,
+            chunks: ['configration', 'list']
+        }),
+        new HtmlWebpackPlugin({  //admin
+            template: './src/views/admin.html',
+            filename: '../views/admin.html',
+            minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true
+            },
+            hash: true,
+            chunks: ['configration', 'list']
+        }),
         new MiniCssExtractPlugin({
             template: './src/public/stylesheets/base/style.min.css',
             filename: '../stylesheets/-b8bW2Vg3fwHozO.css'

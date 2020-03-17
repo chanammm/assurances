@@ -16,13 +16,13 @@
 
 
 <body class="_scrollbar">
-    <div id="c-container-list" style="height: 100%;" data-uri="sys_machine_list" v-loading.fullscreen.lock="loading">
+    <div id="c-container-list" style="height: 100%;" data-uri="sys_machine_instance_list" v-loading.fullscreen.lock="loading">
         <el-container>
             <el-main>
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {}; imageList = {}" type="primary">新增设备<i
+                            <el-button @click="UpdateTableAndVisible = true; formData = {}; search({url: 'sys_machine_list'})" type="primary">新增设备<i
                                     class="el-icon-plus el-icon--right"></i></el-button>
                             <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入设备</el-button>
                         </div>
@@ -40,11 +40,20 @@
                     </el-form>
                     <template>
                         <el-table :data="tableData" stripe style="width: 100%" border>
-                            <el-table-column prop="machineId" label="secretID"></el-table-column>
+                            <el-table-column prop="machineInstanceId" label="secretID"></el-table-column>
                             <el-table-column prop="machineName" label="设备名称"></el-table-column>
                             <el-table-column prop="machineSn" label="设备SN号"></el-table-column>
                             <el-table-column prop="machineType" label="设备类型"></el-table-column>
-                            <el-table-column prop="orderNum" label="出库单号"></el-table-column>
+                            <el-table-column prop="orderNum" label="出库单号">
+                                <template slot-scope="scope">
+                                    {{ scope.row.orderNum == -1 ? '无' : scope.row.orderNum }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="coding" label="物料编号">
+                                <template slot-scope="scope">
+                                    {{ scope.row.coding == -1 ? '无' : scope.row.coding }}
+                                </template>
+                            </el-table-column>
                             <el-table-column prop="maintainStatus" label="质保状态">
                                 <template slot-scope="scope">
                                     {{ scope.row.maintainStatus == 1 ? '有效' : '失效' }}
@@ -61,24 +70,24 @@
                                     {{ scope.row.status == 2 ? '已激活' :  scope.row.status == 1 ? '激活申请中': '未激活' }}
                                 </template>
                             </el-table-column>
-                            <!-- <el-table-column prop="machinePic" label="图片">
+                            <el-table-column prop="machinePic" label="图片">
                             <template slot-scope="scope">
                                 <el-popover trigger="hover" placement="top">
-                                    <el-image :src="scope.row.machinePic"
-                                        :preview-src-list="scope.row.machinePic" style="text-align: center;">
+                                    <el-image :src="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
+                                        :preview-src-list="scope.row.machinePic  == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic" style="text-align: center;">
                                     </el-image>
                                     <div slot="reference" class="name-wrapper">
-                                        <el-image :src="scope.row.machinePic"
-                                            :preview-src-list="scope.row.machinePic" lazy></el-image>
+                                        <el-image :src="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
+                                            :preview-src-list="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic" lazy></el-image>
                                     </div>
                                 </el-popover>
                             </template>
-                        </el-table-column> -->
+                        </el-table-column>
 
 
                             <el-table-column fixed="right" label="操作">
                                 <template slot-scope="scope">
-                                    <el-button type="text" size="small" @click="machineDest(scope.row.machineId)">
+                                    <el-button type="text" size="small" @click="machineDest(scope.row.machineInstanceId)">
                                         详情
                                     </el-button>
                                 </template>
@@ -93,52 +102,50 @@
 
 
                     <el-dialog title="新增设备" :visible.sync="UpdateTableAndVisible">
-                        <el-form :model="formData" id="machine">
-                            <el-form-item label="设备型号：">
-                                <el-input v-model="formData.machineType"></el-input>
-                            </el-form-item>
-
+                        <el-form :model="formData" id="machine" label-width="100px">
                             <el-form-item label="设备SN码：">
                                 <el-input v-model="formData.machineSn"></el-input>
                             </el-form-item>
-
-                            <el-form-item label="物料编号：">
-                                <el-input v-model="formData.coding"></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="机器名称：">
-                                <el-input v-model="formData.machineName"></el-input>
-                            </el-form-item>
-                            <el-form-item label="机器色号">
-                                <el-input v-model="formData.colourScheme"></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="机器参数：">
-                                <el-input v-model="formData.machineParameter"></el-input>
-                            </el-form-item>
-                            <el-form-item label="机器图片">
-                                <template v-model="ruleForm.machinePic">
-                                    <el-upload prop="machinePic" :action="fileUpdata" list-type="picture-card"
-                                        :file-list="imageList.machinePic" :on-change="fileChange"
-                                        :on-success="machineSceneSuccess" :limit="num" :on-exceed="fileExceed"
-                                        :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-                                        <i class="el-icon-plus"></i>
-                                    </el-upload>
-                                    <el-dialog :visible.sync="dialogVisible">
-                                        <img width="100%" :src="dialogImageUrl" alt="">
-                                    </el-dialog>
-                                </template>
-                            </el-form-item>
-
-                            <el-form-item label="出货单号">
+                            <el-form-item label="出货单号：">
                                 <el-input v-model="formData.orderNum"></el-input>
                             </el-form-item>
-
-                            <el-form-item label="地址ID">
-                                <el-input v-model="formData.addressId = 1" :disabled="true"></el-input>
+                            <el-form-item label="物料编号：">
+                                <el-select width="100%"
+                                    v-model="formData.machineId"
+                                    filterable
+                                    remote
+                                    reserve-keyword
+                                    placeholder="输入【物料编号】自动查询，支持模糊查询"
+                                    :remote-method="remoteMethod"
+                                    :loading="loading">
+                                    <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                    </el-option>
+                                </el-select>
+                                <div>输入【物料编号】进行查询出结果后，请点击选择相应的【物料编号】</div>
                             </el-form-item>
-
-                            <el-form-item label="出库日期">
+                            <el-form-item label="区域地址：">
+                                <el-select width="100%"
+                                    v-model="formData.addressId"
+                                    filterable
+                                    remote
+                                    reserve-keyword
+                                    :remote-method="remoteMethods"
+                                    placeholder="输入【区域地址】自动查询，支持模糊查询"
+                                    :loading="loading">
+                                    <el-option
+                                    v-for="item in option"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                    </el-option>
+                                </el-select>
+                                <div>输入【区域地址】进行查询出结果后，请点击选择相应的【区域地址】</div>
+                            </el-form-item>
+                            <el-form-item label="出库日期：">
                                 <el-date-picker v-model="formData.exWarehouseTime" start-placeholder="开始日期">
                                 </el-date-picker>
                             </el-form-item>
@@ -206,7 +213,7 @@
                             <el-form :data="SearchTableFormData" label-width="160px">
                                 
                                 <el-form-item label="激活日期" prop="activateTime">
-                                    <el-input v-model="SearchTableFormData.activateTime"></el-input>
+                                    <el-input v-model="SearchTableFormData.activateTime" disabled="disabled"></el-input>
                                 </el-form-item>
                                 <el-form-item label="机器Sn码" prop="machineSn">
                                     <el-input v-model="SearchTableFormData.machineSn"></el-input>
@@ -214,28 +221,19 @@
                                 <el-form-item label="设备型号" prop="machineType">
                                     <el-input v-model="SearchTableFormData.machineType"></el-input>
                                 </el-form-item>
-                                <el-form-item label="地址区域id" prop="addressId">
-                                    <el-input v-model="SearchTableFormData.addressId"></el-input>
+                                <el-form-item label="审核状态" prop="auditStatus">
+                                    <el-input v-model="SearchTableFormData.auditStatus"></el-input>
+                                    <div style="font-size: 10px;">审核状态：(0-未审核,1-已通过, 2-未通过)</div>
                                 </el-form-item>
-                                <!-- <el-form-item label="审核者" prop="auditBy">
-                                    <el-input v-model="SearchTableFormData.auditBy"></el-input>
-                                </el-form-item> -->
                                 <el-form-item label="审核者当时名称" prop="auditName">
                                     <el-input v-model="SearchTableFormData.auditName"></el-input>
                                 </el-form-item>
-                                <!-- <el-form-item label="审核状态" prop="auditStatus">
-                                    <template>
-                                        <el-input v-model="SearchTableFormData.auditStatus"></el-input>
-                                    </template>
-                                </el-form-item> -->
                                 <el-form-item label="审核时间" prop="auditTime">
                                     <el-input v-model="SearchTableFormData.auditTime"></el-input>
                                 </el-form-item>
-
-                                <el-form-item label="客户id" prop="clientId">
+                                <el-form-item label="客户ID" prop="clientId">
                                     <el-input v-model="SearchTableFormData.clientId"></el-input>
                                 </el-form-item>
-
                                 <el-form-item label="客户姓名" prop="clientName">
                                     <el-input v-model="SearchTableFormData.clientName"></el-input>
                                 </el-form-item>
@@ -257,20 +255,15 @@
                                 <el-form-item label="物料编号" prop="coding">
                                     <el-input v-model="SearchTableFormData.coding"></el-input>
                                 </el-form-item>
-
                                 <el-form-item label="机器色系" prop="colourScheme">
                                     <el-input v-model="SearchTableFormData.colourScheme"></el-input>
                                 </el-form-item>
-                                <!-- <el-form-item label="创建者" prop="createBy">
-                                    <el-input v-model="SearchTableFormData.createBy"></el-input>
-                                </el-form-item> -->
                                 <el-form-item label="创建者当时名称" prop="createName">
                                     <el-input v-model="SearchTableFormData.createName"></el-input>
                                 </el-form-item>
                                 <el-form-item label="创建时间" prop="createTime">
                                     <el-input v-model="SearchTableFormData.createTime"></el-input>
                                 </el-form-item>
-
                                 <el-form-item label="经销商" prop="dealer">
                                     <el-input v-model="SearchTableFormData.dealer"></el-input>
                                 </el-form-item>
@@ -280,34 +273,20 @@
                                 <el-form-item label="质保到期时间" prop="expireTime">
                                     <el-input v-model="SearchTableFormData.expireTime"></el-input>
                                 </el-form-item>
-                                
                                 <el-form-item label="质保延长到期时间" prop="extendExpireTime">
                                     <el-input v-model="SearchTableFormData.extendExpireTime"></el-input>
-                                </el-form-item>
-                                <el-form-item label="装机照片" prop="installPic">
-                                    <el-input v-model="SearchTableFormData.installPic"></el-input>
-                                </el-form-item>
-                                <el-form-item label="机器id" prop="machineId">
-                                    <el-input v-model="SearchTableFormData.machineId"></el-input>
                                 </el-form-item>
                                 <el-form-item label="设备名称" prop="machineName">
                                     <el-input v-model="SearchTableFormData.machineName"></el-input>
                                 </el-form-item>
-
                                 <el-form-item label="机器参数" prop="machineParameter">
                                     <el-input v-model="SearchTableFormData.machineParameter"></el-input>
                                 </el-form-item>
                                 <el-form-item label="机器图片" prop="machinePic">
                                     <el-input v-model="SearchTableFormData.machinePic"></el-input>
                                 </el-form-item>
-                                <el-form-item label="省" prop="province">
-                                    <el-input v-model="SearchTableFormData.province"></el-input>
-                                </el-form-item>
-                                <el-form-item label="市" prop="city">
-                                    <el-input v-model="SearchTableFormData.city"></el-input>
-                                </el-form-item>
-                                <el-form-item label="区" prop="district">
-                                    <el-input v-model="SearchTableFormData.district"></el-input>
+                                <el-form-item label="省/市/区" prop="province">
+                                    <el-input v-model="SearchTableFormData.province +'/'+ SearchTableFormData.city +'/'+ SearchTableFormData.district"></el-input>
                                 </el-form-item>
                                 <el-form-item label="详细地址" prop="address">
                                     <el-input v-model="SearchTableFormData.address"></el-input>
@@ -315,24 +294,24 @@
                                 <el-form-item label="出库单号" prop="orderNum">
                                     <el-input v-model="SearchTableFormData.orderNum"></el-input>
                                 </el-form-item>
-                                <el-form-item label="铭牌照片" prop="nameplatePic">
-                                    <el-input v-model="SearchTableFormData.nameplatePic"></el-input>
+                                <el-form-item label="铭牌照片" prop="SearchTableFormData.nameplatePic">
+                                    <el-popover trigger="hover" placement="top">
+                                        <el-image :src="SearchTableFormData.nameplatePic" style="text-align: center;"></el-image>
+                                        <div slot="reference" class="name-wrapper">
+                                            <el-image :src="SearchTableFormData.nameplatePic"
+                                                :preview-src-list="SearchTableFormData.nameplatePic" lazy></el-image>
+                                        </div>
+                                    </el-popover>
                                 </el-form-item>
-                                <!-- <el-form-item label="质保是否有效" prop="maintainStatus">
-                                    <el-input v-model="SearchTableFormData.maintainStatus"></el-input>
+                                <el-form-item label="装机照片" prop="SearchTableFormData.installPic">
+                                    <el-popover trigger="hover" placement="top">
+                                        <el-image :src="SearchTableFormData.installPic" style="text-align: center;"></el-image>
+                                        <div slot="reference" class="name-wrapper">
+                                            <el-image :src="SearchTableFormData.installPic"
+                                                :preview-src-list="SearchTableFormData.installPic" lazy></el-image>
+                                        </div>
+                                    </el-popover>
                                 </el-form-item>
-
-                                <el-form-item label="数据状态" prop="status">
-                                    <el-input v-model="SearchTableFormData.status"></el-input>
-                                </el-form-item> -->
-
-
-
-
-
-
-
-
                             </el-form>
                         </div>
     </el-dialog>

@@ -80,6 +80,9 @@ class init {
                                             document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = '无';
                                         }else{
                                             document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = Object.values(params.data.data)[i];
+                                            if(document.querySelectorAll(`.qualiydomain>div>span`)[index].getAttribute('name') == 'extendExpireTime'){
+                                                document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = Object.values(params.data.data)[i].split(' ')[0];
+                                            }
                                         }
                                     }
                                 })

@@ -34,7 +34,7 @@ window.addEventListener('pageshow', function (params) {
         data: () => {
             return {
                 fileUpdata: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Files_ : parent.all.json._j.URLS.ForMal_Files_) + 'picture_file_upload',
-                fileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'import_machine_by_excel',
+                fileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'import_machine_instance_by_excel',
                 fileUpdataExcData: {
                     Authorization: JSON.parse(sessionStorage.getItem('token')).asset.secret
                 },
@@ -43,12 +43,20 @@ window.addEventListener('pageshow', function (params) {
                 more: false,
                 tableData: [],
                 UnFormData: [],
-                UnTableFormData:[],
+                UnTableFormData: [],
                 currentPage: 1,
                 pageSize: 20,
                 page: 1,
                 total: 0,
-                formData: {},
+                machineId: [],
+                addressId: [],
+                roleId: [],
+                formData: {
+                    machineId: [],
+                    addressId: []
+                },
+                options: [],
+                option: [],
                 SearchTableAndVisible: false,
                 UpdateTableAndVisible: false,
                 detailTableAndVisible: false,
@@ -56,6 +64,7 @@ window.addEventListener('pageshow', function (params) {
                 dialogVisible: false,
                 adoptModule: false,
                 errorExe: false,
+                pawstate: false,
                 dialogImageUrl: '',
                 fileList: [],
                 data: {},
@@ -79,12 +88,13 @@ window.addEventListener('pageshow', function (params) {
                     remark: '',
                     id: ''
                 },
-                imageList:{
+                imageList: {
                     machinePic: []
                 },
-                fileData:{
-                    
+                fileData: {
+
                 },
+                errorImage: ['../images/error.png'],
                 pickerOptions: {  //时间节点
                     shortcuts: [{
                         text: '最近一周',
@@ -235,10 +245,9 @@ window.addEventListener('pageshow', function (params) {
                 _data_ = qs.stringify(params);
                 axios.post(uri, _data_).then(params => {
                     let xml = [], data = params.data;
-                    data.page.total ? it.total = parseInt(data.page.total) : null;
                     // data.page.pages ? it.currentPage= parseInt(data.page.pages) : null;
-                    if(data.state == 200){
-                        if(uri == 'page_permission_tree'){
+                    if (data.state == 200) {
+                        if (uri == 'page_permission_tree') {
                             data.list.forEach((element, index) => {
                                 if (element.lowers) {
                                     element['hasChildren'] = true;
@@ -246,11 +255,12 @@ window.addEventListener('pageshow', function (params) {
                                 }
                                 xml.push(element);
                             })
-                        }else{
+                        } else {
+                            data.page.total ? it.total = parseInt(data.page.total) : null;
                             xml = data.page.records;
                         }
-                    }else{
-                        is.IError(is.data.msg);
+                    } else {
+                        is.IError(data.msg);
                         is.loading = false;
                     }
                     it.tableData = xml;
@@ -313,13 +323,13 @@ window.addEventListener('pageshow', function (params) {
                         is.UnTableFormData = res.data.list;
                         res.data.list.forEach((element, index) => {
                             params.forEach((els) => {
-                                if(els.permissionId == element.permissionId){
+                                if (els.permissionId == element.permissionId) {
                                     it.$nextTick(function () {
                                         is.tableChecked(index);  //每次更新了数据，触发这个函数即可。
                                     });
                                 }
                             })
-                            
+
                         })
                     } else {
                         is.IError(res.data.msg);
@@ -374,7 +384,7 @@ window.addEventListener('pageshow', function (params) {
 
 
             //查看客户详细
-            customerDest(params){
+            customerDest(params) {
                 axios.get('machine_client_detail', {
                     params: {
                         clientId: params
@@ -392,19 +402,41 @@ window.addEventListener('pageshow', function (params) {
                     })
             },
 
-            //新增设备
-            machine(params){
-                //create_machine
-                //is.data.machinePic
-                document.querySelectorAll('#machine>div>div>div>input').forEach((element, index) => {
-                    console.log(element);
-                })
-                
+            //新增 实例 设备
+            machine(params) {
+                // document.querySelectorAll('#machine>div>div>div>input').forEach((element, index) => {
+                //     console.log(element);
+                // })
+                try {
+                    params['addressId'] = params.addressId[0];
+                    params['machineId'] = params.machineId[0];
+                    params['exWarehouseTime'] = ym.init.getDateTime(params.exWarehouseTime).split(' ')[0];
+                    axios.post('create_machine_instance', qs.stringify(params)).then(res => {
+                        if (res.data.state == 200) {
+                            is.UpdateTableAndVisible = false;
+                            is.ISuccessfull(res.data.msg);
+                            is.data = {};
+                            is.list();
+                        } else {
+                            is.IError(res.data.msg);
+                        }
+                    })
+                        .catch(function (error) {
+                            is.IError(error);
+                        })
+                } catch (error) {
+                    is.IError(error);
+                }
+            },
+
+            //新增设备 
+            devicemachine(params) {
                 params['machinePic'] = is.data.machinePic;
-                params['exWarehouseTime'] = ym.init.getDateTime(params.exWarehouseTime).split(' ')[0];
                 axios.post('create_machine', qs.stringify(params)).then(res => {
                     if (res.data.state == 200) {
                         is.UpdateTableAndVisible = false;
+                        is.ISuccessfull(res.data.msg);
+                        is.data = {};
                         is.list();
                     } else {
                         is.IError(res.data.msg);
@@ -415,29 +447,31 @@ window.addEventListener('pageshow', function (params) {
                     })
             },
 
-            //查看设备详细
-            machineDest(params, timer = null){
-                axios.get('sys_machine_detail', {
+            //查看实例设备详细
+            machineDest(params, timer = null) {
+                axios.get('sys_machine_instance_detail', {
                     params: {
-                        machineId: params
+                        machineInstanceId: params
                     }
                 }).then(res => {
                     if (res.data.state == 200) {
                         is.SearchTableAndVisible = true;
-                        if(res.data.data.status == 1){
-                           is.adoptModule = true; 
-                        }else{
-                            is.adoptModule = false; 
+                        if (res.data.data.status == 1) {
+                            is.adoptModule = true;
+                        } else {
+                            is.adoptModule = false;
                         }
                         // Object.keys(res.data.data).forEach((element, index))
                         is.SearchTableFormData = res.data.data;
                         timer = setTimeout(() => {
-                            if(res.data.data.auditStatus == 2){
+                            document.getElementById('adopt').style.display = 'none';
+                            if (res.data.data.auditStatus == 2) {
                                 document.getElementById('adopt-error').style.display = 'block';
-                                document.getElementById('adopt').style.display = 'none';
-                            }else{
+                            } else {
                                 document.getElementById('adopt-error').style.display = 'none';
-                                document.getElementById('adopt').style.display = 'block';
+                                if(res.data.data.status == 1){
+                                    document.getElementById('adopt').style.display = 'block';
+                                }
                             }
                             timer = null;
                         }, 0)
@@ -449,12 +483,32 @@ window.addEventListener('pageshow', function (params) {
                         is.IError(error);
                     })
             },
+
+            //查看设备详细
+            devicemachineDest(params) {
+                axios.get('sys_machine_detail', {
+                    params: {
+                        machineId: params
+                    }
+                }).then(res => {
+                    if (res.data.state == 200) {
+                        is.SearchTableAndVisible = true;
+                        is.SearchTableFormData = res.data.data;
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
             //审核 工单
-            adopt(params, bool){
-                axios.get('audit_machine', {
+            adopt(params, bool) {
+                axios.get('audit_machine_instance', {
                     params: {
                         auditResult: +bool + 1,
-                        machineId: params.machineId
+                        machineInstanceId : params.machineInstanceId 
                     }
                 }).then(res => {
                     if (res.data.state == 200) {
@@ -470,27 +524,155 @@ window.addEventListener('pageshow', function (params) {
                     })
             },
             //上传EX
-            ExecSceneSuccess(file){
-                if(file.state == 200){
+            ExecSceneSuccess(file) {
+                if (file.state == 200) {
                     this.data['Execfile'] = file.data.failFilePath;
-                    if(file.data.fail > 0){
+                    if (file.data.fail > 0) {
                         is.errorExe = true;
                         is.fileList = [];
                         is.$nextTick(function () {
-                            document.getElementById('ahrefDownload').onclick = function(){
-                                parent.window.open(file.data.failFilePath,'_blank');
+                            document.getElementById('ahrefDownload').onclick = function () {
+                                parent.window.open(file.data.failFilePath, '_blank');
                             };
                         });
                         return false;
                     }
                     this.ISuccessfull('上传成功！');
-                }else{
+                    this.list();
+                } else {
                     is.IError(file.msg);
                 }
             },
-            exeLength(error){
+            exeLength(error) {
                 is.IError('文件上传超出处理限制个数');
             },
+            DeleteInstance(params = {}) {
+                params[Object.keys(params)[1]] = Object.values(params)[1];
+                axios.get(params.url, {
+                    params: params
+                }).then(res => {
+                    if (res.data.state == 200) {
+                        is.ISuccessfull(res.data.msg);
+                        is.list();
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+            // 查询 物料编号/区域地址ID/角色ID
+            search(params) {
+                this.data['page'] = 1;
+                this.data['pageSize'] = 10000;
+                this.data['url'] = params.url;
+                axios.post(this.data.url, qs.stringify(this.data)).then(params => {
+                    if (params.data.state == 200) {
+                        if(this.data.url == 'sys_machine_list'){
+                            this.machineId = params.data.page.records.map(item => {
+                                return { value: `${item.machineId}`, label: `${item.coding}` };
+                            });
+                        }else if(this.data.url == 'sys_role_list'){
+                            this.roleId = params.data.page.records.map(item => {
+                                return { value: `${item.roleId}`, label: `${item.roleName}` };
+                            });
+                        }
+                        axios.post('sys_address_list', qs.stringify(this.data)).then(params => {
+                            if (params.data.state == 200) {
+                                this.addressId = params.data.page.records.map(item => {
+                                    return { value: `${item.id}`, label: `${item.address}` };
+                                });
+                            } else {
+                                is.IError(params.data.msg);
+                            }
+                        })
+                        // this.data = {};
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+            // select 检索
+            remoteMethod(query) {
+                if (query !== '') {
+                    setTimeout(() => {
+                        this.options = this.machineId.filter(item => {
+                            return item.label.toLowerCase()
+                                .indexOf(query.toLowerCase()) > -1;
+                        });
+                    }, 200);
+                } else {
+                    this.options = [];
+                }
+            },
+            //选择区域地址ID
+            remoteMethods(query) {
+                if (query !== '') {
+                    setTimeout(() => {
+                        this.option = this.addressId.filter(item => {
+                            return item.label.toLowerCase()
+                                .indexOf(query.toLowerCase()) > -1;
+                        });
+                    }, 200);
+                } else {
+                    this.option = [];
+                }
+            },
+            //选择角色ID
+            remoteMethodes(query) {
+                if (query !== '') {
+                    setTimeout(() => {
+                        this.options = this.roleId.filter(item => {
+                            return item.label.toLowerCase()
+                                .indexOf(query.toLowerCase()) > -1;
+                        });
+                    }, 200);
+                } else {
+                    this.options = [];
+                }
+            },
+            //管理员详情
+            admindetail(params){
+                axios.get('sys_admin_detail', {
+                    params: params
+                }).then(res => {
+                    if (res.data.state == 200) {
+                        this.UpdateTableAndVisible = true;
+                        this.search({url: 'sys_role_list'});
+                        this.data['addressId'] = res.data.data.addressId;  //缓存起来 地址ID
+                        res.data.data.addressId = res.data.data.address;
+                        this.data['roleId'] = res.data.data.roleId;  //缓存起来 地址ID
+                        res.data.data.roleId = res.data.data.roleName;
+                        this.formData = res.data.data;
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+            //管理员修改
+            admindenit(params) {
+                console.log(this.data)
+                console.log(params)
+                // axios.post('update_admin', qs.stringify(params)).then(params => {
+                //     if (params.data.state == 200) {
+
+                //     } else {
+                //         is.IError(params.data.msg);
+                //     }
+                // })
+                //     .catch(function (error) {
+                //         is.IError(error);
+                //     })
+            },
+
 
 
 

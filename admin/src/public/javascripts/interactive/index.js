@@ -67,11 +67,11 @@ new Vue({
         let tag = JSON.parse(sessionStorage.getItem('tag')), _tag = '', icons = [
             'el-icon-s-cooperation',
             'el-icon-s-order',
-            'el-icon-video-camera-solid',
             'el-icon-s-data',
             'el-icon-user-solid',
             'el-icon-s-finance',
             'el-icon-s-grid',
+            'el-icon-video-camera-solid',
             'el-icon-s-tools',
             'el-icon-toilet-paper',
             'el-icon-s-unfold'
@@ -86,12 +86,11 @@ new Vue({
                 if(tag[i].lowers){
                     tag[i].lowers.forEach((element, index) => {
                         if(process.env.NODE_ENV == "development"){
-                            _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i + 1}">${element.permissionName}
+                            _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i +'-'+ index}">${element.permissionName}
                             </el-menu-item>`;
                         }else{
-                            console.log(element.requestUri.substring(element.requestUri.lastIndexOf('/') + 1).split('.')[0])
                             element.requestUri = `/rundev/assurances/admin/views/${ element.requestUri.substring(element.requestUri.lastIndexOf('/') + 1).split('.')[0] }`;
-                            _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i + 1}">${element.permissionName}
+                            _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i +'-'+ index}">${element.permissionName}
                             </el-menu-item>`;
                         }
                     })

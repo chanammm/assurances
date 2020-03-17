@@ -43,6 +43,15 @@ axios.interceptors.response.use(
 				},500)
 				
 			}
+			if(response.config.url == "sys_machine_instance_detail" || response.config.url == "sys_machine_detail"){
+				Object.keys(response.data.data).forEach((element, index) => {
+					if(Object.values(response.data.data)[index] == -1){
+						response.data.data[element] = '无';
+					}else{
+						response.data.data[element] = Object.values(response.data.data)[index];
+					}
+				})
+			}
 			return Promise.resolve(response);
 		} else {
 			return Promise.reject(response);
