@@ -20,12 +20,12 @@
         <el-container>
             <el-main>
                 <el-main>
-                    <!-- <el-form>
+                    <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {}; imageList = {}"
+                            <el-button @click="UpdateTableAndVisible = true; formData = {};"
                                 type="primary">新增<i class="el-icon-plus el-icon--right"></i></el-button>
                         </div>
-                    </el-form> -->
+                    </el-form>
                     <el-form>
                         <!-- <el-input placeholder="请输入内容" v-model="listSearch._value_" class="_searchVal">
                             <el-select v-model="listSearch._name_" class="_searchVal_select" slot="prepend"
@@ -39,8 +39,7 @@
                     </el-form>
                     <template>
                         <el-table :data="tableData" stripe style="width: 100%" border>
-                            <el-table-column prop="id" label="secretID"></el-table-column>
-                            <el-table-column prop="province" label="省""></el-table-column>
+                            <el-table-column prop="province" label="省"></el-table-column>
                             <el-table-column prop="city" label="市"></el-table-column>
                             <el-table-column prop="district" label="区"></el-table-column>
                             <el-table-column prop="address" label="详细地址"></el-table-column>
@@ -61,42 +60,18 @@
                     </el-pagination>
 
 
-                    <el-dialog title="新增设备" :visible.sync="UpdateTableAndVisible">
-                        <el-form :model="formData" id="machine">
-                            <el-form-item label="物料编号：">
-                                <el-input v-model="formData.coding"></el-input>
+                    <el-dialog title="新增地址" :visible.sync="UpdateTableAndVisible">
+                        <el-form :model="formData" label-width=100px>
+                            <el-form-item label="省/市/区：">
+                                <el-cascader size="large" :options="address" v-model="formData.province" @change="handleChange">
+                                </el-cascader>
+                            </el-form-item>
+                            <el-form-item label="详细地址：">
+                                <el-input v-model="formData.address"></el-input>
                             </el-form-item>
 
-                            <el-form-item label="机器名称：">
-                                <el-input v-model="formData.machineName "></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="机器型号：">
-                                <el-input v-model="formData.machineType"></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="机器色系：">
-                                <el-input v-model="formData.colourScheme"></el-input>
-                            </el-form-item>
-                            <el-form-item label="机器参数：">
-                                <el-input v-model="formData.machineParameter"></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="机器图片">
-                                <template v-model="ruleForm.machinePic">
-                                    <el-upload prop="machinePic" :action="fileUpdata" list-type="picture-card"
-                                        :file-list="imageList.machinePic" :on-change="fileChange"
-                                        :on-success="machineSceneSuccess" :limit="num" :on-exceed="fileExceed"
-                                        :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-                                        <i class="el-icon-plus"></i>
-                                    </el-upload>
-                                    <el-dialog :visible.sync="dialogVisible">
-                                        <img width="100%" :src="dialogImageUrl" alt="">
-                                    </el-dialog>
-                                </template>
-                            </el-form-item>
                             <div class="btn-center" style="text-align: center; margin: 20px;">
-                                <el-button type="primary" @click="devicemachine(formData)">提交
+                                <el-button type="primary" @click="addressmanage(formData)">提交
                                 </el-button>
                             </div>
                         </el-form>

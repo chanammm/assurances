@@ -39,7 +39,7 @@ new Vue({
                 state: ''
             },
             adminName: JSON.parse(sessionStorage.getItem('_a'))._i,
-            drawer: false
+            drawer: true
         }
     },
     created: function () {
@@ -115,7 +115,7 @@ new Vue({
         },
         Href(e) {
             this.$nextTick(function () {  //dom 树节点已经更新
-                this.drawer =false;
+                this.drawer = false;
             });
             document.getElementById('tagHref').setAttribute('src', e.uri);
             document.getElementById('ym-menu-left').click();  //点击菜单

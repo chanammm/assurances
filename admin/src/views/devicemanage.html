@@ -22,8 +22,10 @@
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {}; imageList = {}" type="primary">新增<i
-                                    class="el-icon-plus el-icon--right"></i></el-button>
+                            <el-button @click="UpdateTableAndVisible = true; formData = {}; imageList = {}"
+                                type="primary">新增<i class="el-icon-plus el-icon--right"></i></el-button>
+                            <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入物料信息
+                            </el-button>
                         </div>
                     </el-form>
                     <el-form>
@@ -33,21 +35,19 @@
                                 <el-option label="物料编码" value="coding"></el-option>
                             </el-select>
                         </el-input>
-    
+
                         <el-button icon="el-icon-search" class="_search_btn" @click="list(listSearch)">搜索
                         </el-button>
                     </el-form>
                     <template>
                         <el-table :data="tableData" stripe style="width: 100%" border>
-                            <el-table-column prop="machineId" label="secretID"></el-table-column>
-                            <el-table-column prop="coding" label="物料编码"></el-table-column>
-                            <el-table-column prop="colourScheme" label="色系"></el-table-column>
-                            <el-table-column prop="createTime" label="创建时间"></el-table-column>
-                            <el-table-column prop="machineName" label="机器名称">
+                            <!-- <el-table-column prop="machineId" label="secretID"></el-table-column> -->
+                            <el-table-column prop="coding" label="物料编码"></el-table-column><el-table-column prop="machineName" label="机器名称">
                                 <template slot-scope="scope">
                                     {{ scope.row.machineName }}
                                 </template>
                             </el-table-column>
+                            <el-table-column prop="colourScheme" label="色系"></el-table-column>
                             <el-table-column prop="machineParameter" label="规格参数">
                                 <template slot-scope="scope">
                                     {{ scope.row.machineParameter == -1 ? '无' : scope.row.machineParameter }}
@@ -58,20 +58,25 @@
                                     {{ scope.row.machineParameter}}
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="machinePic" label="图片" width="100px">
-                            <template slot-scope="scope">
-                                <el-popover trigger="hover" placement="top">
-                                    <el-image :src="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
-                                        :preview-src-list="scope.row.machinePic  == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic" style="text-align: center;">
-                                    </el-image>
-                                    <div slot="reference" class="name-wrapper">
-                                        <el-image :src="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
-                                            :preview-src-list="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic" lazy></el-image>
-                                    </div>
-                                </el-popover>
-                            </template>
-                        </el-table-column>
+                            <el-table-column prop="machinePic" label="图片" width="120px">
+                                <template slot-scope="scope">
+                                    <el-popover trigger="hover" placement="top">
+                                        <el-image
+                                            :src="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
+                                            :preview-src-list="scope.row.machinePic  == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
+                                            style="text-align: center;">
+                                        </el-image>
+                                        <div slot="reference" class="name-wrapper">
+                                            <el-image
+                                                :src="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
+                                                :preview-src-list="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
+                                                lazy></el-image>
+                                        </div>
+                                    </el-popover>
+                                </template>
+                            </el-table-column>
 
+                            <el-table-column prop="createTime" label="创建时间"></el-table-column>
                             <el-table-column fixed="right" label="操作">
                                 <template slot-scope="scope">
                                     <el-button type="text" size="small" @click="devicemachineDest(scope.row.machineId)">
@@ -145,8 +150,8 @@
                     <el-dialog title="设备详情" :visible.sync="SearchTableAndVisible" width="50%">
                         <div style="height: 600px;overflow: auto;">
                             <el-form :data="SearchTableFormData" label-width="160px">
-                            
-                                <el-form-item label="设备ID" prop="machineId">
+
+                                <el-form-item label="物料ID" prop="machineId" v-show="false">
                                     <el-input v-model="SearchTableFormData.machineId"></el-input>
                                 </el-form-item>
                                 <el-form-item label="设备名称" prop="machineName">
@@ -161,27 +166,52 @@
                                 <el-form-item label="色系" prop="colourScheme">
                                     <el-input v-model="SearchTableFormData.colourScheme"></el-input>
                                 </el-form-item>
-                                <el-form-item label="创建者ID" prop="createBy">
+                                <!-- <el-form-item label="创建者ID" prop="createBy">
                                     <el-input v-model="SearchTableFormData.createBy"></el-input>
-                                </el-form-item>
-                                <el-form-item label="创建者名称" prop="createName">
+                                </el-form-item> -->
+                                <!-- <el-form-item label="创建者名称" prop="createName">
                                     <el-input v-model="SearchTableFormData.createName"></el-input>
-                                </el-form-item>
+                                </el-form-item> -->
                                 <el-form-item label="机器参数" prop="machineParameter">
                                     <el-input v-model="SearchTableFormData.machineParameter"></el-input>
                                 </el-form-item>
-                                <el-form-item label="创建时间" prop="createTime">
+                                <!-- <el-form-item label="创建时间" prop="createTime">
                                     <el-input v-model="SearchTableFormData.createTime"></el-input>
-                                </el-form-item>
+                                </el-form-item> -->
                                 <el-form-item label="设备图片" prop="machinePic">
-                                    <el-input v-model="SearchTableFormData.machinePic"></el-input>
+                                    <el-popover trigger="hover" placement="top">
+                                        <el-image :src="SearchTableFormData.machinePic" slot="error" style="text-align: center;"></el-image>
+                                        <div slot="reference" class="name-wrapper">
+                                            <el-image :src="SearchTableFormData.machinePic"
+                                                :preview-src-list="SearchTableFormData.machinePic" lazy></el-image>
+                                        </div>
+                                    </el-popover>
                                 </el-form-item>
                             </el-form>
                         </div>
-    </el-dialog>
+                    </el-dialog>
 
-    </el-main>
-    </el-container>
+                    <el-dialog title="导入物料信息" :visible.sync="detailTableAndVisible">
+                        <el-form>
+                            <el-form-item label="Excel文件">
+                                <template v-model="ruleForm.machinePic">
+                                    <el-upload :limit="num" class="upload-demo" :file-list="fileList" drag
+                                        :action="asfileUpdataExc" :headers="fileUpdataExcData"
+                                        :on-success="ExecSceneSuccess" :on-exceed="exeLength" multiple>
+                                        <i class="el-icon-upload"></i>
+                                        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em>，系统会自动处理数据</div>
+                                    </el-upload>
+                                </template>
+                            </el-form-item>
+                            <div class="btn-center" style="text-align: center; margin: 20px;">
+                                <el-button type="primary" @click="detailTableAndVisible = false;">关闭
+                                </el-button>
+                            </div>
+                        </el-form>
+                    </el-dialog>
+
+                </el-main>
+        </el-container>
     </div>
 </body>
 

@@ -12,10 +12,20 @@ html(lang="en")
   body
     div
         img.banner(src="../images/top-banner.png")
-    .domain.login
-        .title
-            div 设备编码
-            input(type="text" name="machineSn" placeholder="请输入设备编码查询")
-        .link
-        .submit(style="margin-top: 80px;") 查询
+    //- .domain.login
+    //-     .title
+    //-         div 设备编码
+    //-         input(type="text" name="machineSn" placeholder="请输入设备编码查询")
+    //-     .link
+    //-     .submit(style="margin-top: 80px;") 查询
+    .login
+      .loginBox
+        .title 质保信息查询
+        input(type="text" name="machineSn" placeholder="请输入设备编号")
+        span.submit
+    .help 如何查看设备编号
+      span
+    .help-box
+      | 通过设备底部的标识牌查看设备编号，标识牌包含设备编号，规格型号，功率，电压，频率
+      span
     .text-mudule

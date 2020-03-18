@@ -69,6 +69,18 @@ class init {
                     break;
                 case 'login':
                     console.log('Temporary landing!!!');
+                    let bool = false;
+                    document.querySelector('.help').onclick = function(){
+                        if(!bool){
+                            this.childNodes[1].setAttribute('style', 'transform:rotate(90deg)');
+                            document.querySelector('.help-box').style.display = 'block';
+                            bool = true;
+                        }else{
+                            this.childNodes[1].setAttribute('style', 'transform:rotate(0deg)');
+                            document.querySelector('.help-box').style.display = 'none';
+                            bool = false;
+                        }
+                    }
                     break;
                 default:
                     axios.get('find_machine_detail?machineSn=' + location.href.split('?')[1]).then((params) => {
@@ -155,9 +167,9 @@ class init {
                                 sessionStorage.setItem('page', true);
                             } else {
                                 this._alert_(params.data.msg, 1000);
-                                if(sessionStorage.getItem('page')){
-                                    this._show_('.alx-module');
-                                }
+                                // if(sessionStorage.getItem('page')){
+                                //     this._show_('.alx-module');
+                                // }
                             }
                             document.querySelector('.show').onclick = function(){
                                 location.href = `./quality.html?${ param.machineSn }`;
