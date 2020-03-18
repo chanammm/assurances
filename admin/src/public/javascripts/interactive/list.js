@@ -34,7 +34,7 @@ window.addEventListener('pageshow', function (params) {
         data: () => {
             return {
                 fileUpdata: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Files_ : parent.all.json._j.URLS.ForMal_Files_) + 'picture_file_upload',
-                fileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'import_machine_instance_by_excel',
+                fileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'import_machine_instance_by_csv',
                 asfileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'import_machine_by_csv',
                 fileUpdataExcData: {
                     Authorization: JSON.parse(sessionStorage.getItem('token')).asset.secret
@@ -56,6 +56,9 @@ window.addEventListener('pageshow', function (params) {
                 formData: {
                     machineId: [],
                     addressId: []
+                },
+                formDataTree: {
+                    modedata: ''
                 },
                 formDatas: {
                     machineId: [],
@@ -101,8 +104,10 @@ window.addEventListener('pageshow', function (params) {
                     remark: '',
                     id: ''
                 },
+                SearchTableFormDatas: {},
                 imageList: {
-                    machinePic: []
+                    machinePic: [],
+                    machinePics: []
                 },
                 fileData: {
 
@@ -293,20 +298,31 @@ window.addEventListener('pageshow', function (params) {
             },
             //查看 角色已赋予 权限
             serchAssetes(params) {
-                // axios.post('role_page_permission', qs.stringify({
-                //     roleId: params
-                // })).then(res => {
-                //     if (res.data.state == 200) {
-                //         is.detailTableAndVisible = true;
-                //         this.data['tree'] = res.data.list;
-                //         is.UnFormData = res.data.list;
-                //     } else {
-                //         is.IError(res.data.msg);
-                //     }
-                // })
-                //     .catch(function (error) {
-                //         is.IError(error);
-                //     })
+                axios.post('role_page_permission', qs.stringify({
+                    roleId: params
+                })).then(res => {
+                    if (res.data.state == 200) {
+                        // is.detailTableAndVisible = true;
+                        // this.data['tree'] = res.data.list;
+                        // is.UnFormData = res.data.list;
+                        let arr = [];
+                        res.data.list.forEach((element, index) => {
+                            if (element.permissionWeight == 1) {
+                                arr.push({id: element.permissionId, name: element.permissionName, value: element.lowers})
+                            }
+                        })
+                        setTimeout(() => {
+                            this.$refs.tree.setCheckedNodes(arr);
+                        },200)
+                        this.data['roleId'] = params;
+                   
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
             },
             //查看 所有 权限 树结构
             serchAssetesAll(params) {
@@ -466,7 +482,11 @@ window.addEventListener('pageshow', function (params) {
                 }).then(res => {
                     if (res.data.state == 200) {
                         is.SearchTableAndVisible = true;
-                        is.SearchTableFormData = res.data.data;
+                        is.imageList.machinePics = [];
+                        // is.imageList.machinePic.push(res.data.machinePic);
+                        is.imageList.machinePics.push({ name: 'machinePics', url: res.data.data.machinePic });
+                        is.SearchTableFormDatas = res.data.data;
+                        // console.log(is.SearchTableFormData.machinePic)
                     } else {
                         is.IError(res.data.msg);
                     }
@@ -730,7 +750,7 @@ window.addEventListener('pageshow', function (params) {
                         let __arr__ = [];
                         if (node.data.value != null) {
                             node.data.value.forEach((element, index) => {
-                                __arr__.push({ name: element.permissionName, id: element.permissionId,  parentId: element.parentId, value: element.lowers })
+                                __arr__.push({ name: element.permissionName, id: element.permissionId, parentId: element.parentId, value: element.lowers })
                             })
                         }
                         setTimeout(function () {
@@ -742,17 +762,131 @@ window.addEventListener('pageshow', function (params) {
 
             //选择的 权限树 
             handleCheckChange(data, checked, indeterminate, array = []) {
-                if(!data.parentId && checked){  //处理根节点全选的时候 ID
+                return false;
+                if (!data.parentId && checked) {  //处理根节点全选的时候 ID
                     array.push(data.id);
                     data.value.forEach((element, index) => {
                         array.push(element.permissionId);
                     });
-                    this.data['permissionId'] != null ? this.data['permissionId'] = this.data.permissionId.set(array) : this.data['permissionId'] = array;
-                }else{
-
+                    this.data['permissionId'] != null ? this.data['permissionId'] = this.data.permissionId.concat(array) : this.data['permissionId'] = array;
+                } else {  //处理 子节点的点击事件
+                    if (checked) {
+                        if (data.parentId) {
+                            array.push(data.id); array.push(data.parentId);
+                            this.data['permissionId'] != null ? this.data['permissionId'] = this.data.permissionId.concat(array) : this.data['permissionId'] = array;
+                        }
+                    } else {
+                        if (this.data['permissionId'] != null) {
+                            let arr = Array.from(new Set(this.data['permissionId']));
+                            for (let i = 0; i < arr.length; i++) {
+                                if (arr[i] == data.id) {
+                                    arr.splice(i, 1);
+                                }
+                            }
+                            // this.data['permissionId'] = arr;
+                        }
+                    }
                 }
-                console.log(this.data['permissionId']);
+                // console.log(this.data['permissionId']);
+                // console.log(Array.from(new Set(this.data['permissionId'])));
             },
+
+            checkChang(params) {
+                axios.post('update_machine', qs.stringify(params)).then(params => {
+                    if (params.data.state == 200) {
+                        is.ISuccessfull(params.data.msg);
+                        is.SearchTableAndVisible = false;
+                        is.formDatas = {};
+                        is.list();
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+            roleformDataTree(params) {
+                let xml = [];
+                this.$refs.tree.getCheckedNodes().forEach((element, index) => {  // 二级
+                    xml.push(element.id);
+                    if(element.value != null) {
+                        element.value.forEach((e, i) => {
+                            xml.push(e.permissionId);
+                        })
+                    }
+                })
+                // .replace(/^(\s|[])+|(\s|[])+$/g, '')
+                // xml = Array.from(new Set(xml));
+                let arr = JSON.stringify(Array.from(new Set(xml))).split('[')[1];
+                arr = arr.split(']')[0];
+                params['roleId'] = this.data.roleId;
+                params['permissionIds'] = arr;
+                params['setupType'] = 1;
+                this.data['setup'] = {};
+                this.data.setup['roleId'] = this.data.roleId;
+                this.data.setup['permissionIds'] = [];
+                this.data.setup['setupType'] = 2;
+
+
+                axios.post('setup_role_permission', qs.stringify(params)).then(params => {
+                    if (params.data.state == 200) {
+                        //资源权限赋予
+                        axios.post('resource_permission_list', {}).then(params => {
+                            if (params.data.state == 200) {
+                                let __arr__ = [];
+                                params.data.list.forEach(element =>{
+                                    __arr__.push(element.permissionId)
+                                })
+                                this.data.setup['permissionIds'] = __arr__;
+                                axios.post('setup_role_permission', qs.stringify(this.data.setup));
+                            } else {
+                                is.IError(params.data.msg);
+                            }
+                        })
+                            .catch(function (error) {
+                                is.IError(error);
+                            })
+
+                        is.ISuccessfull(params.data.msg);
+                        is.TableAndVisible = false;
+                        is.formDatas = {};
+                        is.data = {};
+                        is.list();
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+
+
+
+
+
+
+            machineSceneSuccess(e) {
+                this.data['machinePic'] = e.data.path;
+            },
+
+            handlePictureCardPreview(file) {  //点击查看放大的时候
+                this.dialogVisible = true;
+                this.dialogImageUrl = file;
+            },
+            fileExceed() {
+                this.IError('单图上传');
+            },
+            fileChange() {
+
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+
 
 
 

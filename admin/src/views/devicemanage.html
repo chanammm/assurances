@@ -62,14 +62,14 @@
                                 <template slot-scope="scope">
                                     <el-popover trigger="hover" placement="top">
                                         <el-image
-                                            :src="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
-                                            :preview-src-list="scope.row.machinePic  == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
+                                            :src="scope.row.machinePic"
+                                            :preview-src-list="scope.row.machinePic"
                                             style="text-align: center;">
                                         </el-image>
                                         <div slot="reference" class="name-wrapper">
                                             <el-image
-                                                :src="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
-                                                :preview-src-list="scope.row.machinePic == -1 ? scope.row.machinePic = errorImage : scope.row.machinePic"
+                                                :src="scope.row.machinePic"
+                                                :preview-src-list="scope.row.machinePic"
                                                 lazy></el-image>
                                         </div>
                                     </el-popover>
@@ -149,22 +149,22 @@
 
                     <el-dialog title="设备详情" :visible.sync="SearchTableAndVisible" width="50%">
                         <div style="height: 600px;overflow: auto;">
-                            <el-form :data="SearchTableFormData" label-width="160px">
+                            <el-form :data="SearchTableFormDatas" label-width="160px">
 
                                 <el-form-item label="物料ID" prop="machineId" v-show="false">
-                                    <el-input v-model="SearchTableFormData.machineId"></el-input>
+                                    <el-input v-model="SearchTableFormDatas.machineId"></el-input>
                                 </el-form-item>
                                 <el-form-item label="设备名称" prop="machineName">
-                                    <el-input v-model="SearchTableFormData.machineName"></el-input>
+                                    <el-input v-model="SearchTableFormDatas.machineName"></el-input>
                                 </el-form-item>
                                 <el-form-item label="设备类型" prop="machineType">
-                                    <el-input v-model="SearchTableFormData.machineType"></el-input>
+                                    <el-input v-model="SearchTableFormDatas.machineType"></el-input>
                                 </el-form-item>
                                 <el-form-item label="物料编码" prop="coding">
-                                    <el-input v-model="SearchTableFormData.coding"></el-input>
+                                    <el-input v-model="SearchTableFormDatas.coding"></el-input>
                                 </el-form-item>
                                 <el-form-item label="色系" prop="colourScheme">
-                                    <el-input v-model="SearchTableFormData.colourScheme"></el-input>
+                                    <el-input v-model="SearchTableFormDatas.colourScheme"></el-input>
                                 </el-form-item>
                                 <!-- <el-form-item label="创建者ID" prop="createBy">
                                     <el-input v-model="SearchTableFormData.createBy"></el-input>
@@ -173,12 +173,12 @@
                                     <el-input v-model="SearchTableFormData.createName"></el-input>
                                 </el-form-item> -->
                                 <el-form-item label="机器参数" prop="machineParameter">
-                                    <el-input v-model="SearchTableFormData.machineParameter"></el-input>
+                                    <el-input v-model="SearchTableFormDatas.machineParameter"></el-input>
                                 </el-form-item>
                                 <!-- <el-form-item label="创建时间" prop="createTime">
                                     <el-input v-model="SearchTableFormData.createTime"></el-input>
                                 </el-form-item> -->
-                                <el-form-item label="设备图片" prop="machinePic">
+                                <!-- <el-form-item label="设备图片" prop="machinePic">
                                     <el-popover trigger="hover" placement="top">
                                         <el-image :src="SearchTableFormData.machinePic" slot="error" style="text-align: center;"></el-image>
                                         <div slot="reference" class="name-wrapper">
@@ -186,14 +186,32 @@
                                                 :preview-src-list="SearchTableFormData.machinePic" lazy></el-image>
                                         </div>
                                     </el-popover>
+                                </el-form-item> -->
+                                <el-form-item label="设备图片" prop="machinePic">
+                                    <template v-model="SearchTableFormDatas.machinePic">
+                                        <el-upload :action="fileUpdata" list-type="picture-card"
+                                            :file-list="imageList.machinePics" :limit="num" :data="fileData"
+                                            :on-change="fileChange" :on-success="machineSceneSuccess" :on-exceed="fileExceed"
+                                            :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
+                                            <i class="el-icon-plus"></i>
+                                        </el-upload>
+                                        <el-dialog :visible.sync="dialogVisible">
+                                            <img width="100%" :src="dialogImageUrl" alt="">
+                                        </el-dialog>
+                                    </template>
                                 </el-form-item>
+
+                                <div class="btn-center" style="text-align: center; margin: 20px;">
+                                <el-button type="primary" @click="checkChang(SearchTableFormDatas);">提交
+                                </el-button>
+                            </div>
                             </el-form>
                         </div>
                     </el-dialog>
 
                     <el-dialog title="导入物料信息" :visible.sync="detailTableAndVisible">
                         <el-form>
-                            <el-form-item label="Excel文件">
+                            <el-form-item label=".CSV文件">
                                 <template v-model="ruleForm.machinePic">
                                     <el-upload :limit="num" class="upload-demo" :file-list="fileList" drag
                                         :action="asfileUpdataExc" :headers="fileUpdataExcData"

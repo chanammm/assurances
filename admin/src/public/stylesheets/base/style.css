@@ -98,6 +98,22 @@ body ._scrollbars::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+body .red {
+  color: red;
+}
+
+body .green {
+  color: #06c106;
+}
+
+body .ccc {
+  color: #ccc;
+}
+
+body .blue {
+  color: #1a89d8;
+}
+
 /** login **/
 .login_container {
   overflow: hidden;

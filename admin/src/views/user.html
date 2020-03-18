@@ -85,13 +85,27 @@
                 </el-pagination>
 
                 <el-dialog title="权限树" :visible.sync="TableAndVisible" width="70%">
-                    <el-tree
-                        :props="props"
-                        :load="loadNode"
-                        lazy
-                        show-checkbox
-                        @check-change="handleCheckChange">
-                        </el-tree>
+                    <div>修改绑定的权限树如目标用户是当前用户将会强制重新回到登陆页面，需要重新登陆</div>
+                    <el-form :model="formDataTree" label-width=100px>
+                        <el-form-item label="权限结构：">
+                                <el-tree
+                                :props="props"
+                                :load="loadNode"
+                                node-key="id"
+                                ref="tree"
+                                lazy
+                                show-checkbox
+                                highlight-current
+                                default-expand-all
+                                @check-change="handleCheckChange">
+                                </el-tree>
+                        </el-form-item>
+
+                        <div class="btn-center" style="text-align: center; margin: 20px;">
+                            <el-button type="primary" @click="roleformDataTree(formDataTree)">提交
+                            </el-button>
+                        </div>
+                    </el-form>
                 </el-dialog>
 
                 <el-dialog title="新增角色" :visible.sync="UpdateTableAndVisible" width="50%">

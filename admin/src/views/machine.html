@@ -85,13 +85,17 @@
                             </el-table-column> -->
                             <el-table-column prop="auditStatus" label="审核状态">
                                 <template slot-scope="scope">
-                                    {{ scope.row.auditStatus == 2 ? '未通过' :  scope.row.auditStatus == 1 ? '已通过': '未审核' }}
+                                    <div :class="scope.row.auditStatus == 2 ? 'red' : scope.row.auditStatus == 1 ? 'green': 'ccc'">
+                                        {{ scope.row.auditStatus == 2 ? '未通过' :  scope.row.auditStatus == 1 ? '已通过': '未审核' }}
+                                    </div>
                                 </template>
                             </el-table-column>
 
                             <el-table-column prop="status" label="数据状态">
                                 <template slot-scope="scope">
-                                    {{ scope.row.status == 2 ? '已激活' :  scope.row.status == 1 ? '激活申请中': '未激活' }}
+                                    <div :class="scope.row.status == 1 ? 'blue' : scope.row.status == 2 ? 'green': 'ccc'">
+                                        {{ scope.row.status == 2 ? '已激活' :  scope.row.status == 1 ? '激活申请中': '未激活' }}
+                                    </div>
                                 </template>
                             </el-table-column>
                             <!-- <el-table-column prop="machinePic" label="图片">
@@ -183,7 +187,7 @@
 
                     <el-dialog title="导入设备" :visible.sync="detailTableAndVisible">
                         <el-form>
-                            <el-form-item label="Excel文件">
+                            <el-form-item label=".CSV文件">
                                 <template v-model="ruleForm.machinePic">
                                     <el-upload
                                         :limit="num"

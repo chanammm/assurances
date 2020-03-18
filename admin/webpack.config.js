@@ -146,6 +146,16 @@ module.exports = {
             hash: true,
             chunks: ['configration', 'list']
         }),
+        new HtmlWebpackPlugin({  //log
+            template: './src/views/log.html',
+            filename: '../views/log.html',
+            minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true
+            },
+            hash: true,
+            chunks: ['configration', 'list']
+        }),
         new MiniCssExtractPlugin({
             template: './src/public/stylesheets/base/style.min.css',
             filename: '../stylesheets/-b8bW2Vg3fwHozO.css'
