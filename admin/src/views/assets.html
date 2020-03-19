@@ -47,12 +47,12 @@
                                 @click="AsBinding(scope.row.permissionId)">
                                 捆绑
                             </el-button> -->
-                            <el-button type="text" size="small"
+                            <!-- <el-button type="text" size="small"
                                 @click="IError('未开放')">
                                 更新
-                            </el-button>
+                            </el-button> -->
                             <el-button type="text" size="small"
-                                @click="IError('未开放')">
+                                @click="IError('暂未开放')">
                                 删除
                             </el-button>
                         </template>
@@ -108,7 +108,7 @@
                 </el-dialog>
 
                 <el-dialog title="新增权限" :visible.sync="UpdateTableAndVisible">
-                    <el-form :model="formData">
+                    <el-form :model="formData" >
                         <el-form-item label="权限名称：">
                             <el-input v-model="formData.permissionName"></el-input>
                         </el-form-item>
@@ -129,8 +129,8 @@
                         <el-form-item label="排序号：（同一上级所属&同类型&同等权重下排序号不允许重复）">
                             <el-input v-model="formData.sort" ></el-input>
                         </el-form-item>
-
-                        <el-form-item label="资源类型：（顶级/普通权限时只能选择【页面】选项）">
+                        <el-form-item label="资源类型：">
+                            <div style="font-size: 10px;">（顶级/普通权限时只能选择【页面】选项）</div>
                             <el-radio-group v-model="formData.permissionType">
                                 <el-radio :label="1">新增</el-radio>
                                 <el-radio :label="2">查询</el-radio>

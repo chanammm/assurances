@@ -1,4 +1,5 @@
 import { regionData, CodeToText, TextToCode } from 'element-china-area-data';
+
 if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) {
     window.onload = function (params) {
         for (let i = 0; i < document.getElementsByClassName('el-dialog').length; i++) {
@@ -43,6 +44,7 @@ window.addEventListener('pageshow', function (params) {
                 testAdmin: ym.init.COMPILESTR.decrypt(JSON.parse(sessionStorage.getItem('_a'))._i) == "yuanmenghhx" || ym.init.COMPILESTR.decrypt(JSON.parse(sessionStorage.getItem('_a'))._i) == "yuanmengKSX" ? false : true,  //指定的账号不能显示订单查看
                 more: false,
                 tableData: [],
+                tableDatas: [],
                 UnFormData: [],
                 UnTableFormData: [],
                 currentPage: 1,
@@ -58,8 +60,8 @@ window.addEventListener('pageshow', function (params) {
                     addressId: []
                 },
                 formDataTree: {
-                    modedata: ''
                 },
+                formDataTrees:{},
                 formDatas: {
                     machineId: [],
                     addressId: []
@@ -78,6 +80,7 @@ window.addEventListener('pageshow', function (params) {
                 fileList: [],
                 data: {},
                 num: 1,
+                search_address:'',
                 props: {
                     label: 'name',
                     ids: 'id',
@@ -301,6 +304,7 @@ window.addEventListener('pageshow', function (params) {
                 axios.post('role_page_permission', qs.stringify({
                     roleId: params
                 })).then(res => {
+                    this.data['roleId'] = params;
                     if (res.data.state == 200) {
                         // is.detailTableAndVisible = true;
                         // this.data['tree'] = res.data.list;
@@ -308,16 +312,16 @@ window.addEventListener('pageshow', function (params) {
                         let arr = [];
                         res.data.list.forEach((element, index) => {
                             if (element.permissionWeight == 1) {
-                                arr.push({id: element.permissionId, name: element.permissionName, value: element.lowers})
+                                arr.push({ id: element.permissionId, name: element.permissionName, value: element.lowers })
                             }
                         })
                         setTimeout(() => {
                             this.$refs.tree.setCheckedNodes(arr);
-                        },200)
-                        this.data['roleId'] = params;
-                   
+                        }, 200)
+
                     } else {
-                        is.IError(res.data.msg);
+                        console.log(res.data.msg);
+                        // is.IError(res.data.msg);
                     }
                 })
                     .catch(function (error) {
@@ -341,13 +345,75 @@ window.addEventListener('pageshow', function (params) {
 
                         // })
                     } else {
-                        is.IError(res.data.msg);
+                        // is.IError(res.data.msg);
                     }
                 })
                     .catch(function (error) {
                         is.IError(error);
                     })
             },
+            //查看 角色已赋予资源权限
+            rosSerchAssetes(params) {
+                axios.post('role_resource_permission', qs.stringify({
+                    roleId: params,
+                    page: 1,
+                    pageSize: 100
+                })).then(res => {
+                    this.data['roleId'] = params;
+                    if (res.data.state == 200) {
+                        let arr = [];
+                        res.data.page.records.forEach((element, index) => {
+                            arr.push({ id: element.permissionId, name: element.permissionName })
+                        })
+                    } else {
+                        console.log(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+            //查看 所有 资源权限
+            rosSerchAssetesAll(params) {
+                axios.post('resource_permission_list').then(res => {
+                    if (res.data.state == 200) {
+                        is.detailTableAndVisible = true;
+                        is.data['trees'] = res.data.list;
+                        is.tableDatas = res.data.list;  //**********************/
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+            HandleSelectionChange(params, row) {  //选中的会员操作
+                this.ruleForm.all_vip = false;  //强制当前的全选变成 自主选择
+    
+                this.tableDataVip.forEach((element, index) => {  //处理 清除选中项目
+                    if (element.memberRuleId == params.index) {
+                        this.tableDataVip.splice(index, 1);
+                    }
+                })
+                if (this.ruleForm.all_vip_id.length > 0) {  //选中的优惠券产品
+                    let _arr_ = [], bool = true;
+                    _arr_ = this.ruleForm.all_vip_id;
+                    for (let i = 0; i < _arr_.length; i++) {
+                        if (_arr_[i].memberRuleId == params.memberRuleId) {
+                            bool = false
+                        };
+                    }
+                    bool ? _arr_.push(params) : null;
+                    this.ruleForm.all_vip_id = _arr_;  //批量操作优惠券产品
+                    return;
+                }
+                this.ruleForm.all_vip_id.push(params);  //批量操作优惠券产品
+            },
+
+            tableRowVipClassName({ row, rowIndex }) {  //赋值行号 是当前选中的会员信息
+                row.index = row.memberRuleId;
+            },
+
             //提交 权限页面 绑定
             bindingAction(params) {
                 axios.get('set_permission_role', {
@@ -397,7 +463,7 @@ window.addEventListener('pageshow', function (params) {
                 //     console.log(element);
                 // })
                 try {
-                    params['addressId'] = params.addressId[0];
+                    // params['addressId'] = params.addressId[0];
                     params['machineId'] = params.machineId[0];
                     params['exWarehouseTime'] = ym.init.getDateTime(params.exWarehouseTime).split(' ')[0];
                     axios.post('create_machine_instance', qs.stringify(params)).then(res => {
@@ -452,18 +518,18 @@ window.addEventListener('pageshow', function (params) {
                         }
                         // Object.keys(res.data.data).forEach((element, index))
                         is.SearchTableFormData = res.data.data;
-                        timer = setTimeout(() => {
-                            document.getElementById('adopt').style.display = 'none';
-                            if (res.data.data.auditStatus == 2) {
-                                document.getElementById('adopt-error').style.display = 'block';
-                            } else {
-                                document.getElementById('adopt-error').style.display = 'none';
-                                if (res.data.data.status == 1) {
-                                    document.getElementById('adopt').style.display = 'block';
-                                }
-                            }
-                            timer = null;
-                        }, 0)
+                        // timer = setTimeout(() => {
+                        //     document.getElementById('adopt').style.display = 'none';
+                        //     if (res.data.data.auditStatus == 2) {
+                        //         document.getElementById('adopt-error').style.display = 'block';
+                        //     } else {
+                        //         document.getElementById('adopt-error').style.display = 'none';
+                        //         if (res.data.data.status == 1) {
+                        //             document.getElementById('adopt').style.display = 'block';
+                        //         }
+                        //     }
+                        //     timer = null;
+                        // }, 0)
                     } else {
                         is.IError(res.data.msg);
                     }
@@ -483,6 +549,7 @@ window.addEventListener('pageshow', function (params) {
                     if (res.data.state == 200) {
                         is.SearchTableAndVisible = true;
                         is.imageList.machinePics = [];
+                        is.data['machinePic'] = res.data.data.machinePic;
                         // is.imageList.machinePic.push(res.data.machinePic);
                         is.imageList.machinePics.push({ name: 'machinePics', url: res.data.data.machinePic });
                         is.SearchTableFormDatas = res.data.data;
@@ -538,7 +605,8 @@ window.addEventListener('pageshow', function (params) {
                 }
             },
             exeLength(error) {
-                is.IError('文件上传超出处理限制个数');
+                // is.IError('文件上传超出处理限制个数');
+                this.fileList = [];
             },
             DeleteInstance(params = {}) {
                 params[Object.keys(params)[1]] = Object.values(params)[1];
@@ -759,6 +827,24 @@ window.addEventListener('pageshow', function (params) {
                     }
                 }, 0)
             },
+            loadNodes(node, resolve, tmer = null) {
+                tmer = setInterval(() => {
+                    if (this.data.hasOwnProperty('trees')) {
+                        console.info('this tmer out');
+                        clearInterval(tmer);
+                        if (node.level === 0) {
+                            let _array_ = [];
+                            this.data['trees'].forEach((element, index) => {
+                                _array_.push({ name: element.permissionName, id: element.permissionId });
+                            });
+                            return resolve(_array_);
+                        }
+                        setTimeout(function () {
+                            resolve(__arr__);
+                        }, 500)
+                    }
+                }, 0)
+            },
 
             //选择的 权限树 
             handleCheckChange(data, checked, indeterminate, array = []) {
@@ -790,8 +876,10 @@ window.addEventListener('pageshow', function (params) {
                 // console.log(this.data['permissionId']);
                 // console.log(Array.from(new Set(this.data['permissionId'])));
             },
-
+            // 编辑 物料信息
             checkChang(params) {
+                console.log(params);
+                params['machinePic'] = this.data['machinePic'];
                 axios.post('update_machine', qs.stringify(params)).then(params => {
                     if (params.data.state == 200) {
                         is.ISuccessfull(params.data.msg);
@@ -808,47 +896,44 @@ window.addEventListener('pageshow', function (params) {
             },
 
             roleformDataTree(params) {
-                let xml = [];
-                this.$refs.tree.getCheckedNodes().forEach((element, index) => {  // 二级
+                let xml = [], setup = {}, arr = [];
+                this.$refs.tree.getCheckedNodes().forEach((element, index) => {  // 二级 权限
                     xml.push(element.id);
-                    if(element.value != null) {
+                    if (element.value != null) {  //选择 父类下全部子类
                         element.value.forEach((e, i) => {
                             xml.push(e.permissionId);
                         })
+                    } else if (element.parentId != -1) {  //单选一个父集合的其中一个子类
+                        xml.push(element.parentId);
                     }
                 })
                 // .replace(/^(\s|[])+|(\s|[])+$/g, '')
                 // xml = Array.from(new Set(xml));
-                let arr = JSON.stringify(Array.from(new Set(xml))).split('[')[1];
+                arr = JSON.stringify(Array.from(new Set(xml))).split('[')[1];
                 arr = arr.split(']')[0];
                 params['roleId'] = this.data.roleId;
                 params['permissionIds'] = arr;
                 params['setupType'] = 1;
-                this.data['setup'] = {};
-                this.data.setup['roleId'] = this.data.roleId;
-                this.data.setup['permissionIds'] = [];
-                this.data.setup['setupType'] = 2;
 
+                setup['roleId'] = this.data.roleId;
+                setup['setupType'] = 2;
 
                 axios.post('setup_role_permission', qs.stringify(params)).then(params => {
                     if (params.data.state == 200) {
                         //资源权限赋予
                         axios.post('resource_permission_list', {}).then(params => {
+                            arr = [];
                             if (params.data.state == 200) {
                                 let __arr__ = [];
-                                params.data.list.forEach(element =>{
+                                params.data.list.forEach(element => {
                                     __arr__.push(element.permissionId)
                                 })
-                                this.data.setup['permissionIds'] = __arr__;
-                                axios.post('setup_role_permission', qs.stringify(this.data.setup));
-                            } else {
-                                is.IError(params.data.msg);
+                                arr = JSON.stringify(Array.from(new Set(__arr__))).split('[')[1];
+                                arr = arr.split(']')[0];
+                                setup['permissionIds'] = arr;
+                                axios.post('setup_role_permission', qs.stringify(setup));
                             }
                         })
-                            .catch(function (error) {
-                                is.IError(error);
-                            })
-
                         is.ISuccessfull(params.data.msg);
                         is.TableAndVisible = false;
                         is.formDatas = {};
@@ -863,10 +948,46 @@ window.addEventListener('pageshow', function (params) {
                     })
             },
 
+            //更新 设备信息
+            updateMachine(params) {
+                console.log(params);
+                params['extendExpireTime'] = params['extendExpireTime'].split(' ')[0];
+                axios.post('update_machine_instance', qs.stringify(params)).then(params => {
+                    if (params.data.state == 200) {
+                        is.ISuccessfull(params.data.msg);
+                        is.SearchTableAndVisible = false;
+                        is.SearchTableFormData = {};
+                        is.list();
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
 
+            rosRoleformDataTree(params) {
+                let permissionId = this.data['rosPermissionId'], arr = [], datas= {};
+                arr = JSON.stringify(permissionId).split('[')[1];
+                arr = arr.split(']')[0];
 
+                datas['roleId'] = this.data.roleId;
+                datas['setupType'] = 2;
+                datas['permissionIds'] = arr;
 
-
+                axios.post('setup_role_permission', qs.stringify(datas)).then(params => {
+                    this.data['rosPermissionId'] = [];
+                    if(params.data.state === 200){
+                        this.detailTableAndVisible = false;
+                        is.ISuccessfull(params.data.msg);
+                    }else {
+                        is.IError(params.data.msg);
+                    }
+                }).catch(function (error) {
+                    is.IError(error);
+                });
+            },
 
 
             machineSceneSuccess(e) {
@@ -887,6 +1008,13 @@ window.addEventListener('pageshow', function (params) {
                 console.log(file, fileList);
             },
 
+            handleSelectionChange(params){
+                console.log(params);
+                this.data['rosPermissionId'] = [];
+                params.forEach(element => {
+                    this.data['rosPermissionId'].push(element.permissionId);
+                })
+            },
 
 
 

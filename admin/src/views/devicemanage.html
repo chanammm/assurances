@@ -55,7 +55,7 @@
                             </el-table-column>
                             <el-table-column prop="machineType" label="机器类型">
                                 <template slot-scope="scope">
-                                    {{ scope.row.machineParameter}}
+                                    {{ scope.row.machineType }}
                                 </template>
                             </el-table-column>
                             <el-table-column prop="machinePic" label="图片" width="120px">
@@ -63,13 +63,11 @@
                                     <el-popover trigger="hover" placement="top">
                                         <el-image
                                             :src="scope.row.machinePic"
-                                            :preview-src-list="scope.row.machinePic"
                                             style="text-align: center;">
                                         </el-image>
                                         <div slot="reference" class="name-wrapper">
                                             <el-image
                                                 :src="scope.row.machinePic"
-                                                :preview-src-list="scope.row.machinePic"
                                                 lazy></el-image>
                                         </div>
                                     </el-popover>
@@ -201,6 +199,8 @@
                                     </template>
                                 </el-form-item>
 
+                                
+
                                 <div class="btn-center" style="text-align: center; margin: 20px;">
                                 <el-button type="primary" @click="checkChang(SearchTableFormDatas);">提交
                                 </el-button>
@@ -212,7 +212,7 @@
                     <el-dialog title="导入物料信息" :visible.sync="detailTableAndVisible">
                         <el-form>
                             <el-form-item label=".CSV文件">
-                                <template v-model="ruleForm.machinePic">
+                                <template>
                                     <el-upload :limit="num" class="upload-demo" :file-list="fileList" drag
                                         :action="asfileUpdataExc" :headers="fileUpdataExcData"
                                         :on-success="ExecSceneSuccess" :on-exceed="exeLength" multiple>

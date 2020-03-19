@@ -193,19 +193,22 @@ nav img {
 
 .login {
   position: absolute;
-  top: 6%;
+  top: 50px;
   left: 0;
   width: 100%;
+  height: auto;
+  overflow: hidden;
 }
 
 .login .loginBox {
-  width: 300px;
+  width: 260px;
   margin: 0 auto;
 }
 
 .login .loginBox .title {
   text-align: left;
   font-size: 1rem;
+  color: white;
 }
 
 .login .loginBox input {
@@ -251,12 +254,13 @@ nav img {
   height: 30px;
   float: right;
   background: url(../images/normal.png) no-repeat center center;
+  transform: rotate(90deg);
   background-size: 70%;
   margin-top: 4px;
 }
 
 .help-box {
-  display: none;
+  display: block;
   width: 100%;
   height: auto;
   overflow: hidden;
@@ -272,7 +276,7 @@ nav img {
   width: 100%;
   height: 260px;
   overflow: hidden;
-  background: url(../images/show-help.png) no-repeat center center;
+  background: url(../images/show-help.jpg) no-repeat center center;
   background-size: contain;
 }
 

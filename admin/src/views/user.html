@@ -21,8 +21,8 @@
             <el-main>
                 <el-form>
                     <div style="margin-bottom:10px;">
-                        <el-button @click="UpdateTableAndVisible = true; formData = {};"
-                            type="primary">新增<i class="el-icon-plus el-icon--right"></i></el-button>
+                        <el-button @click="UpdateTableAndVisible = true; formData = {};" type="primary">新增<i
+                                class="el-icon-plus el-icon--right"></i></el-button>
                     </div>
                     <!-- <div style="margin: 10px 0">
                         <el-button type="primary"
@@ -57,12 +57,12 @@
                         <el-table-column prop="roleName" label="角色名称"></el-table-column>
                         <el-table-column prop="createName" label="创建者账号">
                             <template slot-scope="scope">
-                                {{ scope.row.createName == -1 ? '无' : scope.row.createName }} 
+                                {{ scope.row.createName == -1 ? '无' : scope.row.createName }}
                             </template>
                         </el-table-column>
                         <el-table-column prop="status" label="状态">
                             <template slot-scope="scope">
-                                {{ scope.row.status == 1 ? '正常' : '冻结' }} 
+                                {{ scope.row.status == 1 ? '正常' : '冻结' }}
                             </template>
                         </el-table-column>
                         <el-table-column prop="createTime" label="注册时间"></el-table-column>
@@ -72,7 +72,11 @@
                             <template slot-scope="scope">
                                 <el-button type="text" size="small"
                                     @click="serchAssetesAll(); serchAssetes(scope.row.roleId)">
-                                    权限
+                                    页面权限
+                                </el-button>
+                                <el-button type="text" size="small"
+                                    @click="rosSerchAssetesAll(); rosSerchAssetes(scope.row.roleId)">
+                                    资源权限
                                 </el-button>
                             </template>
                         </el-table-column>
@@ -84,21 +88,13 @@
                     layout="total, sizes, prev, pager, next, jumper" :total="total">
                 </el-pagination>
 
-                <el-dialog title="权限树" :visible.sync="TableAndVisible" width="70%">
+                <el-dialog title="页面权限树" :visible.sync="TableAndVisible" width="70%">
                     <div>修改绑定的权限树如目标用户是当前用户将会强制重新回到登陆页面，需要重新登陆</div>
                     <el-form :model="formDataTree" label-width=100px>
                         <el-form-item label="权限结构：">
-                                <el-tree
-                                :props="props"
-                                :load="loadNode"
-                                node-key="id"
-                                ref="tree"
-                                lazy
-                                show-checkbox
-                                highlight-current
-                                default-expand-all
-                                @check-change="handleCheckChange">
-                                </el-tree>
+                            <el-tree :props="props" :load="loadNode" node-key="id" ref="tree" lazy show-checkbox
+                                highlight-current default-expand-all @check-change="handleCheckChange">
+                            </el-tree>
                         </el-form-item>
 
                         <div class="btn-center" style="text-align: center; margin: 20px;">
@@ -106,6 +102,36 @@
                             </el-button>
                         </div>
                     </el-form>
+                </el-dialog>
+
+                <el-dialog title="资源权限树" :visible.sync="detailTableAndVisible" width="70%">
+                    <div>修改绑定的权限树如目标用户是当前用户将会强制重新回到登陆页面，需要重新登陆</div>
+                    <!-- <el-table
+                            :data="tableDatas.filter(data => !search_address || data.memberRuleName.toLowerCase().includes(search_address.toLowerCase()))"
+                            stripe style="width: 50%" height="300px" tooltip-effect="dark"
+                            @row-click="HandleSelectionChange" ref="multipleTable"
+                            :row-class-name="tableRowVipClassName">
+                            <el-table-column property="requestUri" label="资源名称"></el-table-column>
+                            <el-table-column property="permissionName" show-overflow-tooltip="true" label="资源地址"></el-table-column>
+                                <template slot="header" slot-scope="scope">
+                                    <el-input v-model="search_address" size="mini" placeholder="输入关键字搜索" />
+                                </template>
+                            </el-table-column>
+                        </el-table> -->
+                    <el-table ref="multipleTable" :data="tableDatas" tooltip-effect="dark" height="600px" style="width: 100%"
+                        @selection-change="handleSelectionChange">
+                        <el-table-column type="selection">
+                        </el-table-column>
+                        <el-table-column label="资源名称">
+                            <template slot-scope="scope">{{ scope.row.permissionName }}</template>
+                        </el-table-column>
+                        <el-table-column prop="requestUri" label="资源地址">
+                        </el-table-column>
+                    </el-table>
+                    <div class="btn-center" style="text-align: center; margin: 20px;">
+                        <el-button type="primary" @click="rosRoleformDataTree()">提交
+                        </el-button>
+                    </div>
                 </el-dialog>
 
                 <el-dialog title="新增角色" :visible.sync="UpdateTableAndVisible" width="50%">

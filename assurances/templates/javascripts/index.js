@@ -5,37 +5,50 @@ import PickerExtend from 'picker-extend';
 import axios from 'axios';
 import qs from 'qs';
 
-axios.defaults.baseURL = 'http://test.cbcoffee.cn:8090/';
+const URLs = `http://39.108.49.246`;
+const URLfiles = `http://120.24.108.93`;
+
+axios.defaults.baseURL = URLs +':8090/';
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 axios.defaults.crossDomain = true;
 // axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
 axios.defaults.headers.common['Authorization'] = ''; // 设置请求头为 Authorization
 //配置发送请求前的拦截器 可以设置token信息 
 axios.interceptors.request.use(
-	config => {
-		// 在发送请求之前做什么
-		if (config.method === "post") {
-		} else {
-		}
-		return config;
-	},
-	error => {
-		return Promise.reject(error);
-	})
+    config => {
+        // 在发送请求之前做什么
+        if (config.method === "post") {
+        } else {
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    })
 axios.interceptors.response.use(
-	response => {
-		if (response.status === 200) {
-			return Promise.resolve(response);
-		} else {
-			return Promise.reject(response);
-		}
-	},
-	error => {
-		console.log(error)
-		return Promise.reject(error.response);
-	}
+    response => {
+        if (response.status === 200) {
+            return Promise.resolve(response);
+        } else {
+            return Promise.reject(response);
+        }
+    },
+    error => {
+        console.log(error)
+        return Promise.reject(error.response);
+    }
 )
-
+if (!Object.values) Object.values = function(obj) {  //对于 object values 的支持
+    if (obj !== Object(obj))
+        throw new TypeError('Object.values called on a non-object');
+    var val=[],key;
+    for (key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj,key)) {
+            val.push(obj[key]);
+        }
+    }
+    return val;
+}
 class init {
     constructor() {
         this.data = {};
@@ -45,9 +58,15 @@ class init {
         this.bool = true;
     }
 
+    GETURI(){
+		var req = new RegExp("(^|&)" + arguments[0] + "=([^&]*)(&|$)", "i") ,res = window.location.search.substr(1).match(req);
+		if(res != null) return decodeURI(res[2]);
+		return null;
+	}
+
     _input_() {
         document.querySelectorAll('input').forEach((element, index) => {
-            if(element.name != 'installPic' && element.name != 'nameplatePic'){
+            if (element.name != 'installPic' && element.name != 'nameplatePic') {
                 this.data[element.name] = element.value + `|${element.getAttribute('placeholder')}`;
             }
         });
@@ -58,7 +77,8 @@ class init {
             switch (params) {
                 case 'index':
                     if (location.href.split('?').length < 2) location.href = './login.html';
-                    document.querySelector('input[name=machineSn]').value = location.href.split('?')[1];
+                    // document.querySelector('input[name=machineSn]').value = location.href.split('?')[1];
+                    document.querySelector('input[name=machineSn]').value = this.GETURI('machineSn');
                     document.querySelectorAll('.pullimage').forEach((element, index) => {  // 图片上传
                         document.querySelectorAll('.pullimage')[index].onclick = domain => {
                             this._image_(element.name, index);  //触发图片上传
@@ -70,56 +90,60 @@ class init {
                 case 'login':
                     console.log('Temporary landing!!!');
                     let bool = false;
-                    document.querySelector('.help').onclick = function(){
-                        if(!bool){
-                            this.childNodes[1].setAttribute('style', 'transform:rotate(90deg)');
-                            document.querySelector('.help-box').style.display = 'block';
-                            bool = true;
-                        }else{
+                    document.querySelector('.help').onclick = function () {
+                        if (!bool) {
                             this.childNodes[1].setAttribute('style', 'transform:rotate(0deg)');
                             document.querySelector('.help-box').style.display = 'none';
+                            bool = true;
+                        } else {
+                            this.childNodes[1].setAttribute('style', 'transform:rotate(90deg)');
+                            document.querySelector('.help-box').style.display = 'block';
                             bool = false;
                         }
                     }
                     break;
-                default:
-                    axios.get('find_machine_detail?machineSn=' + location.href.split('?')[1]).then((params) => {
+                case 'quality':
+                    axios.get('find_machine_detail?machineSn=' + this.GETURI('machineSn')).then((params) => {
                         if (params.data.state == 200) {
-                            document.querySelectorAll('.qualiydomain>div>span').forEach((domain, index)=> {
-                                Object.keys(params.data.data).forEach((element,i) => {
-                                    if(element == domain.getAttribute('name')){
-                                        if(Object.values(params.data.data)[i] == '-1'){
+                            document.querySelectorAll('.qualiydomain>div>span').forEach((domain, index) => {
+                                Object.keys(params.data.data).forEach((element, i) => {
+                                    if (element == domain.getAttribute('name')) {
+                                        if (Object.values(params.data.data)[i] == '-1') {
                                             document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = '无';
-                                        }else{
+                                        } else {
                                             document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = Object.values(params.data.data)[i];
-                                            if(document.querySelectorAll(`.qualiydomain>div>span`)[index].getAttribute('name') == 'extendExpireTime'){
-                                                document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = Object.values(params.data.data)[i].split(' ')[0];
+                                            if (document.querySelectorAll(`.qualiydomain>div>span`)[index].getAttribute('name') == 'extendExpireTime') {
+                                                Object.values(params.data.data)[i] ? document.querySelectorAll(`.qualiydomain>div>span`)[index].innerHTML = Object.values(params.data.data)[i].split(' ')[0] :null;
                                             }
                                         }
                                     }
                                 })
-                                if(params.data.data.auditStatus == 1){
+                                if (params.data.data.auditStatus == 1) {
                                     document.querySelector(`#time`).style.display = 'block';
                                     document.querySelector(`nav>span`).innerHTML = '已激活';
                                     // nav-top-banner-ccc
-                                }else if(params.data.data.auditStatus == 2){
+                                } else if (params.data.data.auditStatus == 2) {
                                     document.querySelector(`nav>span`).innerHTML = '未通过';
                                     document.querySelector(`#time`).style.display = 'none';
                                     document.querySelector(`.ban>img`).setAttribute('src', '../images/nav-top-banner-ccc.png');
-                                }else{
+                                } else {
                                     document.querySelector(`nav>span`).innerHTML = '审核中';
                                     document.querySelector(`#time`).style.display = 'none';
                                     document.querySelector(`.ban>img`).setAttribute('src', '../images/nav-top-banner-ccc.png');
                                 }
                                 // qualiydomain
                             })
-                            params.data.data.machinePic != -1 ? document.querySelectorAll('.banner')[1].setAttribute('src',  params.data.data.machinePic) : null;
+                            params.data.data.machinePic != -1 ? document.querySelectorAll('.banner')[1].setAttribute('src', params.data.data.machinePic) : null;
                         } else {
                             this._alert_(params.data.msg, 1000);
                         }
                     });
                     sessionStorage.clear();
+                    break;
+                default:
+                    location.href = './login.html';
                     throw new Error('not page action!');
+                    
             }
             this.dom.onclick = (param = {}) => {  //提交
                 try {
@@ -127,17 +151,18 @@ class init {
                     Object.keys(this.data).forEach((element, index) => {  //检测 表单内容
                         if (Object.values(this.data)[index].split('|')[0] != '') {
                             if (params == 'login') {
-                                if(!this.bool){
+                                if (!this.bool) {
                                     throw new Error('进行中,可能网络稍有延迟~~~');
                                 }
                                 this.bool = false;
                                 axios.get('check_activate?machineSn=' + Object.values(this.data)[index].split('|')[0]).then((params) => {
                                     this.bool = true;
                                     if (params.data.state == 200) {
+                                        sessionStorage.setItem('sn', params.data.data.machineSn);
                                         if (params.data.data.isActivate == 0) {
-                                            location.href = `./index.html?${this.data['machineSn'].split('|')[0]}`;
-                                        }else{
-                                            location.href = `./quality.html?${this.data['machineSn'].split('|')[0]}`;
+                                            location.href = `./index.html?machineSn=${this.data['machineSn'].split('|')[0]}`;
+                                        } else {
+                                            location.href = `./quality.html?machineSn=${this.data['machineSn'].split('|')[0]}`;
                                         }
                                     } else {
                                         this._alert_(params.data.msg, 1000);
@@ -148,14 +173,14 @@ class init {
                             throw new Error(Object.values(this.data)[index].split('|')[1] != 'null' ? Object.values(this.data)[index].split('|')[1] : `'${element}' cannot be empty!`);
                         }
                     });
-                    if(params == 'index'){
+                    if (params == 'index') {
                         Object.keys(this.data).forEach((element, index) => {
                             param[element] = Object.values(this.data)[index].split('|')[0];
                         })
                         param['district'] = param['province'].split(',')[2];
                         param['city'] = param['province'].split(',')[1];
                         param['province'] = param['province'].split(',')[0];
-                        if(!this.bool){
+                        if (!this.bool) {
                             throw new Error('进行中,可能网络稍有延迟~~~');
                         }
                         this.bool = false;
@@ -164,6 +189,12 @@ class init {
                             if (params.data.state == 200) {
                                 // this._alert_(params.data.msg, 1000);
                                 this._show_('.alx-module');
+                                document.querySelector('.alx-module').onclick = function () {   // 点击任何都跳转 设备状态详情
+                                    location.href = `./quality.html?machineSn=${param.machineSn}`;
+                                }
+                                this.clone.onclick = () => {
+                                    location.href = `./quality.html?machineSn=${param.machineSn}`;
+                                };
                                 sessionStorage.setItem('page', true);
                             } else {
                                 this._alert_(params.data.msg, 1000);
@@ -171,12 +202,9 @@ class init {
                                 //     this._show_('.alx-module');
                                 // }
                             }
-                            document.querySelector('.show').onclick = function(){
-                                location.href = `./quality.html?${ param.machineSn }`;
-                            };
                         })
                             .catch(function (error) {
-    
+
                             })
                     }
                 } catch (error) {
@@ -247,8 +275,8 @@ class init {
     _image_(name, index) {
         let that = this;
         // document.getElementsByClassName(name)[0].click();
-        document.querySelector(`input[name=${ name }]`).click();
-        document.querySelector(`input[name=${ name }]`).onchange = function (e) {
+        document.querySelector(`input[name=${name}]`).click();
+        document.querySelector(`input[name=${name}]`).onchange = function (e) {
             var localFile = this.files[0];
             var reader = new FileReader();
             var content;
@@ -260,7 +288,7 @@ class init {
                     _$file.append('file', contentFile, 'machineNumber_' + Math.random() + '.png');
                     axios({
                         method: "POST",
-                        url: 'http://test.cbcoffee.cn:8085/picture_file_upload',
+                        url: URLfiles + ':8085/picture_file_upload',
                         data: _$file,
                         processData: false,
                         traditional: true,
@@ -273,7 +301,7 @@ class init {
                         }],
                         onUploadProgress: function (progressEvent) { //原生获取上传进度的事件
                             if (progressEvent.lengthComputable) {
-                                document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML =  '上传图片进度' +(progressEvent.loaded / progressEvent.total * 100 | 0) +'%';
+                                document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML = '上传图片进度' + (progressEvent.loaded / progressEvent.total * 100 | 0) + '%';
                                 if (progressEvent.total % progressEvent.loaded == +false) {
                                     setTimeout(() => {
                                         document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML = '';
@@ -283,10 +311,10 @@ class init {
                         }
                     }).then(
                         response => {
-                            if(response.data.state == 200){
+                            if (response.data.state == 200) {
                                 // document.querySelectorAll('.pullimage')[index].setAttribute('src', response.data.data.path);
                                 that.data[name] = response.data.data.path;
-                            }else{
+                            } else {
                                 document.querySelectorAll('.pullimage')[index].setAttribute('src', '');
                                 that._alert_(response.data.msg, 1000);
                             }

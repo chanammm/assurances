@@ -4,7 +4,7 @@ import json from '../config/json/configuraction.json'
 
 import axios from 'axios';
 import qs from 'qs';
-axios.defaults.baseURL = 'http://120.24.108.93:8080/';
+axios.defaults.baseURL = json.URLS.Development_Server_;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 axios.defaults.crossDomain = true;
 // axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
