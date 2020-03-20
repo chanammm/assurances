@@ -57,7 +57,7 @@ new Vue({
                         localStorage.setItem('uri', JSON.stringify({ uri: '../index.htm?hash:ix', title: '首页' }));
                         sessionStorage.setItem("token", JSON.stringify({ asset: params.data }));
                         axios.defaults.headers.common['Authorization'] = JSON.parse(sessionStorage.getItem('token')).asset.secret; // 设置请求头为 Authorization
-                        axios.post('admin_role_permissions').then(params => {
+                        axios.post('admin_role_permissions').then(params => {  // 页面权限
                             sessionStorage.setItem('_a', JSON.stringify({ _u: ':hash(iox*)', _i: user.value }))  //管理员信息
                             sessionStorage.setItem('tag', JSON.stringify(params.data.data.pagePermissions));
                             setTimeout(() => {

@@ -212,6 +212,7 @@
                     <el-dialog title="导入物料信息" :visible.sync="detailTableAndVisible">
                         <el-form>
                             <el-form-item label=".CSV文件">
+                                <div style="font-size: 10px; color: #409EFF;cursor: pointer;" @click="hrefDown(true)">(模板下载)</div>
                                 <template>
                                     <el-upload :limit="num" class="upload-demo" :file-list="fileList" drag
                                         :action="asfileUpdataExc" :headers="fileUpdataExcData"

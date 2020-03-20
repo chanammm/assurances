@@ -75,8 +75,12 @@
                                     页面权限
                                 </el-button>
                                 <el-button type="text" size="small"
-                                    @click="rosSerchAssetesAll(); rosSerchAssetes(scope.row.roleId)">
+                                    @click="rosSerchAssetesAll(scope.row.roleId);">
                                     资源权限
+                                </el-button>
+                                <el-button type="text" size="small"
+                                    @click="dataSerchAssetes(scope.row.roleId)">
+                                    数据权限
                                 </el-button>
                             </template>
                         </el-table-column>
@@ -104,7 +108,7 @@
                     </el-form>
                 </el-dialog>
 
-                <el-dialog title="资源权限树" :visible.sync="detailTableAndVisible" width="70%">
+                <el-dialog title="资源权限" :visible.sync="detailTableAndVisible" width="70%">
                     <div>修改绑定的权限树如目标用户是当前用户将会强制重新回到登陆页面，需要重新登陆</div>
                     <!-- <el-table
                             :data="tableDatas.filter(data => !search_address || data.memberRuleName.toLowerCase().includes(search_address.toLowerCase()))"
@@ -130,6 +134,24 @@
                     </el-table>
                     <div class="btn-center" style="text-align: center; margin: 20px;">
                         <el-button type="primary" @click="rosRoleformDataTree()">提交
+                        </el-button>
+                    </div>
+                </el-dialog>
+
+                <el-dialog title="数据权限" :visible.sync="SearchTableAndVisible" width="70%">
+                    <div>【<span style="color: red;">只能选中单个权限，超出个数将默认选中第一个</span>】修改绑定的权限树如目标用户是当前用户将会强制重新回到登陆页面，需要重新登陆</div>
+                    <el-table ref="multipleTables" :data="tableDatass" tooltip-effect="dark" height="600px" style="width: 100%"
+                        @selection-change="handleSelectionChanges">
+                        <el-table-column type="selection">
+                        </el-table-column>
+                        <el-table-column label="数据名称">
+                            <template slot-scope="scope">{{ scope.row.dataPermissionName }}</template>
+                        </el-table-column>
+                        <el-table-column prop="createTime" label="创建时间">
+                        </el-table-column>
+                    </el-table>
+                    <div class="btn-center" style="text-align: center; margin: 20px;">
+                        <el-button type="primary" @click="dataRoleformDataTree()">提交
                         </el-button>
                     </div>
                 </el-dialog>

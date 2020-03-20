@@ -1,6 +1,8 @@
-import style from '../../stylesheets/base/style.min.css'
-import app from '../../../app.js'
-import json from '../config/json/configuraction.json'
+import style from '../../stylesheets/base/style.min.css';
+import app from '../../../app.js';
+import json from '../config/json/configuraction.json';
+import "babel-polyfill";
+
 
 import axios from 'axios';
 import qs from 'qs';
@@ -15,6 +17,7 @@ axios.interceptors.request.use(
 		// 在发送请求之前做什么
 		if (config.method === "post") {
 			// 序列化
+			config.data = decodeURIComponent(config.data).replace(/无/g, '-1');
 			// config.data = qs.stringify(config.data);
 			// config.data = JSON.stringify(config.data);
 			// 温馨提示,若是贵公司的提交能直接接受json 格式,可以不用 qs 来序列化的
@@ -39,7 +42,11 @@ axios.interceptors.response.use(
 			if(response.data.state === 201){
 				window.ym.init.MBOX('事务提示：登陆已失效，请重新登陆');
 				setTimeout(function () {
-					parent.location.href = '../login.htm';
+					if(process.env.NODE_ENV == "production"){
+						parent.location.href = 'http://test.cbcoffee.cn/rundev/assurances/admin/login.htm?hash:goback(-hash*)';
+					}else{
+						parent.location.href = '../login.htm';
+					}
 				},500)
 				
 			}

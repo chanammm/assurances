@@ -85,6 +85,9 @@ class init {
                         }
                     });
                     document.querySelectorAll('input[name=address]')[0].onclick = this._address_(); //地址选择事件
+                    document.querySelector('#ifremes').onclick = () => {
+                        this._show_('.iframes');
+                    };
                     this._enlarge_(); //注册示意图放大事件
                     break;
                 case 'login':
@@ -126,6 +129,9 @@ class init {
                                     document.querySelector(`nav>span`).innerHTML = '未通过';
                                     document.querySelector(`#time`).style.display = 'none';
                                     document.querySelector(`.ban>img`).setAttribute('src', '../images/nav-top-banner-ccc.png');
+                                    if(params.data.data.status == 1){
+                                        document.querySelector(`nav>span`).innerHTML = '审核中';
+                                    }
                                 } else {
                                     document.querySelector(`nav>span`).innerHTML = '审核中';
                                     document.querySelector(`#time`).style.display = 'none';
@@ -174,12 +180,16 @@ class init {
                         }
                     });
                     if (params == 'index') {
+                        if(document.querySelector('input[name=success]').checked != true){
+                            this._alert_('请勾选同意服务协议', 1000);
+                            return false;
+                        }
                         Object.keys(this.data).forEach((element, index) => {
                             param[element] = Object.values(this.data)[index].split('|')[0];
                         })
-                        param['district'] = param['province'].split(',')[2];
-                        param['city'] = param['province'].split(',')[1];
-                        param['province'] = param['province'].split(',')[0];
+                        param['district'] = param['province'].split(',')[2] || -1;
+                        param['city'] = param['province'].split(',')[1] || -1;
+                        param['province'] = param['province'].split(',')[0] || -1;
                         if (!this.bool) {
                             throw new Error('进行中,可能网络稍有延迟~~~');
                         }
@@ -301,12 +311,12 @@ class init {
                         }],
                         onUploadProgress: function (progressEvent) { //原生获取上传进度的事件
                             if (progressEvent.lengthComputable) {
-                                document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML = '上传图片进度' + (progressEvent.loaded / progressEvent.total * 100 | 0) + '%';
-                                if (progressEvent.total % progressEvent.loaded == +false) {
-                                    setTimeout(() => {
-                                        document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML = '';
-                                    }, 2000)
-                                }
+                                // document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML = '上传图片进度' + (progressEvent.loaded / progressEvent.total * 100 | 0) + '%';
+                                // if (progressEvent.total % progressEvent.loaded == +false) {
+                                //     setTimeout(() => {
+                                //         document.querySelectorAll('.pullimage')[index].nextElementSibling.innerHTML = '';
+                                //     }, 2000)
+                                // }
                             }
                         }
                     }).then(

@@ -1,6 +1,6 @@
-var [path, HtmlWebpackPlugin, MiniCssExtractPlugin, optimizecssassets, uglifyjs, extractTextWebpackPlugin, fs] = [
+var [path, HtmlWebpackPlugin, MiniCssExtractPlugin, optimizecssassets, uglifyjs, extractTextWebpackPlugin, fs, babel] = [
     require('path'), require('html-webpack-plugin'), require('mini-css-extract-plugin'), require('optimize-css-assets-webpack-plugin'), require('uglifyjs-webpack-plugin'),
-    require('extract-text-webpack-plugin'), require('fs-extra')
+    require('extract-text-webpack-plugin'), require('fs-extra'), require("babel-polyfill")
 ];
 
 
@@ -11,7 +11,7 @@ var [path, HtmlWebpackPlugin, MiniCssExtractPlugin, optimizecssassets, uglifyjs,
 // })
 
 module.exports = {
-    mode: 'production',  //模式 production development
+    mode: 'development',  //模式 production development
     optimization: {
         minimizer: [
             new uglifyjs({

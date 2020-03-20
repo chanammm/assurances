@@ -10,12 +10,12 @@ body {
   min-width: 320px;
   overflow-x: hidden;
   margin: 0 auto;
-  font-size: 1.2rem;
+  font-size: 14px;
   background-color: #f0f0ee;
 }
 
 body input {
-  font-size: 1.1rem;
+  font-size: 14px;
 }
 
 .banner {
@@ -119,6 +119,9 @@ body input {
   left: 0;
   z-index: 1;
   text-align: center;
+  width: 450px;
+  left: 50%;
+  margin-left: -225px;
 }
 
 .alx-module img {
@@ -176,10 +179,6 @@ nav img {
 
 .qualiydomain .title {
   line-height: 40px;
-}
-
-.qualiydomain .title .disabled {
-  width: 120px;
 }
 
 .qualiydomain .title span {
@@ -305,9 +304,31 @@ nav img {
   position: fixed;
   top: 100px;
   left: 5%;
+  text-align: center;
 }
 
 .image-show img {
-  width: 100%;
+  width: 70%;
   height: 100%;
+}
+
+.ban {
+  height: 230px;
+}
+
+.iframes {
+  display: none;
+  position: fixed;
+  top: 100px;
+  left: 5%;
+  width: 90%;
+  height: 500px;
+  background: white;
+}
+
+@media (min-width: 640px) {
+  .image-show img {
+    width: 20%;
+    height: 100%;
+  }
 }

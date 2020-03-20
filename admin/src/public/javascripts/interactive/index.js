@@ -43,6 +43,7 @@ new Vue({
         }
     },
     created: function () {
+        window.is = this;
         $('body').on('click', '.template-skins > a', function (e) {
             e.preventDefault();
             var skin = $(this).data('skin');
@@ -104,6 +105,15 @@ new Vue({
         }
     },
     methods: {
+        ISuccessfull(e) {
+            setTimeout(() => {
+                this.loading = false;
+            }, 1000);
+            this.$message({
+                message: '事务提醒：,' + e,
+                type: 'success'
+            });
+        },
         IError(err) {
             this.$message.error('错了哦，' + err);
         },
@@ -254,6 +264,40 @@ new Vue({
                     break;
             }
         },
+
+        
+            //查询当前管理员
+            serchAdmin(params) {
+                axios.get('sys_admin_detail').then(params => {
+                    if (params.data.state == 200) {
+                        is.UpdateVisible = true;
+                        is.DataVisible = params.data.data;
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                }).catch(function (error) {
+                    is.IError(error);
+                })
+            },
+            // 提交修改
+            submit(params){
+                axios.post('edit_current_admin', qs.stringify(params)).then(params => {
+                    if (params.data.state == 200) {
+                        is.ISuccessfull(params.data.msg);
+                        is.UpdateVisible = false;
+                        is.DataVisible = {};
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            }
+
+
+
+
     }
 });
 

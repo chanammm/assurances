@@ -11,10 +11,10 @@ body{
     min-width: 320px;
     overflow-x: hidden;
     margin: 0 auto;
-    font-size: 1.2rem;
+    font-size: 14px;
     background-color: #f0f0ee;
     input{
-        font-size: 1.1rem;
+        font-size: 14px;
     }
 }
 @mixin widthOrder {
@@ -107,6 +107,9 @@ body{
     left: 0;
     z-index: 1;
     text-align: center;
+    width: 450px;
+    left: 50%;
+    margin-left: -225px;
     img{
         width: $width - 20%;
         height: auto;
@@ -155,7 +158,7 @@ nav{
     .title{
         line-height: 40px;
         .disabled{
-            width: 120px;
+            // width: 120px;
         }
         span{
             float: right;
@@ -269,8 +272,29 @@ nav{
     position: fixed;
     top: 100px;
     left:5%;
+    text-align: center;
     img{
-        width: $width;
+        width: $width - 30%;
         height: $width;
+    }
+}
+.ban{
+    height: 230px;
+}
+.iframes{
+    display: none;
+    position: fixed;
+    top: 100px;
+    left: 5%;
+    width: $width - 10%;
+    height: 500px;
+    background: white;
+}
+@media (min-width: 640px){
+    .image-show{
+        img{
+            width: $width - 80%;
+            height: $width;
+        }
     }
 }

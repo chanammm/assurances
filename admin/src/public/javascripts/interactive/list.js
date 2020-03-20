@@ -1,5 +1,6 @@
 import { regionData, CodeToText, TextToCode } from 'element-china-area-data';
 
+
 if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) {
     window.onload = function (params) {
         for (let i = 0; i < document.getElementsByClassName('el-dialog').length; i++) {
@@ -45,6 +46,7 @@ window.addEventListener('pageshow', function (params) {
                 more: false,
                 tableData: [],
                 tableDatas: [],
+                tableDatass: [],
                 UnFormData: [],
                 UnTableFormData: [],
                 currentPage: 1,
@@ -61,16 +63,18 @@ window.addEventListener('pageshow', function (params) {
                 },
                 formDataTree: {
                 },
-                formDataTrees:{},
+                formDataTrees: {},
                 formDatas: {
                     machineId: [],
                     addressId: []
                 },
+                DataVisible:{},
                 options: [],
                 option: [],
                 SearchTableAndVisible: false,
                 UpdateTableAndVisible: false,
                 detailTableAndVisible: false,
+                UpdateVisible: false,
                 TableAndVisible: false,
                 dialogVisible: false,
                 adoptModule: false,
@@ -80,7 +84,7 @@ window.addEventListener('pageshow', function (params) {
                 fileList: [],
                 data: {},
                 num: 1,
-                search_address:'',
+                search_address: '',
                 props: {
                     label: 'name',
                     ids: 'id',
@@ -266,7 +270,7 @@ window.addEventListener('pageshow', function (params) {
                     it.tableData = xml;
                     setTimeout(() => {
                         it.loading = false;
-                    }, 1000);
+                    }, 100);
                 })
             },
             crud(arg) {
@@ -352,34 +356,68 @@ window.addEventListener('pageshow', function (params) {
                         is.IError(error);
                     })
             },
-            //查看 角色已赋予资源权限
-            rosSerchAssetes(params) {
-                axios.post('role_resource_permission', qs.stringify({
-                    roleId: params,
-                    page: 1,
-                    pageSize: 100
-                })).then(res => {
-                    this.data['roleId'] = params;
+            //查看 所有 资源权限  角色已赋予资源权限
+            rosSerchAssetesAll(params) {
+                axios.post('resource_permission_list').then(res => {
                     if (res.data.state == 200) {
-                        let arr = [];
-                        res.data.page.records.forEach((element, index) => {
-                            arr.push({ id: element.permissionId, name: element.permissionName })
+                        is.detailTableAndVisible = true;
+                        is.tableDatas = res.data.list;  //**********************/
+                        axios.post('role_resource_permission', qs.stringify({
+                            roleId: params,
+                            page: 1,
+                            pageSize: 1000
+                        })).then(response => {
+                            this.data['roleId'] = params;
+                            if (response.data.state == 200) {
+                                res.data.list.forEach((element, index) => {
+                                    response.data.page.records.forEach((els) => {
+                                        if (els.permissionId == element.permissionId) {
+                                            is.$nextTick(function () {
+                                                is.tableChecked(index);  //每次更新了数据，触发这个函数即可。
+                                            });
+                                        }
+                                    })
+                                })
+
+                            } else {
+                                console.log(response.data.msg);
+                            }
                         })
-                    } else {
-                        console.log(res.data.msg);
+                            .catch(function (error) {
+                                is.IError(error);
+                            })
                     }
                 })
                     .catch(function (error) {
                         is.IError(error);
                     })
             },
-            //查看 所有 资源权限
-            rosSerchAssetesAll(params) {
-                axios.post('resource_permission_list').then(res => {
+
+            //查看 角色数据 权限
+            dataSerchAssetes(params) {
+                axios.post('sys_data_permission_list').then(res => {
                     if (res.data.state == 200) {
-                        is.detailTableAndVisible = true;
-                        is.data['trees'] = res.data.list;
-                        is.tableDatas = res.data.list;  //**********************/
+                        is.SearchTableAndVisible = true;
+                        is.tableDatass = res.data.list;  //**********************/
+                        axios.get('role_data_permission?roleId='+ params).then(response => {
+                            this.data['roleId'] = params;
+                            if (response.data.state == 200) {
+                                res.data.list.forEach( (element, index) => {
+                                    if (response.data.data.dataPermissionId == element.dataPermissionId) {
+                                        is.$nextTick(function () {
+                                            is.tableCheckeds(index);  //每次更新了数据，触发这个函数即可。
+                                        });
+                                    }
+                                })
+                            } else {
+                                console.log(response.data.msg);
+                            }
+                        })
+                            .catch(function (error) {
+                                is.IError(error);
+                            })
+                    } else {
+                        is.IError(error);
                     }
                 })
                     .catch(function (error) {
@@ -389,7 +427,7 @@ window.addEventListener('pageshow', function (params) {
 
             HandleSelectionChange(params, row) {  //选中的会员操作
                 this.ruleForm.all_vip = false;  //强制当前的全选变成 自主选择
-    
+
                 this.tableDataVip.forEach((element, index) => {  //处理 清除选中项目
                     if (element.memberRuleId == params.index) {
                         this.tableDataVip.splice(index, 1);
@@ -435,7 +473,10 @@ window.addEventListener('pageshow', function (params) {
             },
 
             tableChecked(e) {  //表格打勾已选择回显 
-                this.$refs.multipleTable.toggleRowSelection(this.tableData[e], true);
+                this.$refs.multipleTable.toggleRowSelection(this.tableDatas[e], true);
+            },
+            tableCheckeds(e) {  //表格打勾已选择回显 
+                this.$refs.multipleTables.toggleRowSelection(this.tableDatass[e], true);
             },
 
             //查看客户详细
@@ -464,8 +505,7 @@ window.addEventListener('pageshow', function (params) {
                 // })
                 try {
                     // params['addressId'] = params.addressId[0];
-                    params['machineId'] = params.machineId[0];
-                    params['exWarehouseTime'] = ym.init.getDateTime(params.exWarehouseTime).split(' ')[0];
+                    params['exWarehouseTime'] = params.exWarehouseTime ? ym.init.getDateTime(params.exWarehouseTime).split(' ')[0] : null;
                     axios.post('create_machine_instance', qs.stringify(params)).then(res => {
                         if (res.data.state == 200) {
                             is.UpdateTableAndVisible = false;
@@ -721,13 +761,15 @@ window.addEventListener('pageshow', function (params) {
 
             //管理员修改
             admindenit(params) {
+                let xml = {};
                 if (isNaN(params.addressId)) {  //不修改 区域地址
-                    params['addressId'] = this.data.addressId;
+                    xml['addressId'] = this.data.addressId;
                 }
                 if (isNaN(params.roleId)) {  //不修改角色
-                    params['roleId'] = this.data.roleId;
+                    xml['roleId'] = this.data.roleId;
                 }
-                axios.post('update_admin', qs.stringify(params)).then(params => {
+                xml = Object.assign({}, params, xml);
+                axios.post('update_admin', qs.stringify(xml)).then(params => {
                     if (params.data.state == 200) {
                         is.ISuccessfull(params.data.msg);
                         is.UpdateTableAndVisible = false;
@@ -951,7 +993,9 @@ window.addEventListener('pageshow', function (params) {
             //更新 设备信息
             updateMachine(params) {
                 console.log(params);
-                params['extendExpireTime'] = params['extendExpireTime'].split(' ')[0];
+                params['exWarehouseTime'] = params['exWarehouseTime'] ? params['exWarehouseTime'].split(' ')[0] : null;
+                params['expireTime'] = params['expireTime'] ? params['expireTime'].split(' ')[0] : null;
+                params['extendExpireTime'] = params['extendExpireTime'] ? params['extendExpireTime'].split(' ')[0] : null;
                 axios.post('update_machine_instance', qs.stringify(params)).then(params => {
                     if (params.data.state == 200) {
                         is.ISuccessfull(params.data.msg);
@@ -966,9 +1010,9 @@ window.addEventListener('pageshow', function (params) {
                         is.IError(error);
                     })
             },
-
+            // 资源权限提交
             rosRoleformDataTree(params) {
-                let permissionId = this.data['rosPermissionId'], arr = [], datas= {};
+                let permissionId = this.data['rosPermissionId'], arr = [], datas = {};
                 arr = JSON.stringify(permissionId).split('[')[1];
                 arr = arr.split(']')[0];
 
@@ -977,11 +1021,30 @@ window.addEventListener('pageshow', function (params) {
                 datas['permissionIds'] = arr;
 
                 axios.post('setup_role_permission', qs.stringify(datas)).then(params => {
-                    this.data['rosPermissionId'] = [];
-                    if(params.data.state === 200){
+                    this.data = {};
+                    if (params.data.state === 200) {
                         this.detailTableAndVisible = false;
                         is.ISuccessfull(params.data.msg);
-                    }else {
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                }).catch(function (error) {
+                    is.IError(error);
+                });
+            },
+            // 数据权限提交
+            dataRoleformDataTree(params) {
+                axios.get('setup_role_data_permission', {
+                    params: {
+                        roleId: this.data.roleId,
+                        dataPermissionId: this.data['dataPermissionId']
+                    }
+                }).then(params => {
+                    this.data = {};
+                    if (params.data.state === 200) {
+                        this.SearchTableAndVisible = false;
+                        is.ISuccessfull(params.data.msg);
+                    } else {
                         is.IError(params.data.msg);
                     }
                 }).catch(function (error) {
@@ -1008,16 +1071,35 @@ window.addEventListener('pageshow', function (params) {
                 console.log(file, fileList);
             },
 
-            handleSelectionChange(params){
-                console.log(params);
+            handleSelectionChange(params) {
                 this.data['rosPermissionId'] = [];
                 params.forEach(element => {
                     this.data['rosPermissionId'].push(element.permissionId);
                 })
             },
 
+            handleSelectionChanges(params) {
+                this.data['dataPermissionId'] = '';
+                this.data['dataPermissionId'] = params[0].dataPermissionId;
+            
+            },
+
+            //模板下载文件
+            hrefDown(params) {
+                if (params) {
+                    parent.window.open('../file/template.csv', '_blank');
+                } else {
+                    parent.window.open('../file/templates.csv', '_blank');
+                }
+            },
+            
 
 
         }
     });
 }, false)
+
+
+window.onload = () => {
+    document.querySelector('#c-container-list').style.display = 'block';
+};

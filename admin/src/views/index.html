@@ -34,8 +34,8 @@
                     <template slot="title"><i class="el-icon-user"></i>{{ adminName }}</template>
                     <el-menu-item index="1-1" @click="screenView()"><i class="el-icon-rank"></i>{{ screenViews }}
                     </el-menu-item>
-                    <!-- <el-menu-item index="1-4" @click="UpdateVisible = true; submit({en: 'pull'})"><i
-                            class="el-icon-connection"></i>个人信息</el-menu-item> -->
+                    <el-menu-item index="1-4" @click="serchAdmin();"><i
+                            class="el-icon-connection"></i>个人信息</el-menu-item>
                     <el-menu-item index="1-5">
                         <el-link style="text-decoration:none;" href="../../login.htm?hash:goback(-hash*)"><i
                                 class="el-icon-switch-button"></i>退出登陆</el-link>
@@ -67,24 +67,20 @@
         </section>
         <el-dialog title="修改用户信息" :visible.sync="UpdateVisible">
             <el-form :model="DataVisible" label-width="100px">
-                <el-form-item label="真实姓名">
-                    <el-input v-model="DataVisible.realName" class="w400"></el-input>
+                <el-form-item label="管理员名称">
+                    <el-input v-model="DataVisible.adminName" class="w400"></el-input>
                 </el-form-item>
-                <el-form-item label="客服电话">
-                    <el-input v-model="DataVisible.adminMobile" class="w400"></el-input>
+                <el-form-item label="手机号码">
+                    <el-input v-model="DataVisible.phone" class="w400"></el-input>
                 </el-form-item>
-                <el-form-item label="微信用户">
-                    <el-autocomplete v-model="DataVisible.state" :fetch-suggestions="querySearchAsync"
-                        placeholder="请输入的用户名" @select="handleSelect"></el-autocomplete>
-                </el-form-item>
-                <el-form-item label="旧密码">
-                    <el-input v-model="DataVisible.oldPwd" class="w400" show-password></el-input>
+                <el-form-item label="原密码">
+                    <el-input v-model="DataVisible.originPassword" class="w400" show-password></el-input>
                 </el-form-item>
                 <el-form-item label="新密码">
-                    <el-input v-model="DataVisible.adminPwd" class="w400" show-password></el-input>
+                    <el-input v-model="DataVisible.password" class="w400" show-password></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="submit({en: 'post', DataVisible})">提交修改</el-button>
+                    <el-button type="primary" @click="submit(DataVisible)">提交修改</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>

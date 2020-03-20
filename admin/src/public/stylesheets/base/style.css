@@ -522,3 +522,7 @@ body .blue {
 .el-badge__content.is-fixed {
   top: 8px;
 }
+
+#c-container-list {
+  display: none;
+}
