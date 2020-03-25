@@ -31,9 +31,9 @@
     "Backups": "location this JSON",
     "URLS": {
         "temporary": "http://120.24.108.93:8085/ http://120.24.108.93:8080/ http://test.cbcoffee.cn:8080/ http://test.cbcoffee.cn:8085/",
-        "ForMal_Files_": "http://120.24.108.93:8085/",
-        "Development_Server_": "http://39.108.49.246:8080/",
-        "Development_Files_": "http://120.24.108.93:8085/"
+        "ForMal_Files_": "http://sfile.coffeedz.com/",
+        "Development_Server_": "http://sadmin.coffeedz.com/",
+        "Development_Files_": "http://sfile.coffeedz.com/"
     },
     "SissionHref": {
         "URI": [

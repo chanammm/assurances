@@ -43,14 +43,14 @@ axios.interceptors.response.use(
 				window.ym.init.MBOX('事务提示：登陆已失效，请重新登陆');
 				setTimeout(function () {
 					if(process.env.NODE_ENV == "production"){
-						parent.location.href = 'http://test.cbcoffee.cn/rundev/assurances/admin/login.htm?hash:goback(-hash*)';
+						parent.location.href = 'http://s.coffeedz.com/work/admin/login.htm?redirect[x*]';
 					}else{
-						parent.location.href = '../login.htm';
+						parent.location.href = '../../login.htm';
 					}
 				},500)
 				
 			}
-			if(response.config.url == "sys_machine_instance_detail" || response.config.url == "sys_machine_detail"){
+			if(response.config.url == "sys_machine_instance_detail" || response.config.url == "sys_machine_detail" || response.config.url == "repairs_detail"){
 				Object.keys(response.data.data).forEach((element, index) => {
 					if(Object.values(response.data.data)[index] == -1){
 						response.data.data[element] = '无';

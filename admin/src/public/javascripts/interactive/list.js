@@ -679,16 +679,17 @@ window.addEventListener('pageshow', function (params) {
                             this.roleId = params.data.page.records.map(item => {
                                 return { value: `${item.roleId}`, label: `${item.roleName}` };
                             });
+
+                            axios.post('sys_address_list', qs.stringify(this.data)).then(params => {
+                                if (params.data.state == 200) {
+                                    this.addressId = params.data.page.records.map(item => {
+                                        return { value: `${item.id}`, label: `${item.address}` };
+                                    });
+                                } else {
+                                    is.IError(params.data.msg);
+                                }
+                            })
                         }
-                        axios.post('sys_address_list', qs.stringify(this.data)).then(params => {
-                            if (params.data.state == 200) {
-                                this.addressId = params.data.page.records.map(item => {
-                                    return { value: `${item.id}`, label: `${item.address}` };
-                                });
-                            } else {
-                                is.IError(params.data.msg);
-                            }
-                        })
                         // this.data = {};
                     } else {
                         is.IError(params.data.msg);
@@ -1093,6 +1094,22 @@ window.addEventListener('pageshow', function (params) {
                 }
             },
             
+            repair(params){  //报修 信息 详情
+                axios.get('repairs_detail', {
+                    params: {
+                        repairsId : params
+                    }
+                }).then(params => {
+                    if (params.data.state === 200) {
+                        this.UpdateTableAndVisible = true;
+                        this.formData = params.data.data;
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                }).catch(function (error) {
+                    is.IError(error);
+                });
+            },
 
 
         }

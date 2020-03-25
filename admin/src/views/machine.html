@@ -292,6 +292,7 @@
                                 <el-form-item label="客户详细地址：" prop="clientAddress">
                                     <el-input v-model="SearchTableFormData.clientAddress"></el-input>
                                 </el-form-item>
+
                                 <el-form-item label="物料编号：" prop="coding">
                                     <el-input v-model="SearchTableFormData.coding"></el-input>
                                 </el-form-item>
@@ -301,6 +302,18 @@
                                 <el-form-item label="经销商：" prop="dealer">
                                     <el-input v-model="SearchTableFormData.dealer"></el-input>
                                 </el-form-item>
+                                
+                                <el-form-item label="销售方电话：" prop="dealerPhone">
+                                    <el-input v-model="SearchTableFormData.dealerPhone"></el-input>
+                                </el-form-item>
+                                <el-form-item label="师傅名称：" prop="maintainerName">
+                                    <el-input v-model="SearchTableFormData.maintainerName"></el-input>
+                                </el-form-item>
+                                <el-form-item label="师傅电话：" prop="maintainerPhone">
+                                    <el-input v-model="SearchTableFormData.maintainerPhone"></el-input>
+                                </el-form-item>
+
+
                                 <el-form-item label="质保到期时间：" prop="expireTime">
                                     <el-date-picker v-model="SearchTableFormData.expireTime" start-placeholder="开始日期">
                                     </el-date-picker>

@@ -64,11 +64,18 @@
                                         <el-image
                                             :src="scope.row.machinePic"
                                             style="text-align: center;">
+                                            <div slot="error">
+                                                暂无产品图片
+                                            </div>
                                         </el-image>
                                         <div slot="reference" class="name-wrapper">
                                             <el-image
                                                 :src="scope.row.machinePic"
-                                                lazy></el-image>
+                                                lazy>
+                                                <div slot="error">
+                                                    <img style="width:40px" src="http://s.coffeedz.com/images/product.png" />
+                                                </div>
+                                            </el-image>
                                         </div>
                                     </el-popover>
                                 </template>

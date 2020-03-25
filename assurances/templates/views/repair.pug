@@ -1,0 +1,40 @@
+
+doctype html
+html(lang="en")
+  meta(charset="UTF-8")
+  meta(name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0")
+  meta(http-equiv="X-UA-Compatible" content="ie=edge") 
+  meta(http-equiv="Pragma" content="no-cache")
+  meta(http-equiv="Cache-control" content="no-cache") 
+  meta(http-equiv="Cache" content="no-cache") 
+  head
+    title 急速报修
+  body
+    .main
+        .repair-domain
+            img(src="../images/repair-background.png", alt="")
+            .box
+                .title
+                    .img
+                    | 联系人信息
+                input(type="text" placeholder="请输入联系人名称" name="contactName")
+                input(type="text" placeholder="请输入联系人电话" name="contactPhone")
+                .title
+                    .img
+                    | 报修内容
+                input(type="text" placeholder="请输入设备编号" name="machineSn")
+                textarea(placeholder="故障描述" name="faultComment")
+        .submit 提交
+    .successFullBox
+        .img
+        p 维保信息提交成功！
+        p 销售方名称：
+            span xxx
+        p 销售方电话：
+            a(href="tel:13189167736") 13189167736
+    .module
+    .text-mudule
+    .alx-module
+        img(src="../images/repair-error.png", alt="")
+        .box
+            .submit.show(style="margin-top: 30px;") 确认

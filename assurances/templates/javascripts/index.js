@@ -5,10 +5,13 @@ import PickerExtend from 'picker-extend';
 import axios from 'axios';
 import qs from 'qs';
 
-const URLs = `http://39.108.49.246`;
-const URLfiles = `http://120.24.108.93`;
+// const URLs = `http://39.108.49.246`;
+// const URLfiles = `http://120.24.108.93`;
 
-axios.defaults.baseURL = URLs +':8090/';
+const URLs = `http://sapi.coffeedz.com/`;
+const URLfiles = `http://sfile.coffeedz.com/`;
+
+axios.defaults.baseURL = URLs;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 axios.defaults.crossDomain = true;
 // axios.defaults.withCredentials = true;  //设置cross跨域 并设置访问权限 允许跨域携带cookie信息
@@ -66,8 +69,13 @@ class init {
 
     _input_() {
         document.querySelectorAll('input').forEach((element, index) => {
-            if (element.name != 'installPic' && element.name != 'nameplatePic') {
+            if (element.name != 'installPic' && element.name != 'nameplatePic') {  //这里是因为
                 this.data[element.name] = element.value + `|${element.getAttribute('placeholder')}`;
+                // if(element.name == 'contactPhone' || element.name == 'clientPhone' || element.name == 'dealerPhone' || element.name == 'maintainerPhone'){
+                //     if(!(/^1[3456789]\d{9}$/.test(element.value))){
+                //         throw new Error('请输入正确的手机号码！')
+                //     }
+                // }
             }
         });
     }
@@ -92,6 +100,9 @@ class init {
                     break;
                 case 'login':
                     console.log('Temporary landing!!!');
+                    document.querySelector('.repair').onclick = function () {
+                        location.href = './repair.html';
+                    }
                     let bool = false;
                     document.querySelector('.help').onclick = function () {
                         if (!bool) {
@@ -146,6 +157,14 @@ class init {
                     });
                     sessionStorage.clear();
                     break;
+                case 'repair':
+                    !this.GETURI('successfull') ? document.querySelector('.main').style.display = 'block': (() => {
+                        document.querySelector('.successFullBox').style.display = 'block';
+                        document.querySelector('.successFullBox>p>span').innerHTML = this.GETURI('successfull').split('*')[0];
+                        document.querySelector('.successFullBox>p>a').innerHTML = this.GETURI('successfull').split('*')[1] == -1 ? '无' : this.GETURI('successfull').split('*')[1];
+                        document.querySelector('.successFullBox>p>a').setAttribute('href', this.GETURI('successfull').split('*')[1] == -1 ? 'javascript:void(0)' : `tel: ${ this.GETURI('successfull').split('*')[1]}` );
+                    })();
+                break;
                 default:
                     location.href = './login.html';
                     throw new Error('not page action!');
@@ -179,14 +198,16 @@ class init {
                             throw new Error(Object.values(this.data)[index].split('|')[1] != 'null' ? Object.values(this.data)[index].split('|')[1] : `'${element}' cannot be empty!`);
                         }
                     });
+                    
+                    Object.keys(this.data).forEach((element, index) => {
+                        param[element] = Object.values(this.data)[index].split('|')[0];
+                    });
+
                     if (params == 'index') {
                         if(document.querySelector('input[name=success]').checked != true){
                             this._alert_('请勾选同意服务协议', 1000);
                             return false;
                         }
-                        Object.keys(this.data).forEach((element, index) => {
-                            param[element] = Object.values(this.data)[index].split('|')[0];
-                        })
                         param['district'] = param['province'].split(',')[2] || -1;
                         param['city'] = param['province'].split(',')[1] || -1;
                         param['province'] = param['province'].split(',')[0] || -1;
@@ -214,7 +235,33 @@ class init {
                             }
                         })
                             .catch(function (error) {
+                                console.log(error)
+                            })
+                    }else if(params == 'repair'){
+                        if(document.querySelector('textarea').value == ''){
+                            throw new Error('请填写故障内容！');
+                        }
 
+                        if(!(/^1[3456789]\d{9}$/.test(param.contactPhone))){
+                            throw new Error('请输入正确的手机号码！');
+                        }
+
+                        param['faultComment'] = document.querySelector('textarea').value;
+
+                        axios.post('commit_repairs', qs.stringify(param)).then(params => {
+                            this.bool = true;
+                            if (params.data.state == 200) {
+                                location.href = location.href + `?successfull=${ params.data.data.dealer }*${ params.data.data.dealerPhone }`;
+                            } else {
+                                // this._alert_(params.data.msg, 1000);
+                                this._show_('.alx-module');
+                                document.querySelector('.show').onclick = () => {
+                                    this._clone_('.alx-module');
+                                }
+                            }
+                        })
+                            .catch(function (error) {
+                                console.log(error)
                             })
                     }
                 } catch (error) {
@@ -298,7 +345,7 @@ class init {
                     _$file.append('file', contentFile, 'machineNumber_' + Math.random() + '.png');
                     axios({
                         method: "POST",
-                        url: URLfiles + ':8085/picture_file_upload',
+                        url: URLfiles + 'picture_file_upload',
                         data: _$file,
                         processData: false,
                         traditional: true,

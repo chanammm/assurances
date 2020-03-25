@@ -37,18 +37,13 @@ html(lang="en")
                 img(src="../images/icon-sketchmap-shop-image.png")
         .title
             img.icons(src="../images/icon-user.png") 
-            div.disabled 店铺名称
+            div.disabled 姓名
             input(type="text" name="clientName" placeholder="请输入店铺名称")
         .link.ccc
         .title
             img.icons(src="../images/icon-call.png") 
-            div.disabled 联系电话
+            div.disabled 电话
             input(type="nubmer" name="clientPhone" placeholder="请输入联系电话")
-        .link.ccc
-        .title
-            img.icons(src="../images/icon-user-shop.png") 
-            div.disabled 销售方
-            input(type="text" name="dealer" placeholder="请输入销售方公司全称")
         .link.ccc
         .title
             img.icons(src="../images/icon-address.png") 
@@ -60,12 +55,36 @@ html(lang="en")
             div.disabled 详细地址
             input(type="text" name="address" placeholder="请输入详细地址")
         .link.ccc
+        
+    .domain(style="margin-top: 10px;")
+        .title
+            img.icons(src="../images/icon-user-shop.png") 
+            div.disabled 销售方姓名
+            input(type="text" name="dealer" placeholder="请输入销售方姓名")
+        .link.ccc
+        .title
+            img.icons(src="../images/icon-call.png") 
+            div.disabled 销售方电话
+            input(type="nubmer" name="dealerPhone" placeholder="请输入销售方电话")
+        .link.ccc
+
+    .domain(style="margin-top: 10px;")
+        .title
+            img.icons(src="../images/icon-user-master-worker.png") 
+            div.disabled 装机师傅名称
+            input(type="text" name="maintainerName" placeholder="请输入装机师傅名称")
+        .link.ccc
+        .title
+            img.icons(src="../images/icon-call.png") 
+            div.disabled 装机师傅电话
+            input(type="nubmer" name="maintainerPhone" placeholder="请输入装机师傅电话")
+        .link.ccc
         .type
             input(type="checkbox" name="success" style="display: inline-block;") 
             span(style="font-size:10px;") 同意 《
                 a#ifremes(style="color: blue;" href="javascript:void(0);") 延保协议
                 | 》
-        .submit 提交审核
+    .submit 提交审核
     .module
     .alx-module
         img(src="../images/icon-module.png", alt="")
@@ -77,4 +96,4 @@ html(lang="en")
         img(src="../images/icon-sketchmap-shop-image.png")
     .oneHoold
     .iframes
-        iframe(src="http://test.cbcoffee.cn/rundev/wb.html" width="100%" height="100%" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes")
+        iframe(src="http://s.coffeedz.com/wb.html" width="100%" height="100%" frameborder="no" border="0" marginwidth="0" marginheight="0" allowtransparency="yes")

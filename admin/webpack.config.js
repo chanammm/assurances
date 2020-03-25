@@ -11,7 +11,7 @@ var [path, HtmlWebpackPlugin, MiniCssExtractPlugin, optimizecssassets, uglifyjs,
 // })
 
 module.exports = {
-    mode: 'development',  //模式 production development
+    mode: 'production',  //模式 production development
     optimization: {
         minimizer: [
             new uglifyjs({
@@ -158,6 +158,16 @@ module.exports = {
         new HtmlWebpackPlugin({  //resources
             template: './src/views/resources.html',
             filename: '../views/resources.html',
+            minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true
+            },
+            hash: true,
+            chunks: ['configration', 'list']
+        }),
+        new HtmlWebpackPlugin({  //repair
+            template: './src/views/repair.html',
+            filename: '../views/repair.html',
             minify: {
                 removeAttributeQuotes: true,
                 collapseWhitespace: true
