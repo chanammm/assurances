@@ -69,8 +69,8 @@ class init {
 
     _input_() {
         document.querySelectorAll('input').forEach((element, index) => {
-            if (element.name != 'installPic' && element.name != 'nameplatePic') {  //这里是因为
-                this.data[element.name] = element.value + `|${element.getAttribute('placeholder')}`;
+            if (element.name != 'installPic' && element.name != 'nameplatePic') {  //这里排除对图片的 校验提示 
+                this.data[element.name] = element.value.replace(/\s+/g, '') + `|${element.getAttribute('placeholder')}`;
                 // if(element.name == 'contactPhone' || element.name == 'clientPhone' || element.name == 'dealerPhone' || element.name == 'maintainerPhone'){
                 //     if(!(/^1[3456789]\d{9}$/.test(element.value))){
                 //         throw new Error('请输入正确的手机号码！')

@@ -198,6 +198,7 @@ window.addEventListener('pageshow', function (params) {
                         ])
                     }]
                 ]),
+                pageparams: {},  // 预存的页面搜索参数
             }
         },
         created: function () {

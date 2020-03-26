@@ -45,7 +45,7 @@ axios.interceptors.response.use(
 					if(process.env.NODE_ENV == "production"){
 						parent.location.href = 'http://s.coffeedz.com/work/admin/login.htm?redirect[x*]';
 					}else{
-						parent.location.href = '../../login.htm';
+						parent.location.href = 'http://192.168.0.168:8080/domain/admin/src/dist/login.htm';
 					}
 				},500)
 				
