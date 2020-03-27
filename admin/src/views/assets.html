@@ -47,10 +47,10 @@
                                 @click="AsBinding(scope.row.permissionId)">
                                 捆绑
                             </el-button> -->
-                            <!-- <el-button type="text" size="small"
-                                @click="IError('未开放')">
+                            <el-button type="text" size="small"
+                                @click="assetsdetails(scope.row.permissionId)">
                                 更新
-                            </el-button> -->
+                            </el-button>
                             <el-button type="text" size="small"
                                 @click="IError('暂未开放')">
                                 删除
@@ -80,30 +80,40 @@
 
                 <el-dialog title="查看/更新" :visible.sync="SearchTableAndVisible" width="50%">
                     <el-form :data="SearchTableFormData">
-                        <el-form-item label="ID" prop="id">
-                            <el-input v-model="SearchTableFormData.id" :disabled="true"></el-input>
+                        <el-form-item label="名称" prop="permissionName">
+                            <el-input v-model="SearchTableFormData.permissionName"></el-input>
                         </el-form-item>
-                        <el-form-item label="分类名称" prop="classifyName">
-                            <el-input v-model="SearchTableFormData.classifyName"></el-input>
-                        </el-form-item>
-                        <el-form-item label="上级分类ID" prop="parentId">
-                            <el-input v-model="SearchTableFormData.parentId"></el-input>
-                        </el-form-item>
-                        <el-form-item label="上级分类名称" prop="parentName">
-                            <el-input v-model="SearchTableFormData.parentName" :disabled="true"></el-input>
+                        <el-form-item label="上级名称" prop="parentName">
+                            <el-input v-model="SearchTableFormData.parentName" disabled="disabled"></el-input>
                         </el-form-item>
                         <el-form-item label="排序号" prop="sort">
                             <el-input v-model="SearchTableFormData.sort"></el-input>
                         </el-form-item>
-                        <el-form-item label="分类等级" prop="level">
-                            <el-input v-model="SearchTableFormData.level" :disabled="true"></el-input>
+                        <el-form-item label="地址" prop="requestUri">
+                            <el-input v-model="SearchTableFormData.requestUri"></el-input>
                         </el-form-item>
-                        <el-form-item label="说明备注" prop="remark">
-                            <el-input type="textarea" v-model="SearchTableFormData.remark"></el-input>
+                        <el-form-item label="权重" prop="permissionWeight">
+                            <el-radio-group v-model="SearchTableFormData.permissionWeight ">
+                                <el-radio :label="1">顶级权限</el-radio>
+                                <el-radio :label="3">资源权限</el-radio>
+                                <el-radio :label="2">普通权限</el-radio>
+                            </el-radio-group>
                         </el-form-item>
-                        <el-button type="primary" size="small" @click="submitForm(SearchTableFormData)">
-                            提交更新
-                        </el-button>
+                        <el-form-item label="资源类型" prop="permissionWeight">
+                            <div style="font-size: 10px;">（顶级/普通权限时只能选择【页面】选项）</div>
+                            <el-radio-group v-model="SearchTableFormData.permissionType">
+                                <el-radio :label="1">新增</el-radio>
+                                <el-radio :label="2">查询</el-radio>
+                                <el-radio :label="3">更新</el-radio>
+                                <el-radio :label="4">删除</el-radio>
+                                <el-radio :label="5">页面</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <div class="btn-center" style="text-align: center; margin: 20px;">
+                            <el-button type="primary" size="small" @click="assertsUpdate(SearchTableFormData)">
+                                提交更新
+                            </el-button>
+                        </div>
                     </el-form>
                 </el-dialog>
 

@@ -69,7 +69,7 @@ body{
             text-align: center;
             margin-top: 10px;
             span{
-                font-size: 1rem;
+                // font-size: 1rem;
                 color: rgba(153, 153, 153, 1);
             }
             img{
@@ -154,14 +154,22 @@ nav{
 }
 .qualiydomain{
     transform: translateY(-180px);
-    font-size: 1rem;
+    // font-size: 1rem;
     .title{
         line-height: 40px;
+        height: 40px;
+        white-space: nowrap;
+        word-break: keep-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: right;
         .disabled{
             // width: 120px;
+            float: left;
+            text-align: left;
         }
         span{
-            float: right;
+            // float: right;
             color:rgba(35, 24, 21, 0.3);
         }
     }
@@ -181,13 +189,13 @@ nav{
         margin: 0 auto;
         .title{
             text-align: left;
-            font-size: 1rem;
+            // font-size: 1rem;
             color: white;
         }
         input{
             height: 36px;
             width: $width;
-            font-size: 1rem;
+            // font-size: 1rem;
             border: 1px solid #fff;
             border-radius:4px;
             padding-left: 6px;
@@ -215,7 +223,7 @@ nav{
     background: white;
     margin-top: 4px;
     line-height: 40px;
-    font-size: 1rem;
+    // font-size: 1rem;
     padding: 0 10px;
     box-sizing: border-box;
     border-bottom: 1px solid #ccc;
@@ -240,7 +248,7 @@ nav{
     height: auto;
     overflow: hidden;
     background: white;
-    font-size: 1rem;
+    // font-size: 1rem;
     color: #ccc;
     padding: 20px;
     box-sizing: border-box;
@@ -314,7 +322,7 @@ nav{
     position: relative;
     img{
         width: $width;
-        height: auto;
+        height: 600px;
         overflow: hidden;
     }
     .box{
@@ -340,7 +348,7 @@ nav{
             }
         }
         .title:nth-of-type(2){
-            margin-top: 30%;
+            margin-top: 26%;
             .img{
                 margin: 0 auto;
                 width: 24px;

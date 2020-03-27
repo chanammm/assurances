@@ -78,7 +78,6 @@ body input {
 }
 
 .domain .title .sketchmap span {
-  font-size: 1rem;
   color: #999999;
 }
 
@@ -174,15 +173,24 @@ nav img {
 
 .qualiydomain {
   transform: translateY(-180px);
-  font-size: 1rem;
 }
 
 .qualiydomain .title {
   line-height: 40px;
+  height: 40px;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.qualiydomain .title .disabled {
+  float: left;
+  text-align: left;
 }
 
 .qualiydomain .title span {
-  float: right;
   color: rgba(35, 24, 21, 0.3);
 }
 
@@ -206,14 +214,12 @@ nav img {
 
 .login .loginBox .title {
   text-align: left;
-  font-size: 1rem;
   color: white;
 }
 
 .login .loginBox input {
   height: 36px;
   width: 100%;
-  font-size: 1rem;
   border: 1px solid #fff;
   border-radius: 4px;
   padding-left: 6px;
@@ -242,7 +248,6 @@ nav img {
   background: white;
   margin-top: 4px;
   line-height: 40px;
-  font-size: 1rem;
   padding: 0 10px;
   box-sizing: border-box;
   border-bottom: 1px solid #ccc;
@@ -268,7 +273,6 @@ nav img {
   height: auto;
   overflow: hidden;
   background: white;
-  font-size: 1rem;
   color: #ccc;
   padding: 20px;
   box-sizing: border-box;
@@ -349,7 +353,7 @@ nav img {
 
 .repair-domain img {
   width: 100%;
-  height: auto;
+  height: 600px;
   overflow: hidden;
 }
 
@@ -378,7 +382,7 @@ nav img {
 }
 
 .repair-domain .box .title:nth-of-type(2) {
-  margin-top: 30%;
+  margin-top: 26%;
 }
 
 .repair-domain .box .title:nth-of-type(2) .img {

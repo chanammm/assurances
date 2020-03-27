@@ -247,11 +247,12 @@ window.addEventListener('pageshow', function (params) {
                 params['pageSize'] = 20;
                 _data_ = qs.stringify(params);
                 axios.post(uri, _data_).then(params => {
-                    let xml = [], data = params.data;
+                    let data = params.data;
                     // data.page.pages ? it.currentPage= parseInt(data.page.pages) : null;
                     if (data.state == 200) {
                         if (uri == 'page_permission_tree') {
                             data.list.forEach((element, index) => {
+                                console.log(element)
                                 if (element.lowers) {
                                     element['hasChildren'] = true;
                                     element['children'] = element.lowers;
@@ -268,6 +269,7 @@ window.addEventListener('pageshow', function (params) {
                         is.IError(data.msg);
                         is.loading = false;
                     }
+                    
                     it.tableData = xml;
                     setTimeout(() => {
                         it.loading = false;
@@ -304,6 +306,42 @@ window.addEventListener('pageshow', function (params) {
                         is.IError(error);
                     })
             },
+            //权限详情
+            assetsdetails(params){
+                axios.get('sys_permission_detail', {
+                    params:{
+                        permissionId : params
+                    }
+                }).then(params => {
+                    if (params.data.state == 200) {
+                        is.SearchTableAndVisible = true;
+                        params.data.data['requestUri'] == -1 ? params.data.data['requestUri'] = "无" : null; 
+                        this.SearchTableFormData = params.data.data;
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
+            //提交更新权限
+            assertsUpdate(params) {
+                axios.post('update_permission', qs.stringify(params)).then(res => {
+                    if (res.data.state == 200) {
+                        is.ISuccessfull(res.data.msg);
+                        is.SearchTableAndVisible =false;
+                        is.list();
+                    } else {
+                        is.IError(res.data.msg);
+                    }
+                })
+                    .catch(function (error) {
+                        is.IError(error);
+                    })
+            },
+
             //查看 角色已赋予 权限
             serchAssetes(params) {
                 axios.post('role_page_permission', qs.stringify({
