@@ -355,12 +355,18 @@ window.addEventListener('pageshow', function (params) {
                         let arr = [];
                         res.data.list.forEach((element, index) => {
                             if (element.permissionWeight == 1) {
-                                arr.push({ id: element.permissionId, name: element.permissionName, value: element.lowers })
+                                // 全部权限
+                                // arr.push({ id: element.permissionId, name: element.permissionName, value: element.lowers })
+                                element.lowers.forEach(e =>{
+                                    arr.push({ id: e.permissionId, name: e.permissionName })
+                                })
                             }
                         })
                         setTimeout(() => {
-                            this.$refs.tree.setCheckedNodes(arr);
-                        }, 200)
+                            this.$nextTick(() => {
+                                this.$refs.tree.setCheckedNodes(arr);
+                            })
+                        }, 1000)
 
                     } else {
                         console.log(res.data.msg);
@@ -464,28 +470,6 @@ window.addEventListener('pageshow', function (params) {
                     })
             },
 
-            HandleSelectionChange(params, row) {  //选中的会员操作
-                this.ruleForm.all_vip = false;  //强制当前的全选变成 自主选择
-
-                this.tableDataVip.forEach((element, index) => {  //处理 清除选中项目
-                    if (element.memberRuleId == params.index) {
-                        this.tableDataVip.splice(index, 1);
-                    }
-                })
-                if (this.ruleForm.all_vip_id.length > 0) {  //选中的优惠券产品
-                    let _arr_ = [], bool = true;
-                    _arr_ = this.ruleForm.all_vip_id;
-                    for (let i = 0; i < _arr_.length; i++) {
-                        if (_arr_[i].memberRuleId == params.memberRuleId) {
-                            bool = false
-                        };
-                    }
-                    bool ? _arr_.push(params) : null;
-                    this.ruleForm.all_vip_id = _arr_;  //批量操作优惠券产品
-                    return;
-                }
-                this.ruleForm.all_vip_id.push(params);  //批量操作优惠券产品
-            },
 
             tableRowVipClassName({ row, rowIndex }) {  //赋值行号 是当前选中的会员信息
                 row.index = row.memberRuleId;

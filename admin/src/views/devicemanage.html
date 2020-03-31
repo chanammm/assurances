@@ -31,8 +31,10 @@
                     <el-form>
                         <el-input placeholder="请输入内容" v-model="listSearch._value_" class="_searchVal">
                             <el-select v-model="listSearch._name_" class="_searchVal_select" slot="prepend"
-                                placeholder="请选择" :change="listSearch._name_ = 'coding'">
+                                placeholder="请选择">
                                 <el-option label="物料编码" value="coding"></el-option>
+                                <el-option label="机器名称" value="machineName"></el-option>
+                                <el-option label="机器类型" value="machineType"></el-option>
                             </el-select>
                         </el-input>
 

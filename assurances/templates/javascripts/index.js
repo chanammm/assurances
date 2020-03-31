@@ -96,7 +96,17 @@ class init {
                     document.querySelector('#ifremes').onclick = () => {
                         this._show_('.iframes');
                     };
+                    document.querySelector('.sub').onclick = () => {
+                        document.querySelector('input[name=success]').checked = "checked";
+                        document.querySelector('.submit').style.backgroundColor = '#dc282a';
+                        this._clone_('.iframes');
+                    }
                     this._enlarge_(); //注册示意图放大事件
+
+                    // 《延保协议》窗口高度
+                    this.h = window.innerHeight - (window.innerHeight / 4);
+                    document.querySelector('.iframes').style.height = this.h + 'px';
+
                     break;
                 case 'login':
                     console.log('Temporary landing!!!');
@@ -205,7 +215,8 @@ class init {
 
                     if (params == 'index') {
                         if(document.querySelector('input[name=success]').checked != true){
-                            this._alert_('请勾选同意服务协议', 1000);
+                            // this._alert_('请同意服务协议', 1000);
+                            this._show_('.iframes');  //显示 条款内容
                             return false;
                         }
                         param['district'] = param['province'].split(',')[2] || -1;
