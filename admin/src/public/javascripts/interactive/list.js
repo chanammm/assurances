@@ -1134,6 +1134,24 @@ window.addEventListener('pageshow', function (params) {
                 });
             },
 
+            //管理员冻结
+            adminblock(params) {
+                axios.get('admin_block', {
+                    params: {
+                        adminId : params
+                    }
+                }).then(params => {
+                    if (params.data.state === 200) {
+                        is.ISuccessfull(params.data.msg);
+                        is.list();
+                    } else {
+                        is.IError(params.data.msg);
+                    }
+                }).catch(function (error) {
+                    is.IError(error);
+                });
+            },
+
 
         }
     });

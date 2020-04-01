@@ -56,9 +56,9 @@
                         <el-table-column prop="adminName" label="名称"></el-table-column>
                         <el-table-column prop="phone" label="手机号码/客服电话"></el-table-column>
                         <!-- <el-table-column prop="roleId" label="角色ID"></el-table-column> -->
-                        <el-table-column prop="status" label="状态">
+                        <el-table-column prop="status" label="状态" >
                             <template slot-scope="scope">
-                                {{ scope.row.status == 1 ? '正常' : '冻结' }} 
+                                <div :class="scope.row.status != 1 ? 'red' : 'green'">{{ scope.row.status == 1 ? '正常' : '冻结' }} </div>
                             </template>
                         </el-table-column>
                         <el-table-column prop="createTime" label="创建时间"></el-table-column>
@@ -68,6 +68,10 @@
                                 <el-button type="text" size="small"
                                     @click="admindetail({adminId: scope.row.adminId });">
                                     详情
+                                </el-button>
+                                <el-button type="text" size="small"
+                                    @click="adminblock(scope.row.adminId);">
+                                    {{ scope.row.status != 1 ? '正常' : '冻结' }} 
                                 </el-button>
                             </template>
                         </el-table-column>

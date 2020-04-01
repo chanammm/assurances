@@ -208,6 +208,7 @@ module.exports = {
                 use: {
                     loader: 'url-loader',
                     options: {
+                        esModule: false, // 这里设置为false
                         limit: 10 * 1024,
                         outputPath: '../images/'
                     }
@@ -226,6 +227,15 @@ module.exports = {
             {
                 test: /\.pug$/,
                 loader: ['html-loader', 'pug-html-loader']
+            },
+            {
+                test: /\.mp3$/,
+                use:{
+                    loader: 'file-loader',
+                    options: {
+                        outputPath: '../../file/'
+                    }
+                }
             }
         ]
     }

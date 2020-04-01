@@ -84,18 +84,18 @@ new Vue({
                 <span>${tag[i].permissionName}</span>
             </template>
             <el-menu-item-group>`;
-                if(tag[i].lowers){
-                    tag[i].lowers.forEach((element, index) => {
-                        if(process.env.NODE_ENV == "development"){
-                            _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i +'-'+ index}">${element.permissionName}
+            if (tag[i].lowers) {
+                tag[i].lowers.forEach((element, index) => {
+                    if (process.env.NODE_ENV == "development") {
+                        _tag += `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i + '-' + index}">${element.permissionName}
                             </el-menu-item>`;
-                        }else{
-                            element.requestUri = `/work/admin/views/${ element.requestUri.substring(element.requestUri.lastIndexOf('/') + 1).split('.')[0] }`;
-                            _tag+= `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i +'-'+ index}">${element.permissionName}
+                    } else {
+                        element.requestUri = `/work/admin/views/${element.requestUri.substring(element.requestUri.lastIndexOf('/') + 1).split('.')[0]}`;
+                        _tag += `<el-menu-item v-on:click=Href({'uri':'${element.requestUri}.html?hash:iforx${parseInt(13 * num / 2)}','title':'${element.permissionName}'}) index="${i + '-' + index}">${element.permissionName}
                             </el-menu-item>`;
-                        }
-                    })
-                }
+                    }
+                })
+            }
             _tag += `</el-menu-item-group></el-submenu>`;
 
         };
@@ -103,6 +103,25 @@ new Vue({
         if (!/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) {
             this.maxWidth = true;
         }
+        setInterval(() => {
+            axios.post("sys_machine_instance_list", qs.stringify({
+                page: 1,
+                pageSize: 20
+            })).then(params => {
+                if (params.data.state == 200) {
+                    params.data.page.records.forEach(element => {
+                        if (element.status == 1) {
+                            this.$notify({
+                                title: '订单提醒',
+                                message: '当前有订单未处理',
+                                position: 'bottom-right'
+                            });
+                            document.querySelector('audio').play();
+                        }
+                    })
+                }
+            })
+        }, 8000)
     },
     methods: {
         ISuccessfull(e) {
@@ -265,35 +284,35 @@ new Vue({
             }
         },
 
-        
-            //查询当前管理员
-            serchAdmin(params) {
-                axios.get('sys_admin_detail').then(params => {
-                    if (params.data.state == 200) {
-                        is.UpdateVisible = true;
-                        is.DataVisible = params.data.data;
-                    } else {
-                        is.IError(params.data.msg);
-                    }
-                }).catch(function (error) {
+
+        //查询当前管理员
+        serchAdmin(params) {
+            axios.get('sys_admin_detail').then(params => {
+                if (params.data.state == 200) {
+                    is.UpdateVisible = true;
+                    is.DataVisible = params.data.data;
+                } else {
+                    is.IError(params.data.msg);
+                }
+            }).catch(function (error) {
+                is.IError(error);
+            })
+        },
+        // 提交修改
+        submit(params) {
+            axios.post('edit_current_admin', qs.stringify(params)).then(params => {
+                if (params.data.state == 200) {
+                    is.ISuccessfull(params.data.msg);
+                    is.UpdateVisible = false;
+                    is.DataVisible = {};
+                } else {
+                    is.IError(params.data.msg);
+                }
+            })
+                .catch(function (error) {
                     is.IError(error);
                 })
-            },
-            // 提交修改
-            submit(params){
-                axios.post('edit_current_admin', qs.stringify(params)).then(params => {
-                    if (params.data.state == 200) {
-                        is.ISuccessfull(params.data.msg);
-                        is.UpdateVisible = false;
-                        is.DataVisible = {};
-                    } else {
-                        is.IError(params.data.msg);
-                    }
-                })
-                    .catch(function (error) {
-                        is.IError(error);
-                    })
-            }
+        }
 
 
 
