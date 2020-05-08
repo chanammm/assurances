@@ -567,6 +567,7 @@ window.addEventListener('pageshow', function (params) {
 
             //查看实例设备详细
             machineDest(params, timer = null) {
+                is.SearchTableFormData = {};
                 axios.get('sys_machine_instance_detail', {
                     params: {
                         machineInstanceId: params
@@ -574,7 +575,7 @@ window.addEventListener('pageshow', function (params) {
                 }).then(res => {
                     if (res.data.state == 200) {
                         is.SearchTableAndVisible = true;
-                        if (res.data.data.status == 1) {
+                        if (res.data.data.status == 1 && res.data.data.auditStatus != 2) {
                             is.adoptModule = true;
                         } else {
                             is.adoptModule = false;
@@ -1017,6 +1018,7 @@ window.addEventListener('pageshow', function (params) {
             //更新 设备信息
             updateMachine(params) {
                 console.log(params);
+                
                 params['exWarehouseTime'] = params['exWarehouseTime'] ? params['exWarehouseTime'].split(' ')[0] : null;
                 params['expireTime'] = params['expireTime'] ? params['expireTime'].split(' ')[0] : null;
                 params['extendExpireTime'] = params['extendExpireTime'] ? params['extendExpireTime'].split(' ')[0] : null;

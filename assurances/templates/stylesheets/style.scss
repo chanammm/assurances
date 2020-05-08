@@ -275,7 +275,8 @@ nav{
     padding: 4px 30px;
     box-sizing: border-box;
     background-color: black;
-    width: -webkit-fill-available;
+    width: 90%;
+    margin: 0 5%;
 }
 .image-show{
     width: $width - 10%;

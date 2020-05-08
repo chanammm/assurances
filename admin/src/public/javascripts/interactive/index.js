@@ -103,7 +103,7 @@ new Vue({
         if (!/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) {
             this.maxWidth = true;
         }
-        setInterval(() => {
+        // setInterval(() => {
             axios.post("sys_machine_instance_list", qs.stringify({
                 page: 1,
                 pageSize: 20
@@ -121,7 +121,7 @@ new Vue({
                     })
                 }
             })
-        }, 8000)
+        // }, 8000)
     },
     methods: {
         ISuccessfull(e) {

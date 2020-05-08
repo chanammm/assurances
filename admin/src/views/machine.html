@@ -328,10 +328,13 @@
                                 <el-form-item label="机器参数：" prop="machineParameter">
                                     <el-input v-model="SearchTableFormData.machineParameter"></el-input>
                                 </el-form-item>
+                                <el-form-item label="创建管理员" prop="createName">
+                                    <el-input v-model="SearchTableFormData.createName"></el-input>
+                                </el-form-item>
                                 <!-- <el-form-item label="机器图片：" prop="machinePic">
                                     {{ SearchTableFormData.machinePic }}
                                 </el-form-item> -->
-                                <el-form-item label="省：" prop="province">
+                                <!-- <el-form-item label="省：" prop="province">
                                     <el-input v-model="SearchTableFormData.province"></el-input>
                                 </el-form-item>
                                 <el-form-item label="市：" prop="city">
@@ -342,12 +345,12 @@
                                 </el-form-item>
                                 <el-form-item label="详细地址：" prop="address">
                                     <el-input v-model="SearchTableFormData.address"></el-input>
-                                </el-form-item>
+                                </el-form-item> -->
                                 <div style="height: auto;overflow: hidden;margin-bottom: 13px;text-align: center;">
                                     <el-button type="primary" @click="updateMachine(SearchTableFormData)">提交更新</el-button>
                                 </div>
                                 <div style="font-size: 10px;text-align: center;color: red;">以下为详细信息预览</div>
-                                <div style="width: 100%;height: 1px; background: #c7c7c7;box-shadow: 0 1px 3px rgba(0,0,0);"></div>
+                                <div style="width: 100%;height: 1px; background: #c7c7c7;box-shadow: 0 1px 3px rgba(0,0,0); margin: 20px 0"></div>
                                 <el-form-item label="铭牌照片：" prop="SearchTableFormData.nameplatePic">
                                     <el-popover trigger="click" placement="top" width="600">
                                         <el-image :src="SearchTableFormData.nameplatePic" style="text-align: center;"></el-image>
