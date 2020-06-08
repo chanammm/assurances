@@ -352,20 +352,24 @@
                                 <div style="font-size: 10px;text-align: center;color: red;">以下为详细信息预览</div>
                                 <div style="width: 100%;height: 1px; background: #c7c7c7;box-shadow: 0 1px 3px rgba(0,0,0); margin: 20px 0"></div>
                                 <el-form-item label="铭牌照片：" prop="SearchTableFormData.nameplatePic">
-                                    <el-popover trigger="click" placement="top" width="600">
-                                        <el-image :src="SearchTableFormData.nameplatePic" style="text-align: center;"></el-image>
-                                        <div slot="reference" class="name-wrapper">
-                                            <el-image :src="SearchTableFormData.nameplatePic" lazy></el-image>
+                                    <el-image :src="SearchTableFormData.nameplatePic" :preview-src-list="SearchTableFormData.srcList" lazy>
+                                        <div slot="placeholder" class="image-slot">
+                                            加载中<span class="dot">...</span>
                                         </div>
-                                    </el-popover>
+                                        <div slot="error">
+                                            <img style="width:40px" src="http://zgksx.com/images/error_image.png" />
+                                        </div>
+                                    </el-image>
                                 </el-form-item>
                                 <el-form-item label="装机照片：" prop="SearchTableFormData.installPic">
-                                    <el-popover trigger="click" placement="top">
-                                        <el-image :src="SearchTableFormData.installPic" style="text-align: center;"></el-image>
-                                        <div slot="reference" class="name-wrapper">
-                                            <el-image :src="SearchTableFormData.installPic" lazy></el-image>
+                                    <el-image :src="SearchTableFormData.installPic" :preview-src-list="SearchTableFormData.srcList" lazy>
+                                        <div slot="placeholder" class="image-slot">
+                                            加载中<span class="dot">...</span>
                                         </div>
-                                    </el-popover>
+                                        <div slot="error">
+                                            <img style="width:40px" src="http://zgksx.com/images/error_image.png" />
+                                        </div>
+                                    </el-image>
                                 </el-form-item>
                             </el-form>
                         </div>

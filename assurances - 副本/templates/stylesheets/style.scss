@@ -1,0 +1,411 @@
+$width: 100%;
+$option: 100px;
+html{
+    margin: 0;
+    padding: 0;
+    width: $width;
+    height: $width;
+}
+body{
+    max-width: 640px;
+    min-width: 320px;
+    overflow-x: hidden;
+    margin: 0 auto;
+    font-size: 14px;
+    background-color: #f0f0ee;
+    input{
+        font-size: 14px;
+    }
+}
+@mixin widthOrder {
+    width: $option;
+}
+.banner{
+    width: 100%;
+    // height: 215px;
+}
+.domain{
+    width: $width - 5%;
+    height: auto;
+    overflow: hidden;
+    margin: 0 auto;
+    transform: translateY(-60px);
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+    box-sizing: border-box;
+    .title{
+        margin: 5px 0;
+        width: $width;
+        .disabled{
+            display: inline-block;
+            width: 90px;
+        }
+        .icons{
+            width: 18px;
+            height: 18px;
+            margin: 12px 6px 0 0;
+            float: left;
+        }
+        input{
+            border: none;
+            background: none;
+            margin-left: 10px;
+            width: $width - 40%;
+            height: 40px;
+        }
+        input:-webkit-input-placeholder{
+            color: rgba(153, 153, 153, 1);
+        }
+        .pullimage{
+            width: 90px;
+            height: 90px;
+            margin: 34px 0;
+        }
+        .sketchmap{
+            width: 90px;
+            height: 90px;
+            float: right;
+            text-align: center;
+            margin-top: 10px;
+            span{
+                // font-size: 1rem;
+                color: rgba(153, 153, 153, 1);
+            }
+            img{
+                width: $width;
+                height: $width;
+            }
+        }
+    }
+    .width100{
+        width: $width;
+    }
+    .link{
+        width: $width;
+        height: 1px;
+        background-color: rgba(220, 40, 42, 1);
+        margin: 5px 0;
+    }
+    .ccc{
+        background-color: rgba(238,238,238,1);
+    }
+}
+.module{
+    width: $width;
+    height: $width;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,.5)
+}
+.alx-module{
+    display: none;
+    position: fixed;
+    top: 100px;
+    left: 0;
+    z-index: 1;
+    text-align: center;
+    width: 450px;
+    left: 50%;
+    margin-left: -225px;
+    img{
+        width: $width - 20%;
+        height: auto;
+        margin-left: 20px;
+    }
+    .box{
+        float: left;
+        transform: translateY(-150px);
+        width: $width;
+        text-align: center;
+        .show{
+            width: $width - 36%;
+        }
+    }
+}
+.submit{
+    width: $width - 10%;
+    height: 40px;
+    text-align: center;
+    color: white;
+    line-height: 40px;
+    border-radius: 5px;
+    margin: 20px auto;
+    background-color: rgba(220, 40, 42, 1);
+}
+nav{
+    text-align: center;
+    color: white;
+    transform: translateY(-190px);
+    height: auto;
+    width: $width;
+    span{
+        display: block;
+    }
+    img{
+        width: 120px !important;
+        height: 120px !important;
+        padding: 2px;
+        background-color: white;
+        border-radius: 50%;
+    }
+}
+.qualiydomain{
+    transform: translateY(-180px);
+    // font-size: 1rem;
+    .title{
+        line-height: 40px;
+        height: 40px;
+        white-space: nowrap;
+        word-break: keep-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: right;
+        .disabled{
+            // width: 120px;
+            float: left;
+            text-align: left;
+        }
+        span{
+            // float: right;
+            color:rgba(35, 24, 21, 0.3);
+        }
+    }
+}
+.qualiybanner{
+    transform: translateY(-78px);
+}
+.login{
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: $width;
+    height: auto;
+    overflow: hidden;
+    .loginBox{
+        width: 260px;
+        margin: 0 auto;
+        .title{
+            text-align: left;
+            // font-size: 1rem;
+            color: #333;
+        }
+        input{
+            height: 36px;
+            width: $width;
+            // font-size: 1rem;
+            border: 1px solid #fff;
+            border-radius:4px;
+            padding-left: 6px;
+            margin-top: 10px;
+        }
+        input::-webkit-input-placeholder{
+            color: #999999;
+        }
+        span{
+            display: block;
+            width: 60px;
+            height: 40px;
+            float: right;
+            transform: translate(10px,-40px);
+            background: url(../images/search.png) #333333 no-repeat center center;
+            background-size: 40%;
+            border-radius: 0;
+            margin: 0;
+        }
+    }
+}
+.help, .repair{
+    width: $width;
+    height: 40px;
+    background: white;
+    margin-top: 4px;
+    line-height: 40px;
+    // font-size: 1rem;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #ccc;
+    span{
+        width: 16px;
+        height: 30px;
+        float: right;
+        background: url(../images/normal.png) no-repeat center center;
+        transform: rotate(90deg);
+        background-size: 70%;
+        margin-top: 4px;
+    }
+}
+.repair{
+    span{
+        transform: rotate(0deg);
+    }
+}
+.help-box{
+    display: block;
+    width: $width;
+    height: auto;
+    overflow: hidden;
+    background: white;
+    // font-size: 1rem;
+    color: #ccc;
+    padding: 20px;
+    box-sizing: border-box;
+    span{
+        display: inline-block;
+        width: $width;
+        height: 260px;
+        overflow: hidden;
+        background: url(../images/show-help.jpg) no-repeat center center;
+        background-size: contain;
+    }
+}
+.text-mudule{
+    display: none;
+    font-weight:400;
+    color:rgba(255,255,255,1);
+    border-radius: 5px;
+    text-align: center;
+    line-height: 40px;
+    position: fixed;
+    top: 20%;
+    left: 0;
+    z-index: 100;
+    padding: 4px 30px;
+    box-sizing: border-box;
+    background-color: black;
+    width: 90%;
+    margin: 0 5%;
+}
+.image-show{
+    width: $width - 10%;
+    height: auto;
+    display: none;
+    z-index: 9;
+    position: fixed;
+    top: 100px;
+    left:5%;
+    text-align: center;
+    img{
+        width: $width - 30%;
+        height: $width;
+    }
+}
+.ban{
+    height: 230px;
+}
+.iframes{
+    display: none;
+    position: fixed;
+    top: 5%;
+    left: 5%;
+    width: $width - 10%;
+    height: 500px;
+    background: white;
+    padding-bottom: 60px;
+    box-sizing: border-box;
+    .sub{
+        width: 160px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        color: white;
+        background-color: rgba(220, 40, 42, 1);
+        margin: 6px auto;
+        border-radius: 5px;
+    }
+}
+@media (min-width: 640px){
+    .image-show{
+        img{
+            width: $width - 80%;
+            height: $width;
+        }
+    }
+}
+
+// 2020-03-25 新增内容
+.main{
+    display: none;
+}
+.repair-domain{
+    padding: 15px;
+    box-sizing: border-box;
+    position: relative;
+    img{
+        width: $width;
+        height: 600px;
+        overflow: hidden;
+    }
+    .box{
+        position: absolute;
+        top: 5%;
+        left: 5%;
+        width: $width - 10%;
+        text-align: center;
+        overflow: hidden;
+        padding: 0 20px;
+        box-sizing: border-box;
+        .title {
+            margin-bottom: 10px;
+            color: rgba(51,51,51,1);
+        }
+        .title:nth-of-type(1){
+            .img{
+                margin: 0 auto;
+                width: 30px;
+                height: 30px;
+                background: url(../images/contant.png) no-repeat center center;
+                background-size: $width;
+            }
+        }
+        .title:nth-of-type(2){
+            margin-top: 26%;
+            .img{
+                margin: 0 auto;
+                width: 24px;
+                height: 30px;
+                background: url(../images/order.png) no-repeat center center;
+                background-size: $width;
+            }
+        }
+        input{
+            width: $width;
+            font-size: 13px;
+            padding-left: 10px;
+            line-height: 30px;
+            box-sizing: border-box;
+            border:1px solid rgba(233,127,109,1);
+            border-radius:8px;
+            margin: 8px 0;
+            background: rgba(255, 244, 242, 1);
+        }
+        textarea{
+            width: $width;
+            height: 80px;
+            border:1px solid rgba(233,127,109,1);
+            border-radius:8px;
+            padding: 5px;
+            box-sizing: border-box;
+            background: rgba(255, 244, 242, 1);
+        }
+        input::-webkit-input-placeholder, textarea::-webkit-input-placeholder{
+            color: rgba(233,127,109,1);
+        }
+    }
+}
+
+.successFullBox{
+    display: none;
+    text-align: center;
+    margin-top: 100px;
+    .img{
+        width: 125px;
+        height: 103px;
+        margin: 0 auto;
+        overflow: hidden;
+        background: url(../images/repair-success.png) no-repeat center center;
+        background-size: $width;
+    }
+}

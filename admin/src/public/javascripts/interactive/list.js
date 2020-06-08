@@ -581,6 +581,7 @@ window.addEventListener('pageshow', function (params) {
                             is.adoptModule = false;
                         }
                         // Object.keys(res.data.data).forEach((element, index))
+                        res.data.data['srcList'] = [res.data.data.nameplatePic,res.data.data.installPic];
                         is.SearchTableFormData = res.data.data;
                         // timer = setTimeout(() => {
                         //     document.getElementById('adopt').style.display = 'none';
