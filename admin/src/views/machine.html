@@ -22,7 +22,7 @@
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {}; search({url: 'sys_machine_list'})" type="primary">新增设备<i
+                            <el-button @click="UpdateTableAndVisible = true; formData = { needActivate: 0 }; search({url: 'sys_machine_list'})" type="primary">新增设备<i
                                     class="el-icon-plus el-icon--right"></i></el-button>
                             <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入设备</el-button>
                         </div>
@@ -170,6 +170,17 @@
                                 </el-select>
                                 <div>输入【区域地址】进行查询出结果后，请点击选择相应的【区域地址】</div>
                             </el-form-item> -->
+                            <el-form-item label="是否需要激活：">
+                                <div style="font-size: 12px; color: #999"> 
+                                    <div>否，(当前设备会直接变成激活成功状态,质保期限为两年半)</div>
+                                    <div>是，(当前设备仍需客户手动激活, 激活成功后质保期限为三年)</div>
+                                </div>
+                                <el-radio-group v-model="formData.needActivate">
+                                    <el-radio :label="0" style="margin-right: 10px;">否</el-radio>
+                                    <el-radio :label="1">是</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+
                             <el-form-item label="出货单号（选填）：">
                                 <el-input v-model="formData.orderNum"></el-input>
                             </el-form-item>

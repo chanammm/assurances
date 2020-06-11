@@ -59,7 +59,8 @@ window.addEventListener('pageshow', function (params) {
                 roleId: [],
                 formData: {
                     machineId: [],
-                    addressId: []
+                    addressId: [],
+                    needActivate: 0
                 },
                 formDataTree: {
                 },
