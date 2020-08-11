@@ -530,6 +530,7 @@ window.addEventListener('pageshow', function (params) {
                 try {
                     // params['addressId'] = params.addressId[0];
                     params['exWarehouseTime'] = params.exWarehouseTime ? ym.init.getDateTime(params.exWarehouseTime).split(' ')[0] : null;
+                    params.warranty ? null : params['warranty'] = 0;
                     axios.post('create_machine_instance', qs.stringify(params)).then(res => {
                         if (res.data.state == 200) {
                             is.UpdateTableAndVisible = false;
@@ -568,7 +569,7 @@ window.addEventListener('pageshow', function (params) {
 
             //查看实例设备详细
             machineDest(params, timer = null) {
-                is.SearchTableFormData = {};
+                this.SearchTableFormData = {};
                 axios.get('sys_machine_instance_detail', {
                     params: {
                         machineInstanceId: params
@@ -582,8 +583,10 @@ window.addEventListener('pageshow', function (params) {
                             is.adoptModule = false;
                         }
                         // Object.keys(res.data.data).forEach((element, index))
-                        res.data.data['srcList'] = [res.data.data.nameplatePic,res.data.data.installPic];
-                        is.SearchTableFormData = res.data.data;
+                        res.data.data['srcList'] = [];
+                        res.data.data['srcList'].push(res.data.data.nameplatePic)
+                        res.data.data['srcList'].push(res.data.data.installPic);
+                        this.SearchTableFormData = res.data.data;
                         // timer = setTimeout(() => {
                         //     document.getElementById('adopt').style.display = 'none';
                         //     if (res.data.data.auditStatus == 2) {
@@ -699,7 +702,7 @@ window.addEventListener('pageshow', function (params) {
                     if (params.data.state == 200) {
                         if (this.data.url == 'sys_machine_list') {
                             this.machineId = params.data.page.records.map(item => {
-                                return { value: `${item.machineId}`, label: `${item.coding}` };
+                                return { value: `${item.machineId}`, label: `${item.coding}`, is: `${ item.isAutoActivation }` };
                             });
                         } else if (this.data.url == 'sys_role_list') {
                             this.roleId = params.data.page.records.map(item => {
@@ -1154,6 +1157,15 @@ window.addEventListener('pageshow', function (params) {
                 }).catch(function (error) {
                     is.IError(error);
                 });
+            },
+
+            // 2020-07-07 改动动态 质保时间
+            selectChanged(params) {
+                this.options.forEach((element, index) => {
+                    if(element.value == params){
+                        element.is > 0 ? this.pawstate = true : this.pawstate = false;
+                    }
+                }) 
             },
 
 

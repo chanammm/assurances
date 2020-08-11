@@ -16,22 +16,27 @@
 
 
 <body class="_scrollbar">
-    <div id="c-container-list" style="height: 100%;" data-uri="sys_machine_instance_list" v-loading.fullscreen.lock="loading">
+    <div id="c-container-list" style="height: 100%;" data-uri="sys_machine_instance_list"
+        v-loading.fullscreen.lock="loading">
         <el-container>
             <el-main>
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = { needActivate: 0 }; search({url: 'sys_machine_list'})" type="primary">新增设备<i
-                                    class="el-icon-plus el-icon--right"></i></el-button>
-                            <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入设备</el-button>
+                            <el-button
+                                @click="UpdateTableAndVisible = true; formData = { needActivate: 0 }; search({url: 'sys_machine_list'})"
+                                type="primary">新增设备<i class="el-icon-plus el-icon--right"></i></el-button>
+                            <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入设备
+                            </el-button>
                         </div>
                     </el-form>
                     <el-form>
                         <el-input placeholder="请输入内容" v-model="listSearch._value_" class="_searchVal">
                             <el-select v-model="listSearch._name_" class="_searchVal_select" slot="prepend"
-                                placeholder="请选择" :change="listSearch._name_ = 'machineSn'">
+                                placeholder="请选择">
                                 <el-option label="设备SN号" value="machineSn"></el-option>
+                                <el-option label="物料编号" value="coding"></el-option>
+                                <el-option label="设备名称" value="machineName"></el-option>
                             </el-select>
                         </el-input>
 
@@ -55,10 +60,11 @@
                             </el-select>
                         </div>
 
-                        <div class="more_search el-icon-circle-plus-outline" v-show="!more" @click="more = !more"> 更多搜索条件
+                        <div class="more_search el-icon-circle-plus-outline" v-show="!more" @click="more = !more">
+                            更多搜索条件
                         </div>
                         <div class="more_search el-icon-remove-outline" v-show="more" @click="more = !more"> 收起 </div>
-    
+
                         <el-button icon="el-icon-search" class="_search_btn" @click="list(listSearch)">搜索
                         </el-button>
                     </el-form>
@@ -85,7 +91,8 @@
                             </el-table-column> -->
                             <el-table-column prop="auditStatus" label="审核状态">
                                 <template slot-scope="scope">
-                                    <div :class="scope.row.auditStatus == 2 ? 'red' : scope.row.auditStatus == 1 ? 'green': 'ccc'">
+                                    <div
+                                        :class="scope.row.auditStatus == 2 ? 'red' : scope.row.auditStatus == 1 ? 'green': 'ccc'">
                                         {{ scope.row.auditStatus == 2 ? '未通过' :  scope.row.auditStatus == 1 ? '已通过': '未审核' }}
                                     </div>
                                 </template>
@@ -93,7 +100,8 @@
 
                             <el-table-column prop="status" label="数据状态">
                                 <template slot-scope="scope">
-                                    <div :class="scope.row.status == 1 ? 'blue' : scope.row.status == 2 ? 'green': 'ccc'">
+                                    <div
+                                        :class="scope.row.status == 1 ? 'blue' : scope.row.status == 2 ? 'green': 'ccc'">
                                         {{ scope.row.status == 2 ? '已激活' :  scope.row.status == 1 ? '激活申请中': '未激活' }}
                                     </div>
                                 </template>
@@ -115,7 +123,8 @@
 
                             <el-table-column fixed="right" label="操作">
                                 <template slot-scope="scope">
-                                    <el-button type="text" size="small" @click="machineDest(scope.row.machineInstanceId)">
+                                    <el-button type="text" size="small"
+                                        @click="machineDest(scope.row.machineInstanceId)">
                                         详情
                                     </el-button>
                                 </template>
@@ -135,19 +144,10 @@
                                 <el-input v-model="formData.machineSn"></el-input>
                             </el-form-item>
                             <el-form-item label="物料编号：">
-                                <el-select width="100%"
-                                    v-model="formData.machineId"
-                                    filterable
-                                    remote
-                                    reserve-keyword
-                                    placeholder="输入【物料编号】自动查询，支持模糊查询"
-                                    :remote-method="remoteMethod"
-                                    :loading="loading">
-                                    <el-option
-                                    v-for="item in options"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
+                                <el-select width="100%" v-model="formData.machineId" @change="selectChanged" filterable remote reserve-keyword
+                                    placeholder="输入【物料编号】自动查询，支持模糊查询" :remote-method="remoteMethod" :loading="loading">
+                                    <el-option v-for="item in options" :key="item.value" :label="item.label"
+                                        :value="item.value">
                                     </el-option>
                                 </el-select>
                                 <div>输入【物料编号】进行查询出结果后，请点击选择相应的【物料编号】</div>
@@ -170,8 +170,8 @@
                                 </el-select>
                                 <div>输入【区域地址】进行查询出结果后，请点击选择相应的【区域地址】</div>
                             </el-form-item> -->
-                            <el-form-item label="是否需要激活：">
-                                <div style="font-size: 12px; color: #999"> 
+                            <!-- <el-form-item label="是否需要激活：">
+                                <div style="font-size: 12px; color: #999">
                                     <div>否，(当前设备会直接变成激活成功状态,质保期限为两年半)</div>
                                     <div>是，(当前设备仍需客户手动激活, 激活成功后质保期限为三年)</div>
                                 </div>
@@ -179,6 +179,9 @@
                                     <el-radio :label="0" style="margin-right: 10px;">否</el-radio>
                                     <el-radio :label="1">是</el-radio>
                                 </el-radio-group>
+                            </el-form-item> -->
+                            <el-form-item label="保修时间(月)：" v-if="pawstate">
+                                <el-input v-model="formData.warranty"></el-input>
                             </el-form-item>
 
                             <el-form-item label="出货单号（选填）：">
@@ -199,21 +202,15 @@
                     <el-dialog title="导入设备" :visible.sync="detailTableAndVisible">
                         <el-form>
                             <el-form-item label=".CSV文件">
-                                <div style="font-size: 10px; color: #409EFF;cursor: pointer;" @click="hrefDown(false)">(模板下载)</div>
+                                <div style="font-size: 10px; color: #409EFF;cursor: pointer;" @click="hrefDown(false)">
+                                    (模板下载)</div>
                                 <template>
-                                    <el-upload
-                                        :limit="num"
-                                        class="upload-demo"
-                                        :file-list="fileList"
-                                        drag
-                                        :action="fileUpdataExc"
-                                        :headers="fileUpdataExcData"
-                                        :on-success="ExecSceneSuccess"
-                                        :on-exceed="exeLength"
-                                        multiple>
+                                    <el-upload :limit="num" class="upload-demo" :file-list="fileList" drag
+                                        :action="fileUpdataExc" :headers="fileUpdataExcData"
+                                        :on-success="ExecSceneSuccess" :on-exceed="exeLength" multiple>
                                         <i class="el-icon-upload"></i>
                                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em>，系统会自动处理数据</div>
-                                        </el-upload>
+                                    </el-upload>
                                 </template>
                             </el-form-item>
                             <div class="btn-center" style="text-align: center; margin: 20px;">
@@ -255,11 +252,14 @@
                                     <el-input v-model="SearchTableFormData.orderNum"></el-input>
                                 </el-form-item>
                                 <el-form-item label="出库日期：" prop="exWarehouseTime">
-                                    <el-date-picker v-model="SearchTableFormData.exWarehouseTime" start-placeholder="开始日期">
+                                    <el-date-picker v-model="SearchTableFormData.exWarehouseTime"
+                                        start-placeholder="开始日期">
                                     </el-date-picker>
                                 </el-form-item>
                                 <el-form-item>
-                                    <div style="font-size: 10px;">审核状态：当前选中状态为<span style="color: red;font-size:14px;">{{ SearchTableFormData.auditStatus == 1 ? '【已通过】' : SearchTableFormData.auditStatus == 2 ? '【未通过】' : '【未审核】' }}</span>，此参数若与原先对比发生变化就会修改机器实例的审核相关信息</div>
+                                    <div style="font-size: 10px;">审核状态：当前选中状态为<span
+                                            style="color: red;font-size:14px;">{{ SearchTableFormData.auditStatus == 1 ? '【已通过】' : SearchTableFormData.auditStatus == 2 ? '【未通过】' : '【未审核】' }}</span>，此参数若与原先对比发生变化就会修改机器实例的审核相关信息
+                                    </div>
                                 </el-form-item>
                                 <el-form-item label="审核状态：" prop="auditStatus">
                                     <el-radio-group v-model="SearchTableFormData.auditStatus">
@@ -313,7 +313,7 @@
                                 <el-form-item label="经销商：" prop="dealer">
                                     <el-input v-model="SearchTableFormData.dealer"></el-input>
                                 </el-form-item>
-                                
+
                                 <el-form-item label="销售方电话：" prop="dealerPhone">
                                     <el-input v-model="SearchTableFormData.dealerPhone"></el-input>
                                 </el-form-item>
@@ -330,7 +330,8 @@
                                     </el-date-picker>
                                 </el-form-item>
                                 <el-form-item label="质保延长到期时间：" prop="extendExpireTime">
-                                    <el-date-picker v-model="SearchTableFormData.extendExpireTime" start-placeholder="开始日期">
+                                    <el-date-picker v-model="SearchTableFormData.extendExpireTime"
+                                        start-placeholder="开始日期">
                                     </el-date-picker>
                                 </el-form-item>
                                 <el-form-item label="设备名称：" prop="machineName">
@@ -358,36 +359,41 @@
                                     <el-input v-model="SearchTableFormData.address"></el-input>
                                 </el-form-item> -->
                                 <div style="height: auto;overflow: hidden;margin-bottom: 13px;text-align: center;">
-                                    <el-button type="primary" @click="updateMachine(SearchTableFormData)">提交更新</el-button>
+                                    <el-button type="primary" @click="updateMachine(SearchTableFormData)">提交更新
+                                    </el-button>
                                 </div>
                                 <div style="font-size: 10px;text-align: center;color: red;">以下为详细信息预览</div>
-                                <div style="width: 100%;height: 1px; background: #c7c7c7;box-shadow: 0 1px 3px rgba(0,0,0); margin: 20px 0"></div>
-                                <el-form-item label="铭牌照片：" prop="SearchTableFormData.nameplatePic">
-                                    <el-image :src="SearchTableFormData.nameplatePic" :preview-src-list="SearchTableFormData.srcList" lazy>
+                                <div
+                                    style="width: 100%;height: 1px; background: #c7c7c7;box-shadow: 0 1px 3px rgba(0,0,0); margin: 20px 0">
+                                </div>
+                                <el-form-item label="铭牌照片：">
+                                    <img :src="SearchTableFormData.nameplatePic" style="width: 80%;"
+                                        :preview-src-list="SearchTableFormData.srcList">
                                         <div slot="placeholder" class="image-slot">
                                             加载中<span class="dot">...</span>
                                         </div>
                                         <div slot="error">
                                             <img style="width:40px" src="http://zgksx.com/images/error_image.png" />
                                         </div>
-                                    </el-image>
+                                    </img>
                                 </el-form-item>
-                                <el-form-item label="装机照片：" prop="SearchTableFormData.installPic">
-                                    <el-image :src="SearchTableFormData.installPic" :preview-src-list="SearchTableFormData.srcList" lazy>
+                                <el-form-item label="装机照片：">
+                                    <img :src="SearchTableFormData.installPic"style="width: 80%;"
+                                        :preview-src-list="SearchTableFormData.srcList">
                                         <div slot="placeholder" class="image-slot">
                                             加载中<span class="dot">...</span>
                                         </div>
                                         <div slot="error">
                                             <img style="width:40px" src="http://zgksx.com/images/error_image.png" />
                                         </div>
-                                    </el-image>
+                                    </img>
                                 </el-form-item>
                             </el-form>
                         </div>
-    </el-dialog>
+                    </el-dialog>
 
-    </el-main>
-    </el-container>
+                </el-main>
+        </el-container>
     </div>
 </body>
 
