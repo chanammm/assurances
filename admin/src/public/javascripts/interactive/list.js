@@ -1022,11 +1022,13 @@ window.addEventListener('pageshow', function (params) {
 
             //更新 设备信息
             updateMachine(params) {
-                console.log(params);
-                
-                params['exWarehouseTime'] = params['exWarehouseTime'] ? params['exWarehouseTime'].split(' ')[0] : null;
-                params['expireTime'] = params['expireTime'] ? params['expireTime'].split(' ')[0] : null;
-                params['extendExpireTime'] = params['extendExpireTime'] ? params['extendExpireTime'].split(' ')[0] : null;
+                try {
+                    params['exWarehouseTime'] = params['exWarehouseTime'] ? ym.init.getDateTime(params['exWarehouseTime']).split(' ')[0] : null;
+                    params['expireTime'] = params['expireTime'] ? ym.init.getDateTime(params['expireTime']).split(' ')[0] : null;
+                    params['extendExpireTime'] = params['extendExpireTime'] ? ym.init.getDateTime(params['extendExpireTime']).split(' ')[0] : null;
+                } catch (error) {
+                    console.info(error)
+                }
                 axios.post('update_machine_instance', qs.stringify(params)).then(params => {
                     if (params.data.state == 200) {
                         is.ISuccessfull(params.data.msg);
