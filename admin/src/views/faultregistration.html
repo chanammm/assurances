@@ -16,13 +16,13 @@
 
 
 <body class="_scrollbar">
-    <div id="c-container-list" style="height: 100%;" data-uri="sys_machine_list" v-loading.fullscreen.lock="loading">
+    <div id="c-container-list" style="height: 100%;" data-uri="fault_registration_page" v-loading.fullscreen.lock="loading">
         <el-container>
             <el-main>
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {}; imageList = {}"
+                            <el-button @click="UpdateTableAndVisible = true; formData = {}; imageList = {}; searchMachine()"
                                 type="primary">新增<i class="el-icon-plus el-icon--right"></i></el-button>
                             <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入物料信息
                             </el-button>
@@ -32,11 +32,26 @@
                         <el-input placeholder="请输入内容" v-model="listSearch._value_" class="_searchVal">
                             <el-select v-model="listSearch._name_" class="_searchVal_select" slot="prepend"
                                 placeholder="请选择">
-                                <el-option label="物料编码" value="coding"></el-option>
+                                <el-option label="机器编码" value="machineCode"></el-option>
                                 <el-option label="机器名称" value="machineName"></el-option>
                                 <el-option label="机器类型" value="machineType"></el-option>
+                                <el-option label="工单号" value="workId"></el-option>
                             </el-select>
                         </el-input>
+
+                        <div class="_search_centent" v-show="more">
+                            <el-button>报单状态</el-button>
+                            <el-select v-model="listSearch.isSubmitWork" slot="prepend" placeholder="请选择">
+                                <el-option label="不限" value=""></el-option>
+                                <el-option label="未报单" value="0"></el-option>
+                                <el-option label="已报单" value="1"></el-option>
+                            </el-select>
+                        </div>
+
+                        <div class="more_search el-icon-circle-plus-outline" v-show="!more" @click="more = !more">
+                            更多搜索条件
+                        </div>
+                        <div class="more_search el-icon-remove-outline" v-show="more" @click="more = !more"> 收起 </div>
 
                         <el-button icon="el-icon-search" class="_search_btn" @click="list(listSearch)">搜索
                         </el-button>
@@ -108,46 +123,72 @@
                     </el-pagination>
 
 
-                    <el-dialog title="新增设备" :visible.sync="UpdateTableAndVisible">
+                    <el-dialog title="新增故障登记" :visible.sync="UpdateTableAndVisible" width="90%">
                         <el-form :model="formData" id="machine">
-                            <el-form-item label="物料编号：">
-                                <el-input v-model="formData.coding"></el-input>
+                            <el-form-item label="选择设备：">
+                                <!-- <div>已选择设备数量：{{data.machineId}}</div> -->
+                                <el-table
+                                    ref="singleTable"
+                                    :data="formDataTableData"
+                                    highlight-current-row
+                                    @selection-change="formDataHandleCurrentChange"
+                                    :row-key="getRowKey"
+                                    style="width: 100%">
+                                    <el-table-column
+                                    type="selection"
+                                    :reserve-selection="true"
+                                    width="55">
+                                  </el-table-column>
+                                    <el-table-column
+                                    property="machineName"
+                                    label="名称">
+                                    </el-table-column>
+                                    <el-table-column
+                                    property="coding"
+                                    label="编号">
+                                    </el-table-column>
+                                    <el-table-column
+                                    property="colourScheme"
+                                    label="颜色">
+                                    </el-table-column>
+                                    <el-table-column
+                                    property="machineParameter"
+                                    label="规格">
+                                    </el-table-column>
+                                    <el-table-column align="right">
+                                        <template slot="header" slot-scope="scope">
+                                            <!-- <el-select v-model="listSearch._name_" slot="prepend" style="float: left;"
+                                                placeholder="请选择">
+                                                <el-option label="机器编码" value="machineCode"></el-option>
+                                                <el-option label="机器名称" value="machineName"></el-option>
+                                                <el-option label="机器类型" value="machineType"></el-option>
+                                            </el-select> -->
+                                            <el-input size="mini" v-model="formData.search" @input="searchMachine" placeholder="输入关键字搜索"/>
+                                        </template>
+                                        -
+                                    </el-table-column>
+                                </el-table>
+                                <el-pagination v-if="formDataTableData.length > 0" @current-change="formHandleCurrentChange"
+                                    :current-page="formPage"  :page-size="formPageSize"
+                                    layout="total, prev, pager, next" :total="formTotal">
+                                </el-pagination>
                             </el-form-item>
 
-                            <el-form-item label="机器名称：">
-                                <el-input v-model="formData.machineName "></el-input>
+                            <el-form-item label="反馈描述：">
+                                <el-input v-model="formData.feedbackDesc" type="textarea"></el-input>
                             </el-form-item>
 
-                            <el-form-item label="机器型号：">
-                                <el-input v-model="formData.machineType"></el-input>
+                            <el-form-item label="备注：">
+                                <el-input v-model="formData.remarks"></el-input>
                             </el-form-item>
 
-                            <el-form-item label="机器色系：">
-                                <el-input v-model="formData.colourScheme"></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="机器参数：">
-                                <el-input v-model="formData.machineParameter"></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="激活：">
-                                <el-radio-group v-model="formData.isAutoActivation">
-                                    <el-radio :label="0" style="margin-right: 10px;">手动激活</el-radio>
-                                    <el-radio :label="1">自动激活</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-
-                            <el-form-item label="机器图片">
+                            <el-form-item label="反馈图片：">
                                 <template>
-                                    <el-upload prop="machinePic" :action="fileUpdata" list-type="picture-card"
-                                        :file-list="imageList.machinePic" :on-change="fileChange"
-                                        :on-success="machineSceneSuccess" :limit="num" :on-exceed="fileExceed"
-                                        :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
+                                    <el-upload ref="uploads" prop="feedbackDiagram" :action="fileUpdata" list-type="picture-card"
+                                        :file-list="imageList.feedbackDiagram" 
+                                        :on-success="formMachineSceneSuccess" :on-remove="formHandleRemove" accept=".jpg,.jpeg,.png,.JPG,.JPEG">
                                         <i class="el-icon-plus"></i>
                                     </el-upload>
-                                    <el-dialog :visible.sync="dialogVisible">
-                                        <img width="100%" :src="dialogImageUrl" alt="">
-                                    </el-dialog>
                                 </template>
                             </el-form-item>
                             <div class="btn-center" style="text-align: center; margin: 20px;">
@@ -260,6 +301,12 @@
                 </el-main>
         </el-container>
     </div>
+    <style>
+        .el-table__body tr.current-row > td{
+            background-color: #6ab3f7 !important;
+            color: white !important;
+        }
+    </style>
 </body>
 
 </html>

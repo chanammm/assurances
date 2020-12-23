@@ -200,6 +200,11 @@ window.addEventListener('pageshow', function (params) {
                     }]
                 ]),
                 pageparams: {},  // 预存的页面搜索参数
+                // ###### Wed Dec 23 14:34:56 CST 2020
+                formPageSize: 5,
+                formTotal: 0,
+                formPage: 1,
+                formDataTableData: []
             }
         },
         created: function () {
@@ -246,8 +251,10 @@ window.addEventListener('pageshow', function (params) {
                     return it.currentPage
                 })() : it.page;
                 params['pageSize'] = 20;
-                _data_ = qs.stringify(params);
-                axios.post(uri, _data_).then(params => {
+
+                // ###### Wed Dec 23 11:01:13 CST 2020
+                uri == 'fault_registration_page' ? _data_ = {params: params}:_data_ = qs.stringify(params);
+                axios[uri == 'fault_registration_page' ? 'get':'post'](uri, _data_).then(params => {
                     let data = params.data;
                     // data.page.pages ? it.currentPage= parseInt(data.page.pages) : null;
                     if (data.state == 200) {
@@ -1087,6 +1094,10 @@ window.addEventListener('pageshow', function (params) {
 
 
             machineSceneSuccess(e) {
+                if (e.state != 200) {
+                    this.IError(e.msg);
+                    return false;
+                }
                 this.data['machinePic'] = e.data.path;
             },
 
@@ -1169,6 +1180,69 @@ window.addEventListener('pageshow', function (params) {
                     }
                 }) 
             },
+
+            // ###### Wed Dec 23 14:31:42 CST 2020
+            // 故障登记 -- 选择设备
+            formDataHandleCurrentChange (params){
+                console.log(params)
+            },
+            getRowKey (row) {
+                return row.machineId
+            },
+            // 故障登记 -- 查询设备
+            searchMachine(){
+                console.log(this.data)
+                let data = {
+                    page: this.formPage,
+                    pageSize: 5
+                }
+                this.formData.search ? data['machineName'] = this.formData.search : null;
+                axios.post('sys_machine_list', qs.stringify(data)).then(params => {
+                    this.formDataTableData = []
+                    if (params.data.state == 200) {
+                        this.formDataTableData = params.data.page.records
+                        // 
+                        // this.$nextTick(function () {
+                        //     this.data.machineId ? this.data.machineId.forEach((e, i) => {
+                        //         this.formDataTableData.forEach((element, index) => {
+                        //             if(e.machineId == element.machineId) {
+                        //                 this.$refs.singleTable.toggleRowSelection(this.formDataTableData[index], true);
+                        //             }
+                        //         })
+                        //     }): null
+                        // })
+                        this.formTotal = params.data.page.total
+                    } else {
+                        this.IError(params.data.msg);
+                    }
+                }).catch((error) => {
+                    this.IError(error);
+                });
+            },
+            // 故障登记 -- 设备分页
+            formHandleCurrentChange(params){
+                this.formPage = params
+                this.searchMachine()
+            },
+            // 故障登记 -- 图片上传
+            formMachineSceneSuccess(e) {
+                if (e.state != 200) {
+                    this.IError(e.msg);
+                    this.$refs.uploads.clearFiles();
+                    return false;
+                }
+                if(!this.data['feedbackDiagram']){
+                    this.data['feedbackDiagram'] = [];
+                };
+                this.data['feedbackDiagram'].push(e.data.path)
+            },
+            formHandleRemove (file, filelist){
+                this.data.feedbackDiagram.forEach((element, index) => {
+                    if (element == file.response.data.path) {
+                        this.data.feedbackDiagram.splice(index, 1)
+                    }
+                })
+            }
 
 
         }
