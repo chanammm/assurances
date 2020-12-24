@@ -22,10 +22,10 @@
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {}; imageList = {}; searchMachine()"
+                            <el-button @click="UpdateTableAndVisible = true; formData = {machineId: [],title: '新增故障登记'}; imageList = {}; searchMachine();$refs.singleTable.clearSelection();"
                                 type="primary">新增<i class="el-icon-plus el-icon--right"></i></el-button>
-                            <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入物料信息
-                            </el-button>
+                            <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入</el-button>
+                            <el-button @click="UpdateVisible = true; formData = {}; imageList = {}" type="primary">导出EXCEL</el-button>
                         </div>
                     </el-form>
                     <el-form>
@@ -58,60 +58,50 @@
                     </el-form>
                     <template>
                         <el-table :data="tableData" stripe style="width: 100%" border>
-                            <!-- <el-table-column prop="machineId" label="secretID"></el-table-column> -->
-                            <el-table-column prop="coding" label="物料编码"></el-table-column><el-table-column prop="machineName" label="机器名称">
-                                <template slot-scope="scope">
-                                    {{ scope.row.machineName }}
+                            <el-table-column type="expand">
+                                <template slot-scope="props">
+                                  <el-form label-position="left" class="demo-table-expand">
+                                    <el-form-item label="机器名称：">
+                                        <span>{{ props.row.machineName }}</span>
+                                      </el-form-item>
+                                    <el-form-item label="工单号：">
+                                      <span>{{ props.row.workId != -1 ? props.row.workId : '-' }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="故障描述：">
+                                      <span>{{ props.row.feedbackDesc }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="备注：">
+                                      <span>{{ props.row.founder ? props.row.founder : '-' }}</span>
+                                    </el-form-item>
+                                    <el-form-item label="报单时间：">
+                                      <span>{{ props.row.submitWorkTime ? props.row.submitWorkTime : '-' }}</span>
+                                    </el-form-item>
+                                  </el-form>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="colourScheme" label="色系"></el-table-column>
-                            <el-table-column prop="machineParameter" label="规格参数">
+                            <el-table-column prop="machineName" label="机器名称" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column prop="machineCode" label="物料编号"></el-table-column>
+                            <el-table-column prop="isSubmitWork" label="报单">
                                 <template slot-scope="scope">
-                                    {{ scope.row.machineParameter == -1 ? '无' : scope.row.machineParameter }}
+                                    {{ scope.row.isSubmitWork == 1 ? '是' : '否'}}
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="machineType" label="机器类型">
+                            <el-table-column prop="machineType" label="机器类型"></el-table-column>
+                            <el-table-column prop="state" label="状态">
                                 <template slot-scope="scope">
-                                    {{ scope.row.machineType }}
+                                    <div :style="scope.row.state == 0 ? 'color: red': 'color: green'">{{ scope.row.state == 0 ? '撤销': '正常'}}</div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="machinePic" label="图片" width="120px">
-                                <template slot-scope="scope">
-                                    <el-popover trigger="hover" placement="top">
-                                        <el-image
-                                            :src="scope.row.machinePic"
-                                            style="text-align: center;">
-                                            <div slot="error">
-                                                暂无产品图片
-                                            </div>
-                                        </el-image>
-                                        <div slot="reference" class="name-wrapper">
-                                            <el-image
-                                                :src="scope.row.machinePic"
-                                                lazy>
-                                                <div slot="error">
-                                                    <img style="width:40px" src="http://s.coffeedz.com/images/product.png" />
-                                                </div>
-                                            </el-image>
-                                        </div>
-                                    </el-popover>
-                                </template>
-                            </el-table-column>
+                            <el-table-column prop="feedbackDesc" label="故障描述" :show-overflow-tooltip="true"></el-table-column>
 
-                            <el-table-column prop="isAutoActivation" label="激活方式">
-                                <template slot-scope="scope">
-                                    {{ scope.row.isAutoActivation == 0 ? '手动激活': '自动激活'}}
-                                </template>
-                            </el-table-column>
-                            <!-- <el-table-column prop="createTime" label="创建时间"></el-table-column> -->
                             <el-table-column fixed="right" label="操作">
                                 <template slot-scope="scope">
-                                    <el-button type="text" size="small" @click="devicemachineDest(scope.row.machineId)">
+                                    <el-button type="text" size="small" @click="falutrDetails(scope.row)">
                                         详情
                                     </el-button>
-                                    <!-- <el-button type="text" size="small" @click="DeleteInstance({url:'delete_machine',machineId: scope.row.machineId})">
-                                        删除
-                                    </el-button> -->
+                                    <el-button type="text" size="small" @click="falutrDetele(scope.row)">
+                                        {{ scope.row.state != 1 ?  '恢复' : '撤销' }}
+                                    </el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -123,64 +113,104 @@
                     </el-pagination>
 
 
-                    <el-dialog title="新增故障登记" :visible.sync="UpdateTableAndVisible" width="90%">
+                    <el-dialog :title="formData.title" :visible.sync="UpdateTableAndVisible" width="90%">
                         <el-form :model="formData" id="machine">
-                            <el-form-item label="选择设备：">
-                                <!-- <div>已选择设备数量：{{data.machineId}}</div> -->
-                                <el-table
-                                    ref="singleTable"
-                                    :data="formDataTableData"
-                                    highlight-current-row
-                                    @selection-change="formDataHandleCurrentChange"
-                                    :row-key="getRowKey"
-                                    style="width: 100%">
-                                    <el-table-column
-                                    type="selection"
-                                    :reserve-selection="true"
-                                    width="55">
-                                  </el-table-column>
-                                    <el-table-column
-                                    property="machineName"
-                                    label="名称">
+                            <el-form-item label="选择设备 * ：">
+                                <div v-if="formData.id">
+                                    <span style="color: #409eff;">当前机器（已选择的机器不允许修改）：{{ formData.machineName }}, 编号：{{ formData.machineCode }}</span>
+                                    <div style="float: right">
+                                        <el-button type="primary" size="small" @click="dialogVisible = true; formData.workId == -1 ? formData.workId = '' : ''">填写工单</el-button>
+                                        <el-button type="primary" size="small" @click="TableAndVisible = true;formData.returnVisit == -1 ? formData.returnVisit = '' : ''"">填写回访记录</el-button>
+                                    </div>
+                                </div>
+                                <div v-if="!formData.id">
+                                    <el-table
+                                        ref="singleTable"
+                                        :data="formDataTableData"
+                                        highlight-current-row
+                                        @selection-change="formDataHandleCurrentChange"
+                                        :row-key="getRowKey"
+                                        style="width: 100%">
+                                        <el-table-column v-if="!formData.id"
+                                        type="selection"
+                                        :reserve-selection="true"
+                                        width="55">
                                     </el-table-column>
-                                    <el-table-column
-                                    property="coding"
-                                    label="编号">
-                                    </el-table-column>
-                                    <el-table-column
-                                    property="colourScheme"
-                                    label="颜色">
-                                    </el-table-column>
-                                    <el-table-column
-                                    property="machineParameter"
-                                    label="规格">
-                                    </el-table-column>
-                                    <el-table-column align="right">
-                                        <template slot="header" slot-scope="scope">
-                                            <!-- <el-select v-model="listSearch._name_" slot="prepend" style="float: left;"
-                                                placeholder="请选择">
-                                                <el-option label="机器编码" value="machineCode"></el-option>
-                                                <el-option label="机器名称" value="machineName"></el-option>
-                                                <el-option label="机器类型" value="machineType"></el-option>
-                                            </el-select> -->
-                                            <el-input size="mini" v-model="formData.search" @input="searchMachine" placeholder="输入关键字搜索"/>
-                                        </template>
-                                        -
-                                    </el-table-column>
-                                </el-table>
-                                <el-pagination v-if="formDataTableData.length > 0" @current-change="formHandleCurrentChange"
-                                    :current-page="formPage"  :page-size="formPageSize"
-                                    layout="total, prev, pager, next" :total="formTotal">
-                                </el-pagination>
+                                        <el-table-column
+                                        property="machineName"
+                                        label="名称">
+                                        </el-table-column>
+                                        <el-table-column
+                                        property="coding"
+                                        label="编号">
+                                        </el-table-column>
+                                        <el-table-column
+                                        property="colourScheme"
+                                        label="颜色">
+                                        </el-table-column>
+                                        <el-table-column
+                                        property="machineParameter"
+                                        label="规格">
+                                        </el-table-column>
+                                        <el-table-column align="right">
+                                            <template slot="header" slot-scope="scope">
+                                                <!-- <el-select v-model="listSearch._name_" slot="prepend" style="float: left;"
+                                                    placeholder="请选择">
+                                                    <el-option label="机器编码" value="machineCode"></el-option>
+                                                    <el-option label="机器名称" value="machineName"></el-option>
+                                                    <el-option label="机器类型" value="machineType"></el-option>
+                                                </el-select> -->
+                                                <el-input size="mini" v-model="formData.search" @input="formPage = 1; searchMachine()" v-if="!formData.id" placeholder="输入设备名称搜索"/>
+                                            </template>
+                                            -
+                                        </el-table-column>
+                                    </el-table>
+                                    <el-pagination v-if="formDataTableData.length > 0" @current-change="formHandleCurrentChange"
+                                        :current-page="formPage"  :page-size="formPageSize"
+                                        layout="total, prev, pager, next" :total="formTotal">
+                                    </el-pagination>
+                                </div>
                             </el-form-item>
 
-                            <el-form-item label="反馈描述：">
+                            <el-form-item label="反馈描述 * ：">
                                 <el-input v-model="formData.feedbackDesc" type="textarea"></el-input>
                             </el-form-item>
 
                             <el-form-item label="备注：">
                                 <el-input v-model="formData.remarks"></el-input>
                             </el-form-item>
+
+                            <div v-if="!formData.id">
+                                <el-form-item label="工单号：">
+                                    <el-input v-model="formData.workId"></el-input>
+                                </el-form-item>
+                                <el-form-item label="报单时间：">
+                                    <el-date-picker
+                                        v-model="formData.submitWorkTime"
+                                        align="right"
+                                        type="date"
+                                        placeholder="选择日期"
+                                        :picker-options="pickerOptionsDay">
+                                    </el-date-picker>
+                                </el-form-item>
+                                <el-form-item label="回访记录：">
+                                    <el-input v-model="formData.returnVisit" type="textarea"></el-input>
+                                </el-form-item>
+                            </div>
+                            
+                            <div v-if="formData.id">
+                                <el-form-item label="工单号：">
+                                    <div>
+                                        {{formData.workId != -1 ? formData.workId : '-'}}
+                                    </div>
+                                </el-form-item>
+    
+                                <el-form-item label="回访记录：">
+                                    <div>
+                                        {{formData.returnVisit != -1 ? formData.returnVisit : '-'}}
+                                    </div>
+                                </el-form-item>
+                            </div>
 
                             <el-form-item label="反馈图片：">
                                 <template>
@@ -192,7 +222,7 @@
                                 </template>
                             </el-form-item>
                             <div class="btn-center" style="text-align: center; margin: 20px;">
-                                <el-button type="primary" @click="devicemachine(formData)">提交
+                                <el-button type="primary" @click="submitFormData">提交
                                 </el-button>
                             </div>
                         </el-form>
@@ -208,83 +238,15 @@
                         </template>
                     </el-dialog>
 
-                    <el-dialog title="设备详情" :visible.sync="SearchTableAndVisible" width="50%">
-                        <div style="height: 600px;overflow: auto;">
-                            <el-form :data="SearchTableFormDatas" label-width="160px">
-
-                                <el-form-item label="物料ID" prop="machineId" v-show="false">
-                                    <el-input v-model="SearchTableFormDatas.machineId"></el-input>
-                                </el-form-item>
-                                <el-form-item label="设备名称" prop="machineName">
-                                    <el-input v-model="SearchTableFormDatas.machineName"></el-input>
-                                </el-form-item>
-                                <el-form-item label="设备类型" prop="machineType">
-                                    <el-input v-model="SearchTableFormDatas.machineType"></el-input>
-                                </el-form-item>
-                                <el-form-item label="物料编码" prop="coding">
-                                    <el-input v-model="SearchTableFormDatas.coding"></el-input>
-                                </el-form-item>
-                                <el-form-item label="色系" prop="colourScheme">
-                                    <el-input v-model="SearchTableFormDatas.colourScheme"></el-input>
-                                </el-form-item>
-                                <!-- <el-form-item label="创建者ID" prop="createBy">
-                                    <el-input v-model="SearchTableFormData.createBy"></el-input>
-                                </el-form-item> -->
-                                <!-- <el-form-item label="创建者名称" prop="createName">
-                                    <el-input v-model="SearchTableFormData.createName"></el-input>
-                                </el-form-item> -->
-                                <el-form-item label="机器参数" prop="machineParameter">
-                                    <el-input v-model="SearchTableFormDatas.machineParameter"></el-input>
-                                </el-form-item>
-                                <el-form-item label="激活：">
-                                    <el-radio-group v-model="SearchTableFormDatas.isAutoActivation">
-                                        <el-radio :label="0" style="margin-right: 10px;">手动激活</el-radio>
-                                        <el-radio :label="1">自动激活</el-radio>
-                                    </el-radio-group>
-                                </el-form-item>
-                                <!-- <el-form-item label="创建时间" prop="createTime">
-                                    <el-input v-model="SearchTableFormData.createTime"></el-input>
-                                </el-form-item> -->
-                                <!-- <el-form-item label="设备图片" prop="machinePic">
-                                    <el-popover trigger="hover" placement="top">
-                                        <el-image :src="SearchTableFormData.machinePic" slot="error" style="text-align: center;"></el-image>
-                                        <div slot="reference" class="name-wrapper">
-                                            <el-image :src="SearchTableFormData.machinePic"
-                                                :preview-src-list="SearchTableFormData.machinePic" lazy></el-image>
-                                        </div>
-                                    </el-popover>
-                                </el-form-item> -->
-                                <el-form-item label="设备图片" prop="machinePic">
-                                    <template v-model="SearchTableFormDatas.machinePic">
-                                        <el-upload :action="fileUpdata" list-type="picture-card"
-                                            :file-list="imageList.machinePics" :limit="num" :data="fileData"
-                                            :on-change="fileChange" :on-success="machineSceneSuccess" :on-exceed="fileExceed"
-                                            :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-                                            <i class="el-icon-plus"></i>
-                                        </el-upload>
-                                        <el-dialog :visible.sync="dialogVisible">
-                                            <img width="100%" :src="dialogImageUrl" alt="">
-                                        </el-dialog>
-                                    </template>
-                                </el-form-item>
-
-                                
-
-                                <div class="btn-center" style="text-align: center; margin: 20px;">
-                                <el-button type="primary" @click="checkChang(SearchTableFormDatas);">提交
-                                </el-button>
-                            </div>
-                            </el-form>
-                        </div>
-                    </el-dialog>
-
-                    <el-dialog title="导入物料信息" :visible.sync="detailTableAndVisible">
+                    <el-dialog title="导入故障登记" :visible.sync="detailTableAndVisible" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
                         <el-form>
-                            <el-form-item label=".CSV文件">
-                                <div style="font-size: 10px; color: #409EFF;cursor: pointer;" @click="hrefDown(true)">(模板下载)</div>
+                            <el-form-item label=".XLSX文件">
+                                <div style="font-size: 10px; color: #409EFF;cursor: pointer;" @click="hrefDown(true, true)">(模板下载)</div>
                                 <template>
-                                    <el-upload :limit="num" class="upload-demo" :file-list="fileList" drag
-                                        :action="asfileUpdataExc" :headers="fileUpdataExcData"
+                                    <el-upload :limit="num" class="upload-demo" drag
+                                        ref="uploadXlsx"
+                                        accept=".xlsx"
+                                        :action="formFileUpdataExc" :headers="fileUpdataExcData"
                                         :on-success="ExecSceneSuccess" :on-exceed="exeLength" multiple>
                                         <i class="el-icon-upload"></i>
                                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em>，系统会自动处理数据</div>
@@ -292,8 +254,79 @@
                                 </template>
                             </el-form-item>
                             <div class="btn-center" style="text-align: center; margin: 20px;">
-                                <el-button type="primary" @click="detailTableAndVisible = false;">关闭
-                                </el-button>
+                                <el-button type="primary" @click="detailTableAndVisible = false; $refs.uploadXlsx.clearFiles()">关闭</el-button>
+                            </div>
+                        </el-form>
+                    </el-dialog>
+
+                    <el-dialog title="导出故障登记" width="80%" :visible.sync="UpdateVisible" :close-on-click-modal="false" :close-on-press-escape="false">
+                        <el-form :model="formData">
+                            <el-form-item label="机器名称 ：">
+                                <el-input v-model="formData.machineName"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机器类型 ：">
+                                <el-input v-model="formData.machineType"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机器编码 ：">
+                                <el-input v-model="formData.machineCode"></el-input>
+                            </el-form-item>
+                            <el-form-item label="报单 ：">
+                                <el-radio-group v-model="formData.isSubmitWork">
+                                    <el-radio :label="0" style="margin-right: 10px;">否</el-radio>
+                                    <el-radio :label="1">是</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="状态 ：">
+                                <el-radio-group v-model="formData.state">
+                                    <el-radio :label="0" style="margin-right: 10px;">已撤销</el-radio>
+                                    <el-radio :label="1">已登记</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="时间区间 ：">
+                                <el-date-picker
+                                    v-model="formData.dataTiume"
+                                    type="daterange"
+                                    align="right"
+                                    unlink-panels
+                                    range-separator="至"
+                                    start-placeholder="开始日期"
+                                    end-placeholder="结束日期"
+                                    :picker-options="pickerOptions">
+                                </el-date-picker>
+                            </el-form-item>
+                            <div class="btn-center" style="text-align: center; margin: 20px;">
+                                <el-button type="primary" @click="outSubmitPath">提交</el-button>
+                            </div>
+                        </el-form>
+                    </el-dialog>
+
+                    <el-dialog title="填写工单号" :visible.sync="dialogVisible">
+                        <el-form :model="formData">
+                            <el-form-item label="工单号 ：">
+                                <el-input v-model="formData.workId"></el-input>
+                            </el-form-item>
+                            <el-form-item label="报单时间：">
+                                <el-date-picker
+                                    v-model="formData.submitWorkTime"
+                                    align="right"
+                                    type="date"
+                                    placeholder="选择日期"
+                                    :picker-options="pickerOptionsDay">
+                                </el-date-picker>
+                            </el-form-item>
+                            <div class="btn-center" style="text-align: center; margin: 20px;">
+                                <el-button type="primary" @click="submitOrder">提交</el-button>
+                            </div>
+                        </el-form>
+                    </el-dialog>
+
+                    <el-dialog title="填写回访记录" :visible.sync="TableAndVisible">
+                        <el-form :model="formData">
+                            <el-form-item label="回访记录 ：">
+                                <el-input v-model="formData.returnVisit" type="textarea"></el-input>
+                            </el-form-item>
+                            <div class="btn-center" style="text-align: center; margin: 20px;">
+                                <el-button type="primary" @click="submitVisit">提交</el-button>
                             </div>
                         </el-form>
                     </el-dialog>

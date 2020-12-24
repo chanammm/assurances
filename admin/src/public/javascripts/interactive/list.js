@@ -38,6 +38,7 @@ window.addEventListener('pageshow', function (params) {
                 fileUpdata: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Files_ : parent.all.json._j.URLS.ForMal_Files_) + 'picture_file_upload',
                 fileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'import_machine_instance_by_csv',
                 asfileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'import_machine_by_csv',
+                formFileUpdataExc: (process.env.NODE_ENV == "development" ? parent.all.json._j.URLS.Development_Server_ : parent.all.json._j.URLS.Development_Server_) + 'fault_registration_import',
                 fileUpdataExcData: {
                     Authorization: JSON.parse(sessionStorage.getItem('token')).asset.secret
                 },
@@ -164,6 +165,31 @@ window.addEventListener('pageshow', function (params) {
                         }
                     }]
                 },
+                pickerOptionsDay: {
+                    disabledDate(time) {
+                      return time.getTime() > Date.now();
+                    },
+                    shortcuts: [{
+                      text: '今天',
+                      onClick(picker) {
+                        picker.$emit('pick', new Date());
+                      }
+                    }, {
+                      text: '昨天',
+                      onClick(picker) {
+                        const date = new Date();
+                        date.setTime(date.getTime() - 3600 * 1000 * 24);
+                        picker.$emit('pick', date);
+                      }
+                    }, {
+                      text: '一周前',
+                      onClick(picker) {
+                        const date = new Date();
+                        date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', date);
+                      }
+                    }]
+                },
                 StatusName: new Map([
                     ['free', {
                         user: new Map([
@@ -250,7 +276,8 @@ window.addEventListener('pageshow', function (params) {
                     it.currentPage = 1;
                     return it.currentPage
                 })() : it.page;
-                params['pageSize'] = 20;
+
+                params['pageSize'] = this.pageSize;  //
 
                 // ###### Wed Dec 23 11:01:13 CST 2020
                 uri == 'fault_registration_page' ? _data_ = {params: params}:_data_ = qs.stringify(params);
@@ -1129,8 +1156,12 @@ window.addEventListener('pageshow', function (params) {
             },
 
             //模板下载文件
-            hrefDown(params) {
+            hrefDown(params, bool = false) { // ###### Thu Dec 24 10:25:49 CST 2020
                 if (params) {
+                    if (bool) { // ###### Thu Dec 24 10:26:30 CST 2020
+                        parent.window.open('../file/fault_template.xlsx', '_blank');
+                        return false
+                    } 
                     parent.window.open('../file/template.csv', '_blank');
                 } else {
                     parent.window.open('../file/templates.csv', '_blank');
@@ -1184,14 +1215,17 @@ window.addEventListener('pageshow', function (params) {
             // ###### Wed Dec 23 14:31:42 CST 2020
             // 故障登记 -- 选择设备
             formDataHandleCurrentChange (params){
+                this.formData['machineId'] = []
                 console.log(params)
+                params.forEach((element, index) => {
+                    this.formData['machineId'].push(element.machineId)
+                })
             },
             getRowKey (row) {
                 return row.machineId
             },
             // 故障登记 -- 查询设备
             searchMachine(){
-                console.log(this.data)
                 let data = {
                     page: this.formPage,
                     pageSize: 5
@@ -1201,19 +1235,23 @@ window.addEventListener('pageshow', function (params) {
                     this.formDataTableData = []
                     if (params.data.state == 200) {
                         this.formDataTableData = params.data.page.records
-                        // 
-                        // this.$nextTick(function () {
-                        //     this.data.machineId ? this.data.machineId.forEach((e, i) => {
-                        //         this.formDataTableData.forEach((element, index) => {
-                        //             if(e.machineId == element.machineId) {
-                        //                 this.$refs.singleTable.toggleRowSelection(this.formDataTableData[index], true);
-                        //             }
-                        //         })
-                        //     }): null
-                        // })
+                        this.$nextTick(function () {
+                            if (this.formData.machineIds) {  // 是编辑 存在
+                                // this.$refs.singleTable.clearSelection();  // 清除
+                                this.formDataTableData.forEach((element, index) => {
+                                    this.formData.machineIds.toString().split(',').forEach((id, i) => {
+                                        if(id == element.machineId){
+                                            this.$refs.singleTable.toggleRowSelection(this.formDataTableData[index], true);
+                                        }else{
+                                            this.$refs.singleTable.toggleRowSelection(this.formDataTableData[index], false);
+                                        }
+                                    })
+                                })
+                            }
+                        })
                         this.formTotal = params.data.page.total
                     } else {
-                        this.IError(params.data.msg);
+                        params.data.state == 405 ? null : this.IError(params.data.msg);
                     }
                 }).catch((error) => {
                     this.IError(error);
@@ -1236,12 +1274,158 @@ window.addEventListener('pageshow', function (params) {
                 };
                 this.data['feedbackDiagram'].push(e.data.path)
             },
+            // 已上传图片删除(仅仅列表删除)
             formHandleRemove (file, filelist){
                 this.data.feedbackDiagram.forEach((element, index) => {
-                    if (element == file.response.data.path) {
-                        this.data.feedbackDiagram.splice(index, 1)
+                    if(file.response){
+                        if (element == file.response.data.path) {
+                            this.data.feedbackDiagram.splice(index, 1)
+                        }
+                    }else{
+                        if (element == file.url) {
+                            this.data.feedbackDiagram.splice(index, 1)
+                        }
                     }
                 })
+            },
+            // 故障登记详情
+            falutrDetails (params) {
+                axios.get('fault_registration_details', {
+                    params: {
+                        id: params.id
+                    }
+                }).then(params => {
+                    if (params.data.state != 200){
+                        this.IError(params.data.msg);
+                        return false;
+                    }
+                    this.UpdateTableAndVisible = true
+                    this.formData.title = '编辑故障登记'
+                    params.data.data.remarks == -1 ? params.data.data.remarks = '' : null
+                    this.formData = params.data.data
+                    this.formData['machineIds'] = params.data.data.machineId
+                    // 图片
+                    if (params.data.data.feedbackDiagram != -1) {
+                        let arr = []
+                        params.data.data.feedbackDiagram.split(',').forEach((element, index) => {
+                            arr.push({name: element, url: element})
+                        })
+                        this.imageList.feedbackDiagram = arr
+                        this.data.feedbackDiagram = params.data.data.feedbackDiagram.split(',')
+                    }
+                    this.formData.search = params.data.data.machineName // 预期搜索
+                    // this.searchMachine()
+                }).catch((error) => {
+                    this.IError(error);
+                });
+            },
+            // 提交信息
+            submitFormData () {
+                // if(this.formData.id){
+                    // this.formData.machineId = [...new Set(this.formData.machineId.concat(parseInt(this.formData.machineIds.toString().split(','))))]
+                // }
+                if(this.formData.machineId.length < 1 || !this.formData.feedbackDesc) {
+                    this.IError('加 * 的为必填项，请填写完整')
+                    return false
+                }
+                this.data.feedbackDiagram ? this.formData['feedbackDiagram'] = this.data.feedbackDiagram.toString().replace(/\[|\]/g, '') : ''
+                this.formData.machineIds = this.formData.machineId.toString().replace(/\[|\]/g, '')
+                if (this.formData.id) {
+                    this.formData.machineId = this.formData.machineId.toString().replace(/\[|\]/g, '')
+                }
+                if(this.formData.submitWorkTime) {
+                    this.formData.submitWorkTime = ym.init.getDateTime(this.formData.submitWorkTime)
+                }
+                axios.post(this.formData.id ? 'fault_registration_updated':'fault_registration_saved', qs.stringify(this.formData)).then(params => {
+                    if (params.data.state != 200){
+                        this.IError(params.data.msg);
+                        return false;
+                    }
+                    this.ISuccessfull(params.data.msg)
+                    this.UpdateTableAndVisible = false;
+                    this.formData = {}
+                    this.list()
+                }).catch((error) => {
+                    this.formData.machineId = []
+                    this.IError(error);
+                });
+            },
+            // 导出
+            outSubmitPath () {
+                if (this.formData.dataTiume) {
+                    this.formData['startDate'] = ym.init.getDateTime(this.formData.dataTiume[0])
+                    this.formData['endDate'] = ym.init.getDateTime(this.formData.dataTiume[1])
+                }
+                axios.post('fault_registration_export', qs.stringify(this.formData)).then(params => {
+                    if (params.data.state != 200){
+                        this.IError(params.data.msg);
+                        return false;
+                    }
+                    this.ISuccessfull(params.data.msg)
+                    this.UpdateVisible = false;
+                    this.formData = {}
+                    parent.window.open(params.data.data)
+                }).catch((error) => {
+                    this.IError(error);
+                });
+            },
+
+            submitOrder () {
+                axios.post('fill_work_id', qs.stringify({
+                    workId: this.formData.workId,
+                    id:  this.formData.id,
+                    submitWorkTime: this.formData.submitWorkTime ? ym.init.getDateTime(this.formData.submitWorkTime) : ''
+                })).then(params => {
+                    if (params.data.state != 200){
+                        this.IError(params.data.msg);
+                        return false;
+                    }
+                    this.ISuccessfull(params.data.msg)
+                    this.dialogVisible = false;
+                    this.UpdateTableAndVisible = false;
+                    this.formData = {}
+                }).catch((error) => {
+                    this.IError(error);
+                });
+            },
+
+            submitVisit () {
+                axios.post('fill_return_visit', qs.stringify({
+                    returnVisit: this.formData.returnVisit,
+                    id:  this.formData.id
+                })).then(params => {
+                    if (params.data.state != 200){
+                        this.IError(params.data.msg);
+                        return false;
+                    }
+                    this.ISuccessfull(params.data.msg)
+                    this.TableAndVisible = false;
+                    this.UpdateTableAndVisible = false;
+                    this.formData = {}
+                }).catch((error) => {
+                    this.IError(error);
+                });
+            },
+
+            falutrDetele (params) {
+                this.$confirm('撤销故障登记, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('revoke_or_not', qs.stringify({
+                        id:  params.id
+                    })).then(params => {
+                        if (params.data.state != 200){
+                            this.IError(params.data.msg);
+                            return false;
+                        }
+                        this.ISuccessfull(params.data.msg)
+                        this.list()
+                    }).catch((error) => {
+                        this.IError(error);
+                    });
+                }).catch(() => {});
             }
 
 
