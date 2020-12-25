@@ -1216,26 +1216,78 @@ window.addEventListener('pageshow', function (params) {
             // 故障登记 -- 选择设备
             formDataHandleCurrentChange (params){
                 this.formData['machineId'] = []
-                console.log(params)
                 params.forEach((element, index) => {
-                    this.formData['machineId'].push(element.machineId)
+                    this.formData['machineId'].push(element.machineInstanceId)
                 })
+                if (params.length == 1) {
+                    this.searchMachineAddress(params[0])
+                } else {
+                    this.formData['province'] = []
+                    this.formData['street'] = ''
+                    this.formData['shopName'] = ''
+                }
             },
+
+            searchMachineAddress (params) {
+                console.log(params)
+                axios.get('machine_instance_detail_sn', {
+                    params: {
+                        machineSn : params.machineSn
+                    }
+                }).then(params => {
+                    if (params.data.state === 200) {
+                        let _arr_ = [];
+                        if (TextToCode[params.data.data.clientProvince]) {
+                            dsCode()
+                        } else if(TextToCode[params.data.data.clientProvince+ '省']){
+                            dsCode('省')
+                        } else if(TextToCode[params.data.data.clientProvince+ '市']){
+                            dsCode('市')
+                        } else if(TextToCode[params.data.data.clientProvince+ '壮族自治区']){
+                            dsCode('壮族自治区')
+                        } else if(TextToCode[params.data.data.clientProvince+ '自治区']){
+                            dsCode('自治区')
+                        } else if(TextToCode[params.data.data.clientProvince+ '维吾尔自治区']){
+                            dsCode('维吾尔自治区')
+                        } else if(TextToCode[params.data.data.clientProvince+ '回族自治区']){
+                            dsCode('回族自治区')
+                        } else if(TextToCode[params.data.data.clientProvince+ '特别自治区']){
+                            dsCode('特别自治区')
+                        } else {
+                            this.IError('客户省市区地址识别异常，请手动填入')
+                        }
+                        function dsCode (param){
+                            _arr_.push(TextToCode[params.data.data.clientProvince + param].code)
+                            _arr_.push(TextToCode[params.data.data.clientProvince + param][params.data.data.clientDistrict == -1 ? '市辖区' : params.data.data.clientCity + '市'].code)
+                            _arr_.push(TextToCode[params.data.data.clientProvince + param][params.data.data.clientDistrict == -1 ? '市辖区' : params.data.data.clientCity + '市'][params.data.data.clientDistrict == -1 ? params.data.data.clientCity : params.data.data.clientDistrict].code);
+                        }
+                        this.$nextTick(function () {
+                            this.formData['province'] = _arr_
+                            this.formData['street'] = params.data.data.clientAddress != -1 ?params.data.data.clientAddress : ''
+                            this.formData['shopName'] = params.data.data.clientName != -1 ?params.data.data.clientName : ''
+                        })
+                    }
+                }).catch((error) => {
+                    this.IError(error);
+                });
+            },
+
             getRowKey (row) {
-                return row.machineId
+                return row.machineInstanceId
             },
-            // 故障登记 -- 查询设备
+            // 故障登记 -- 查询实例设备
             searchMachine(){
                 let data = {
                     page: this.formPage,
                     pageSize: 5
                 }
                 this.formData.search ? data['machineName'] = this.formData.search : null;
-                axios.post('sys_machine_list', qs.stringify(data)).then(params => {
+                axios.post('sys_machine_instance_list', qs.stringify(data)).then(params => {
                     this.formDataTableData = []
                     if (params.data.state == 200) {
                         this.formDataTableData = params.data.page.records
                         this.$nextTick(function () {
+                            return false
                             if (this.formData.machineIds) {  // 是编辑 存在
                                 // this.$refs.singleTable.clearSelection();  // 清除
                                 this.formDataTableData.forEach((element, index) => {
@@ -1314,6 +1366,48 @@ window.addEventListener('pageshow', function (params) {
                         this.data.feedbackDiagram = params.data.data.feedbackDiagram.split(',')
                     }
                     this.formData.search = params.data.data.machineName // 预期搜索
+                    
+                    // ###### Fri Dec 25 16:09:10 CST 2020
+                    this.formData['machineInstanceId'] = params.data.data.machineId
+                    // this.searchMachineAddress(this.formData)
+
+                    let _arr_ = [];
+                        if (TextToCode[params.data.data.province]) {
+                            dsCode()
+                        } else if(TextToCode[params.data.data.province+ '省']){
+                            dsCode('省')
+                        } else if(TextToCode[params.data.data.province+ '市']){
+                            dsCode('市')
+                        } else if(TextToCode[params.data.data.province+ '壮族自治区']){
+                            dsCode('壮族自治区')
+                        } else if(TextToCode[params.data.data.province+ '自治区']){
+                            dsCode('自治区')
+                        } else if(TextToCode[params.data.data.province+ '维吾尔自治区']){
+                            dsCode('维吾尔自治区')
+                        } else if(TextToCode[params.data.data.province+ '回族自治区']){
+                            dsCode('回族自治区')
+                        } else if(TextToCode[params.data.data.province+ '特别自治区']){
+                            dsCode('特别自治区')
+                        } else {
+                            this.IError('客户省市区地址识别异常，请手动填入')
+                        }
+                        function dsCode (param){
+                            param ? params.data.data.province = params.data.data.province + param: null
+                            
+                            if (params.data.data.district != -1) {
+                                params.data.data.city = /市/.test(params.data.data.city) ? params.data.data.city : params.data.data.city + '市'
+                            }
+                            
+                            _arr_.push(TextToCode[params.data.data.province].code)
+                            _arr_.push(TextToCode[params.data.data.province][params.data.data.district == -1 ? '市辖区' : params.data.data.city].code)
+                            _arr_.push(TextToCode[params.data.data.province][params.data.data.district == -1 ? '市辖区' : params.data.data.city][params.data.data.district == -1 ? params.data.data.city : params.data.data.district].code);
+                        }
+                        this.$nextTick(function () {
+                            this.formData['province'] = _arr_
+                            this.formData['street'] = params.data.data.street != -1 ?params.data.data.street : ''
+                            this.formData['shopName'] = params.data.data.shopName != -1 ?params.data.data.shopName : ''
+                        })
+
                     // this.searchMachine()
                 }).catch((error) => {
                     this.IError(error);
@@ -1329,12 +1423,19 @@ window.addEventListener('pageshow', function (params) {
                     return false
                 }
                 this.data.feedbackDiagram ? this.formData['feedbackDiagram'] = this.data.feedbackDiagram.toString().replace(/\[|\]/g, '') : ''
-                this.formData.machineIds = this.formData.machineId.toString().replace(/\[|\]/g, '')
+                this.formData.machineInstanceIds = this.formData.machineId.toString().replace(/\[|\]/g, '')
                 if (this.formData.id) {
-                    this.formData.machineId = this.formData.machineId.toString().replace(/\[|\]/g, '')
+                    // this.formData.machineInstanceId = this.formData.machineId.toString().replace(/\[|\]/g, '')
+                    delete this.formData.machineInstanceIds
                 }
                 if(this.formData.submitWorkTime) {
                     this.formData.submitWorkTime = ym.init.getDateTime(this.formData.submitWorkTime)
+                }
+                if (this.formData['province'].length > 0) {
+                    this.formData['catchData'] = this.formData['province'] // 
+                    this.formData['city'] = CodeToText[this.formData['province'][1]] || '';
+                    this.formData['district'] = CodeToText[this.formData['province'][2]] || '';
+                    this.formData['province'] = CodeToText[this.formData['province'][0]] || '';
                 }
                 axios.post(this.formData.id ? 'fault_registration_updated':'fault_registration_saved', qs.stringify(this.formData)).then(params => {
                     if (params.data.state != 200){
@@ -1343,10 +1444,11 @@ window.addEventListener('pageshow', function (params) {
                     }
                     this.ISuccessfull(params.data.msg)
                     this.UpdateTableAndVisible = false;
-                    this.formData = {}
                     this.list()
+                    this.formData = {}
                 }).catch((error) => {
                     this.formData.machineId = []
+                    this.formData['province'] = this.formData['catchData']
                     this.IError(error);
                 });
             },
@@ -1426,7 +1528,27 @@ window.addEventListener('pageshow', function (params) {
                         this.IError(error);
                     });
                 }).catch(() => {});
-            }
+            },
+
+            formExecSceneSuccess(file) {
+                if (file.state == 200) {
+                    if (file.data != -1) {
+                        this.errorExe = true;
+                        this.fileList = [];
+                        this.$nextTick(function () {
+                            document.getElementById('ahrefDownload').onclick = function () {
+                                parent.window.open(file.data, '_blank');
+                            };
+                        });
+                        return false;
+                    }
+                    this.ISuccessfull('上传成功！');
+                    this.list();
+                } else {
+                    this.fileList = [];
+                    this.IError(file.msg);
+                }
+            },
 
 
         }

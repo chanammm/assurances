@@ -17,7 +17,7 @@ axios.interceptors.request.use(
 		// 在发送请求之前做什么
 		if (config.method === "post") {
 			// 序列化
-			config.data = decodeURIComponent(config.data).replace(/无/g, '-1');
+			// config.data = decodeURIComponent(config.data).replace(/无/g, '-1');
 			// config.data = qs.stringify(config.data);
 			// config.data = JSON.stringify(config.data);
 			// 温馨提示,若是贵公司的提交能直接接受json 格式,可以不用 qs 来序列化的

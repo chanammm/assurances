@@ -22,7 +22,7 @@
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {machineId: [],title: '新增故障登记'}; imageList = {}; searchMachine();$refs.singleTable.clearSelection();"
+                            <el-button @click="UpdateTableAndVisible = true; formData = {machineId: [],title: '新增故障登记',province:[],street: '',shopName: ''}; imageList = {}; searchMachine();$refs.singleTable.clearSelection();"
                                 type="primary">新增<i class="el-icon-plus el-icon--right"></i></el-button>
                             <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入</el-button>
                             <el-button @click="UpdateVisible = true; formData = {}; imageList = {}" type="primary">导出EXCEL</el-button>
@@ -32,9 +32,9 @@
                         <el-input placeholder="请输入内容" v-model="listSearch._value_" class="_searchVal">
                             <el-select v-model="listSearch._name_" class="_searchVal_select" slot="prepend"
                                 placeholder="请选择">
+                                <el-option label="机器SN" value="machineSn"></el-option>
                                 <el-option label="机器编码" value="machineCode"></el-option>
                                 <el-option label="机器名称" value="machineName"></el-option>
-                                <el-option label="机器类型" value="machineType"></el-option>
                                 <el-option label="工单号" value="workId"></el-option>
                             </el-select>
                         </el-input>
@@ -60,39 +60,50 @@
                         <el-table :data="tableData" stripe style="width: 100%" border>
                             <el-table-column type="expand">
                                 <template slot-scope="props">
-                                  <el-form label-position="left" class="demo-table-expand">
-                                    <el-form-item label="机器名称：">
+                                    <div style="font-size: 14px;line-height: 30px;">
+                                        <span>机器名称：</span>
                                         <span>{{ props.row.machineName }}</span>
-                                      </el-form-item>
-                                    <el-form-item label="工单号：">
-                                      <span>{{ props.row.workId != -1 ? props.row.workId : '-' }}</span>
-                                    </el-form-item>
-                                    <el-form-item label="故障描述：">
-                                      <span>{{ props.row.feedbackDesc }}</span>
-                                    </el-form-item>
-                                    <el-form-item label="备注：">
-                                      <span>{{ props.row.founder ? props.row.founder : '-' }}</span>
-                                    </el-form-item>
-                                    <el-form-item label="报单时间：">
-                                      <span>{{ props.row.submitWorkTime ? props.row.submitWorkTime : '-' }}</span>
-                                    </el-form-item>
-                                  </el-form>
+                                    </div>
+                                    <div style="font-size: 14px;line-height: 30px;">
+                                        <span>故障描述：</span>
+                                        <span>{{ props.row.feedbackDesc }}</span>
+                                    </div>
+                                    <div style="font-size: 14px;line-height: 30px;">
+                                        <span>备注：</span>
+                                        <span>{{ props.row.founder ? props.row.founder : '-' }}</span>
+                                    </div>
+                                    <div style="font-size: 14px;line-height: 30px;">
+                                        <span>工单号：</span>
+                                        <span>{{ props.row.workId != -1 ? props.row.workId : '-' }}</span>
+                                    </div>
+                                    <div style="font-size: 14px;line-height: 30px;">
+                                        <span>报单时间：</span>
+                                        <span>{{ props.row.submitWorkTime ? props.row.submitWorkTime : '-' }}</span>
+                                    </div>
+                                    <div style="font-size: 14px;line-height: 30px;">
+                                        <span>质保到期时间：</span>
+                                        <span>{{ props.row.expireTime ? props.row.expireTime : '-' }}</span>
+                                    </div>
                                 </template>
                             </el-table-column>
+                            <el-table-column prop="machineSn" label="机器SN"></el-table-column>
                             <el-table-column prop="machineName" label="机器名称" :show-overflow-tooltip="true"></el-table-column>
-                            <el-table-column prop="machineCode" label="物料编号"></el-table-column>
+                            <el-table-column prop="maintainStatus" label="质保期">
+                                <template slot-scope="scope">
+                                    {{ scope.row.maintainStatus == 1 ? '有效' : '失效'}}
+                                </template>
+                            </el-table-column>
                             <el-table-column prop="isSubmitWork" label="报单">
                                 <template slot-scope="scope">
                                     {{ scope.row.isSubmitWork == 1 ? '是' : '否'}}
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="machineType" label="机器类型"></el-table-column>
+                            <el-table-column prop="shopName" label="门店"></el-table-column>
                             <el-table-column prop="state" label="状态">
                                 <template slot-scope="scope">
                                     <div :style="scope.row.state == 0 ? 'color: red': 'color: green'">{{ scope.row.state == 0 ? '撤销': '正常'}}</div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="feedbackDesc" label="故障描述" :show-overflow-tooltip="true"></el-table-column>
 
                             <el-table-column fixed="right" label="操作">
                                 <template slot-scope="scope">
@@ -113,14 +124,15 @@
                     </el-pagination>
 
 
-                    <el-dialog :title="formData.title" :visible.sync="UpdateTableAndVisible" width="90%">
+                    <el-dialog :title="formData.title" :visible.sync="UpdateTableAndVisible" width="70%">
                         <el-form :model="formData" id="machine">
                             <el-form-item label="选择设备 * ：">
                                 <div v-if="formData.id">
-                                    <span style="color: #409eff;">当前机器（已选择的机器不允许修改）：{{ formData.machineName }}, 编号：{{ formData.machineCode }}</span>
+                                    <div style="color: #409eff;">当前机器（已选择的机器不允许修改）：{{ formData.machineName }}, 编号：{{ formData.machineCode }}</div>
+                                    
                                     <div style="float: right">
                                         <el-button type="primary" size="small" @click="dialogVisible = true; formData.workId == -1 ? formData.workId = '' : ''">填写工单</el-button>
-                                        <el-button type="primary" size="small" @click="TableAndVisible = true;formData.returnVisit == -1 ? formData.returnVisit = '' : ''"">填写回访记录</el-button>
+                                        <el-button type="primary" size="small" @click="TableAndVisible = true;formData.returnVisit == -1 ? formData.returnVisit = '' : ''">填写回访记录</el-button>
                                     </div>
                                 </div>
                                 <div v-if="!formData.id">
@@ -145,12 +157,12 @@
                                         label="编号">
                                         </el-table-column>
                                         <el-table-column
-                                        property="colourScheme"
-                                        label="颜色">
+                                        property="machineSn"
+                                        label="SN号">
                                         </el-table-column>
                                         <el-table-column
-                                        property="machineParameter"
-                                        label="规格">
+                                        property="machineType"
+                                        label="类型">
                                         </el-table-column>
                                         <el-table-column align="right">
                                             <template slot="header" slot-scope="scope">
@@ -212,6 +224,18 @@
                                 </el-form-item>
                             </div>
 
+                            
+                            <el-form-item label="门店名称：">
+                                <el-input v-model="formData.shopName"></el-input>
+                            </el-form-item>
+                            <el-form-item label="省/市/区：">
+                                <el-cascader size="large" :options="address" v-model="formData.province" @change="handleChange">
+                                </el-cascader>
+                            </el-form-item>
+                            <el-form-item label="详细地址：">
+                                <el-input v-model="formData.street"></el-input>
+                            </el-form-item>
+
                             <el-form-item label="反馈图片：">
                                 <template>
                                     <el-upload ref="uploads" prop="feedbackDiagram" :action="fileUpdata" list-type="picture-card"
@@ -247,7 +271,7 @@
                                         ref="uploadXlsx"
                                         accept=".xlsx"
                                         :action="formFileUpdataExc" :headers="fileUpdataExcData"
-                                        :on-success="ExecSceneSuccess" :on-exceed="exeLength" multiple>
+                                        :on-success="formExecSceneSuccess" :on-exceed="exeLength" multiple>
                                         <i class="el-icon-upload"></i>
                                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em>，系统会自动处理数据</div>
                                     </el-upload>
@@ -338,6 +362,9 @@
         .el-table__body tr.current-row > td{
             background-color: #6ab3f7 !important;
             color: white !important;
+        }
+        .el-form-item__label{
+            float: none !important;
         }
     </style>
 </body>
