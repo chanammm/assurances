@@ -53,7 +53,7 @@ axios.interceptors.response.use(
 			if(response.config.url == "sys_machine_instance_detail" || response.config.url == "sys_machine_detail" || response.config.url == "repairs_detail"){
 				Object.keys(response.data.data).forEach((element, index) => {
 					if(Object.values(response.data.data)[index] == -1){
-						response.data.data[element] = '无';
+						response.data.data[element] = '';
 					}else{
 						response.data.data[element] = Object.values(response.data.data)[index];
 					}

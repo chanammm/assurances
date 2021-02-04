@@ -22,7 +22,7 @@
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {}; imageList = {}"
+                            <el-button @click="addMoust"
                                 type="primary">新增<i class="el-icon-plus el-icon--right"></i></el-button>
                             <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入物料信息
                             </el-button>
@@ -139,7 +139,7 @@
 
                             <el-form-item label="机器图片">
                                 <template>
-                                    <el-upload prop="machinePic" :action="fileUpdata" list-type="picture-card"
+                                    <el-upload ref="upload" prop="machinePic" :action="fileUpdata" list-type="picture-card"
                                         :file-list="imageList.machinePic" :on-change="fileChange"
                                         :on-success="machineSceneSuccess" :limit="num" :on-exceed="fileExceed"
                                         :on-preview="handlePictureCardPreview" :on-remove="handleRemove">

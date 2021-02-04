@@ -230,7 +230,11 @@ window.addEventListener('pageshow', function (params) {
                 formPageSize: 5,
                 formTotal: 0,
                 formPage: 1,
-                formDataTableData: []
+                formPageSizes: 5,
+                formTotals: 0,
+                formPages: 1,
+                formDataTableData: [],
+                formDataTableDatas: []
             }
         },
         created: function () {
@@ -601,6 +605,16 @@ window.addEventListener('pageshow', function (params) {
                     })
             },
 
+            // ###### Thu Jan 28 14:41:34 CST 2021
+            addMoust () {
+                this.UpdateTableAndVisible = true;
+                this.formData = {};
+                this.imageList.machinePics = [];
+                this.data = {};
+                this.$refs.upload.clearFiles();
+            },
+            // ###### Thu Jan 28 14:41:34 CST 2021
+            
             //查看实例设备详细
             machineDest(params, timer = null) {
                 this.SearchTableFormData = {};
@@ -654,7 +668,7 @@ window.addEventListener('pageshow', function (params) {
                         is.imageList.machinePics = [];
                         is.data['machinePic'] = res.data.data.machinePic;
                         // is.imageList.machinePic.push(res.data.machinePic);
-                        is.imageList.machinePics.push({ name: 'machinePics', url: res.data.data.machinePic });
+                        res.data.data.machinePic ? is.imageList.machinePics.push({ name: 'machinePics', url: res.data.data.machinePic }): null;
                         is.SearchTableFormDatas = res.data.data;
                         // console.log(is.SearchTableFormData.machinePic)
                     } else {
@@ -1063,14 +1077,29 @@ window.addEventListener('pageshow', function (params) {
                 } catch (error) {
                     console.info(error)
                 }
-                axios.post('update_machine_instance', qs.stringify(params)).then(params => {
-                    if (params.data.state == 200) {
-                        is.ISuccessfull(params.data.msg);
+                if (!params.clientName) params.clientName = -1;
+                if (!params.clientPhone) params.clientPhone = -1;
+                if (!params.maintainerName) params.maintainerName = -1;
+                if (!params.maintainerPhone) params.maintainerPhone = -1;
+                if (!params.clientProvince) params.clientProvince = -1;
+                if (!params.clientCity) params.clientCity = -1;
+                if (!params.clientDistrict) params.clientDistrict = -1;
+                if (!params.clientAddress) params.clientAddress = -1;
+                if (!params.clientId) params.clientId = -1;
+                if (!params.dealer) params.dealer = -1;
+                if (!params.dealerPhone) params.dealerPhone = -1;
+
+                axios.post('update_machine_instance', qs.stringify(params)).then(param => {
+                    if (param.data.state == 200) {
+                        is.ISuccessfull(param.data.msg);
                         is.SearchTableAndVisible = false;
                         is.SearchTableFormData = {};
                         is.list();
                     } else {
-                        is.IError(params.data.msg);
+                        is.SearchTableFormData = {}
+                        is.machineDest(params.machineInstanceId);
+
+                        is.IError(param.data.msg);
                     }
                 })
                     .catch(function (error) {
@@ -1228,6 +1257,22 @@ window.addEventListener('pageshow', function (params) {
                 }
             },
 
+            // ###### Wed Dec 23 14:31:42 CST 2020
+            // 故障登记 -- 选择物料
+            formDataHandleCurrentChanges (params){
+                this.formData['machineIdCoding'] = []
+                params.forEach((element, index) => {
+                    this.formData['machineIdCoding'].push(element.machineId)
+                })
+                if (params.length == 1) {
+                    this.searchMachineAddress(params[0])
+                } else {
+                    this.formData['province'] = []
+                    this.formData['street'] = ''
+                    this.formData['shopName'] = ''
+                }
+            },
+
             searchMachineAddress (params) {
                 console.log(params)
                 axios.get('machine_instance_detail_sn', {
@@ -1254,7 +1299,7 @@ window.addEventListener('pageshow', function (params) {
                         } else if(TextToCode[params.data.data.clientProvince+ '特别自治区']){
                             dsCode('特别自治区')
                         } else {
-                            this.IError('客户省市区地址识别异常，请手动填入')
+                            console.log('客户省市区地址识别异常，请手动填入')
                         }
                         function dsCode (param){
                             _arr_.push(TextToCode[params.data.data.clientProvince + param].code)
@@ -1275,18 +1320,66 @@ window.addEventListener('pageshow', function (params) {
             getRowKey (row) {
                 return row.machineInstanceId
             },
+            //  ###### Thu Feb 4 11:22:26 CST 2021
+            getRowKeys (row) {
+                return row.machineId
+            },
+            // 故障登记 -- 查询物料 sys_machine_list
+            searchMachineLists(){
+                let data = {
+                    page: this.formPages,
+                    pageSize: 5
+                }
+                this.formData.search ? data['coding'] = this.formData.search : null;
+                axios.post('sys_machine_list', qs.stringify(data)).then(params => {
+                    this.formDataTableDatas = []
+                    if (params.data.state == 200) {
+                        this.formDataTableDatas = params.data.page.records
+                        this.$nextTick(function () {
+                            return false
+                            if (this.formData.machineIds) {  // 是编辑 存在
+                                // this.$refs.singleTable.clearSelection();  // 清除
+                                this.formDataTableData.forEach((element, index) => {
+                                    this.formData.machineIds.toString().split(',').forEach((id, i) => {
+                                        if(id == element.machineId){
+                                            this.$refs.singleTable.toggleRowSelection(this.formDataTableData[index], true);
+                                        }else{
+                                            this.$refs.singleTable.toggleRowSelection(this.formDataTableData[index], false);
+                                        }
+                                    })
+                                })
+                            }
+                        })
+                        this.formTotals = params.data.page.total
+                    } else {
+                        params.data.state == 405 ? null : this.IError(params.data.msg);
+                    }
+                }).catch((error) => {
+                    this.IError(error);
+                });
+            },
+            // ###### Thu Feb 4 17:21:20 CST 2021
+            rowClick(params){
+                if(this.formData.machineSn == -1){
+                    this.formData['machineSn'] = params.machineSn
+                }
+            },
             // 故障登记 -- 查询实例设备
-            searchMachine(){
+            searchMachine(bool = false) {
                 let data = {
                     page: this.formPage,
                     pageSize: 5
                 }
-                this.formData.search ? data['machineName'] = this.formData.search : null;
+                if(this.formData._machineIdCoding){ // ###### Thu Feb 4 16:51:45 CST 2021
+                    data['coding'] = this.formData._machineIdCoding;
+                } else {
+                    this.formData.search ? data['machineSn'] = this.formData.search : null;
+                }
                 axios.post('sys_machine_instance_list', qs.stringify(data)).then(params => {
                     this.formDataTableData = []
                     if (params.data.state == 200) {
-                        this.formDataTableData = params.data.page.records
                         this.$nextTick(function () {
+                            this.formDataTableData = params.data.page.records
                             return false
                             if (this.formData.machineIds) {  // 是编辑 存在
                                 // this.$refs.singleTable.clearSelection();  // 清除
@@ -1308,6 +1401,11 @@ window.addEventListener('pageshow', function (params) {
                 }).catch((error) => {
                     this.IError(error);
                 });
+            },
+            // 故障登记 -- 物料分页 ###### Thu Feb 4 11:25:22 CST 2021
+            formHandleCurrentChanges(params){
+                this.formPages = params
+                this.searchMachineLists()
             },
             // 故障登记 -- 设备分页
             formHandleCurrentChange(params){
@@ -1389,7 +1487,7 @@ window.addEventListener('pageshow', function (params) {
                         } else if(TextToCode[params.data.data.province+ '特别自治区']){
                             dsCode('特别自治区')
                         } else {
-                            this.IError('客户省市区地址识别异常，请手动填入')
+                            console.log('客户省市区地址识别异常，请手动填入')
                         }
                         function dsCode (param){
                             param ? params.data.data.province = params.data.data.province + param: null
@@ -1408,6 +1506,12 @@ window.addEventListener('pageshow', function (params) {
                             this.formData['shopName'] = params.data.data.shopName != -1 ?params.data.data.shopName : ''
                         })
 
+                        if(params.data.data.machineSn == -1) { // ###### Thu Feb 4 16:47:30 CST 2021
+                            this.formData._faultSwitch = false;
+                            this.formData._machineIdCoding = params.data.data.machineCode
+                            this.searchMachine()
+                        }
+
                     // this.searchMachine()
                 }).catch((error) => {
                     this.IError(error);
@@ -1415,15 +1519,28 @@ window.addEventListener('pageshow', function (params) {
             },
             // 提交信息
             submitFormData () {
+                console.log(this.formData)
                 // if(this.formData.id){
                     // this.formData.machineId = [...new Set(this.formData.machineId.concat(parseInt(this.formData.machineIds.toString().split(','))))]
                 // }
-                if(this.formData.machineId.length < 1 || !this.formData.feedbackDesc) {
-                    this.IError('加 * 的为必填项，请填写完整')
-                    return false
+
+                // ###### Thu Feb 4 16:29:43 CST 2021
+                if (this.formData._faultSwitch) {// 无 sn 号
+                    if(this.formData.machineIdCoding.length < 1 || !this.formData.feedbackDesc) {
+                        this.IError('加 * 的为必填项，请填写完整')
+                        return false
+                    }
+                    this.formData.machineIds = this.formData.machineIdCoding.toString().replace(/\[|\]/g, '') 
+                } else {
+                    if(this.formData.machineId.length < 1 || !this.formData.feedbackDesc) {
+                        this.IError('加 * 的为必填项，请填写完整')
+                        return false
+                    }
+                    this.formData.machineInstanceIds = this.formData.machineId.toString().replace(/\[|\]/g, '')
                 }
+
                 this.data.feedbackDiagram ? this.formData['feedbackDiagram'] = this.data.feedbackDiagram.toString().replace(/\[|\]/g, '') : ''
-                this.formData.machineInstanceIds = this.formData.machineId.toString().replace(/\[|\]/g, '')
+                
                 if (this.formData.id) {
                     // this.formData.machineInstanceId = this.formData.machineId.toString().replace(/\[|\]/g, '')
                     delete this.formData.machineInstanceIds

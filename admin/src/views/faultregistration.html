@@ -22,7 +22,7 @@
                 <el-main>
                     <el-form>
                         <div style="margin-bottom:10px;">
-                            <el-button @click="UpdateTableAndVisible = true; formData = {machineId: [],title: '新增故障登记',province:[],street: '',shopName: ''}; imageList = {}; searchMachine();$refs.singleTable.clearSelection();"
+                            <el-button @click="UpdateTableAndVisible = true; formData = {machineId: [],title: '新增故障登记',province:[],street: '',shopName: ''}; imageList = {}; searchMachineLists(); searchMachine();$refs.singleTable.clearSelection();"
                                 type="primary">新增<i class="el-icon-plus el-icon--right"></i></el-button>
                             <el-button @click="detailTableAndVisible = true; formData = {}" type="primary">导入</el-button>
                             <el-button @click="UpdateVisible = true; formData = {}; imageList = {}" type="primary">导出EXCEL</el-button>
@@ -86,11 +86,21 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="machineSn" label="机器SN"></el-table-column>
+                            <el-table-column prop="machineSn" label="机器SN">
+                                <template slot-scope="scope">
+                                    {{ scope.row.machineSn == -1 ? '-' : scope.row.machineSn}}
+                                </template>
+                            </el-table-column>
                             <el-table-column prop="machineName" label="机器名称" :show-overflow-tooltip="true"></el-table-column>
                             <el-table-column prop="maintainStatus" label="质保期">
                                 <template slot-scope="scope">
-                                    {{ scope.row.maintainStatus == 1 ? '有效' : '失效'}}
+                                    {{ scope.row.maintainStatus == 1 ? '有效' : scope.row.maintainStatus == -1 ? '未知' : '失效'}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="isGuaranteed" label="质保期内提交">
+                                <template slot-scope="scope">
+                                    {{ scope.row.isGuaranteed == 1 ? '是' : scope.row.isGuaranteed == -1 ? '未知' : '否'}}
+                                    <!-- 0-否,1-是,-1-未知 -->
                                 </template>
                             </el-table-column>
                             <el-table-column prop="isSubmitWork" label="报单">
@@ -98,7 +108,11 @@
                                     {{ scope.row.isSubmitWork == 1 ? '是' : '否'}}
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="shopName" label="门店"></el-table-column>
+                            <el-table-column prop="shopName" label="门店">
+                                <template slot-scope="scope">
+                                    {{ scope.row.shopName == -1 ? '-' : scope.row.shopName}}
+                                </template>
+                            </el-table-column>
                             <el-table-column prop="state" label="状态">
                                 <template slot-scope="scope">
                                     <div :style="scope.row.state == 0 ? 'color: red': 'color: green'">{{ scope.row.state == 0 ? '撤销': '正常'}}</div>
@@ -126,21 +140,31 @@
 
                     <el-dialog :title="formData.title" :visible.sync="UpdateTableAndVisible" width="70%">
                         <el-form :model="formData" id="machine">
-                            <el-form-item label="选择设备 * ：">
+                            <el-form-item label="获取设备SN号：" v-if="!formData.id">
+                                <el-switch
+                                    v-model="formData._faultSwitch"
+                                    active-text="无设备SN号"
+                                    inactive-text="有设备SN号">
+                                </el-switch>
+                            </el-form-item>
+                            <el-form-item label="选择设备(最少选择一项)：">
                                 <div v-if="formData.id">
-                                    <div style="color: #409eff;">当前机器（已选择的机器不允许修改）：{{ formData.machineName }}, 编号：{{ formData.machineCode }}</div>
+                                    <div style="color: #409eff;" v-if="formData.machineSn != -1">当前机器（已选择的机器不允许修改）：{{ formData.machineName }}, 编号：{{ formData.machineCode }}</div>
+                                    <div style="color: #409eff;" v-if="formData.machineSn == -1">当前选择的是物料：{{ formData.machineName }}, 编号：{{ formData.machineCode }}，下面是当前物料下的SN设备，单击列选择设备SN绑定</div>
                                     
                                     <div style="float: right">
                                         <el-button type="primary" size="small" @click="dialogVisible = true; formData.workId == -1 ? formData.workId = '' : ''">填写工单</el-button>
-                                        <el-button type="primary" size="small" @click="TableAndVisible = true;formData.returnVisit == -1 ? formData.returnVisit = '' : ''">填写回访记录</el-button>
+                                        <el-button type="primary" size="small" @click="TableAndVisible = true;formData.returnVisit == -1 ? formData.returnVisit = '' : ''">填写处理方案及结果</el-button>
                                     </div>
                                 </div>
-                                <div v-if="!formData.id">
+
+                                <div v-if="!formData._faultSwitch">
                                     <el-table
                                         ref="singleTable"
                                         :data="formDataTableData"
                                         highlight-current-row
                                         @selection-change="formDataHandleCurrentChange"
+                                        @row-click="rowClick"
                                         :row-key="getRowKey"
                                         style="width: 100%">
                                         <el-table-column v-if="!formData.id"
@@ -172,7 +196,7 @@
                                                     <el-option label="机器名称" value="machineName"></el-option>
                                                     <el-option label="机器类型" value="machineType"></el-option>
                                                 </el-select> -->
-                                                <el-input size="mini" v-model="formData.search" @input="formPage = 1; searchMachine()" v-if="!formData.id" placeholder="输入设备名称搜索"/>
+                                                <el-input size="mini" v-model="formData.search" @input="formPage = 1; searchMachine()" v-if="!formData.id" placeholder="设备Sn搜索"/>
                                             </template>
                                             -
                                         </el-table-column>
@@ -182,9 +206,52 @@
                                         layout="total, prev, pager, next" :total="formTotal">
                                     </el-pagination>
                                 </div>
+
+                                <div v-if="formData._faultSwitch">
+                                    <el-table
+                                        ref="singleTables"
+                                        :data="formDataTableDatas"
+                                        highlight-current-row
+                                        @selection-change="formDataHandleCurrentChanges"
+                                        :row-key="getRowKeys"
+                                        style="width: 100%">
+                                        <el-table-column 
+                                        type="selection"
+                                        :reserve-selection="true"
+                                        width="55">
+                                    </el-table-column>
+                                        <el-table-column
+                                        property="machineName"
+                                        label="名称">
+                                        </el-table-column>
+                                        <el-table-column
+                                        property="coding"
+                                        label="编号">
+                                        </el-table-column>
+                                        <el-table-column
+                                        property="machineParameter"
+                                        label="规格">
+                                        </el-table-column>
+                                        <el-table-column
+                                        property="machineType"
+                                        label="类型">
+                                        </el-table-column>
+                                        <el-table-column align="right">
+                                            <template slot="header" slot-scope="scope">
+                                                <el-input size="mini" v-model="formData.search" @input="formPages = 1; searchMachineLists()" v-if="!formData.id" placeholder="物料编码搜索"/>
+                                            </template>
+                                            -
+                                        </el-table-column>
+                                    </el-table>
+                                    <el-pagination v-if="formDataTableDatas.length > 0" @current-change="formHandleCurrentChanges"
+                                        :current-page="formPages"  :page-size="formPageSizes"
+                                        layout="total, prev, pager, next" :total="formTotals">
+                                    </el-pagination>
+                                </div>
+
                             </el-form-item>
 
-                            <el-form-item label="反馈描述 * ：">
+                            <el-form-item label="反馈描述(必填)：">
                                 <el-input v-model="formData.feedbackDesc" type="textarea"></el-input>
                             </el-form-item>
 
@@ -205,7 +272,7 @@
                                         :picker-options="pickerOptionsDay">
                                     </el-date-picker>
                                 </el-form-item>
-                                <el-form-item label="回访记录：">
+                                <el-form-item label="处理方案及结果：">
                                     <el-input v-model="formData.returnVisit" type="textarea"></el-input>
                                 </el-form-item>
                             </div>
@@ -217,7 +284,7 @@
                                     </div>
                                 </el-form-item>
     
-                                <el-form-item label="回访记录：">
+                                <el-form-item label="处理方案及结果：">
                                     <div>
                                         {{formData.returnVisit != -1 ? formData.returnVisit : '-'}}
                                     </div>
@@ -344,9 +411,9 @@
                         </el-form>
                     </el-dialog>
 
-                    <el-dialog title="填写回访记录" :visible.sync="TableAndVisible">
+                    <el-dialog title="填写处理方案及结果" :visible.sync="TableAndVisible">
                         <el-form :model="formData">
-                            <el-form-item label="回访记录 ：">
+                            <el-form-item label="处理方案及结果 ：">
                                 <el-input v-model="formData.returnVisit" type="textarea"></el-input>
                             </el-form-item>
                             <div class="btn-center" style="text-align: center; margin: 20px;">

@@ -104,23 +104,23 @@ new Vue({
             this.maxWidth = true;
         }
         // setInterval(() => {
-            axios.post("sys_machine_instance_list", qs.stringify({
-                page: 1,
-                pageSize: 20
-            })).then(params => {
-                if (params.data.state == 200) {
-                    params.data.page.records.forEach(element => {
-                        if (element.status == 1) {
-                            this.$notify({
-                                title: '订单提醒',
-                                message: '当前有订单未处理',
-                                position: 'bottom-right'
-                            });
-                            document.querySelector('audio').play();
-                        }
-                    })
-                }
-            })
+            // axios.post("sys_machine_instance_list", qs.stringify({
+            //     page: 1,
+            //     pageSize: 20
+            // })).then(params => {
+            //     if (params.data.state == 200) {
+            //         params.data.page.records.forEach(element => {
+            //             if (element.status == 1) {
+            //                 this.$notify({
+            //                     title: '订单提醒',
+            //                     message: '当前有订单未处理',
+            //                     position: 'bottom-right'
+            //                 });
+            //                 document.querySelector('audio').play();
+            //             }
+            //         })
+            //     }
+            // })
         // }, 8000)
     },
     methods: {
