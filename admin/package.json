@@ -28,7 +28,7 @@
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "pug": "^2.0.4",
     "pug-html-loader": "^1.1.5",
-    "qs": "^6.9.1",
+    "qs": "^6.9.7",
     "style-loader": "^0.23.1",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "url-loader": "^1.1.2",
